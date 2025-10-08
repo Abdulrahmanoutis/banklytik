@@ -15,4 +15,4 @@ staticfiles/
 # IDE and system
 .vscode/
 .DS_Store
-*.log
+*.log.env

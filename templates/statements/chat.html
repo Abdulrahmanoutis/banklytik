@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Ask a Question About: {{ statement.title }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="question" placeholder="e.g. How much did I spend on POS?" size="60" required>
+    <button type="submit">Ask</button>
+</form>
+
+<br>
+
+{% if answer %}
+  <h3>📊 Result:</h3>
+  <p><strong>{{ answer }}</strong></p>
+{% endif %}
+
+
+{% if code %}
+  <hr>
+  <h4>🧠 Generated Pandas Code:</h4>
+  <pre><code class="language-python">{{ code|escape }}</code></pre>
+{% endif %}
+<br>
+
+{% if is_plot %}
+  <div id="plotly-chart">{{ answer|safe }}</div>
+{% else %}
+  <p><strong>{{ answer }}</strong></p>
+{% endif %}
+
+<br>
+
+<a href="{% url 'statements:history' statement.pk %}">🕘 View Chat History</a>
+
+<p><a href="{% url 'statements:detail' statement.pk %}">← Back to Transactions</a></p>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{
+  "transaction_table_pages": [1, 2],
+  "tables": [
+    {
+      "page": 1,
+      "original_header": ["Date/Time", "Money In", "Money out", "Category", "To / From", "Description", "Balance"],
+      "column_mapping": {
+        "Date/Time": "date",
+        "Money In": "credit",
+        "Money out": "debit",
+        "Category": "other",
+        "To / From": "description",
+        "Description": "description",
+        "Balance": "balance"
+      }
+    },
+    {
+      "page": 2,
+      "original_header": ["Date/Time", "Money In", "Money out", "Category", "To / From", "Description", "Balance"],
+      "column_mapping": {
+        "Date/Time": "date",
+        "Money In": "credit",
+        "Money out": "debit",
+        "Category": "other",
+        "To / From": "description",
+        "Description": "description",
+        "Balance": "balance"
+      }
+    }
+  ],
+  "reasoning_summary": "Both pages contain transaction tables with identical headers showing date, amounts, description fields, and balance columns."
+}

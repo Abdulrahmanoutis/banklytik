@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Welcome to BankLytik</h2>
+  <p>This is your AI-powered bank statement analyzer.</p>
+  {% if user.is_authenticated %}
+    <p><a href="{% url 'statements:upload' %}">Upload a Bank Statement</a></p>
+  {% else %}
+    <p><a href="{% url 'login' %}">Login</a> to get started.</p>
+  {% endif %}
+{% endblock %}

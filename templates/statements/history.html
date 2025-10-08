@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Chat History for: {{ statement.title }}</h2>
+<a href="{% url 'statements:chat' statement.pk %}">← Back to Chat</a>
+
+{% if chats %}
+  <ul>
+    {% for chat in chats %}
+      <li style="margin-bottom: 2rem; border-bottom: 1px solid #ddd; padding-bottom: 1rem;">
+        <strong>Question:</strong> {{ chat.question }} <br>
+        <strong>Code:</strong> <pre style="background:#f5f5f5;">{{ chat.code }}</pre>
+        <strong>Result:</strong> <pre style="background:#eaf5ea;">{{ chat.result }}</pre>
+        <small><em>{{ chat.created_at }}</em></small>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No history yet for this statement.</p>
+{% endif %}
+{% endblock %}

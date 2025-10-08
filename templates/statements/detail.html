@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Transactions for {{ statement.title }}</h2>
+
+<!-- 🔄 Reprocess Button -->
+<p>
+  <a href="{% url 'statements:reprocess' statement.pk %}" class="btn btn-warning">
+    🔄 Reprocess Statement
+  </a>
+</p>
+
+<table border="1" cellpadding="8">
+ <thead>
+  <tr>
+    <th>Date</th>
+    <th>Description</th>
+    <th>Debit</th>
+    <th>Credit</th>
+    <th>Balance</th>
+    <th>Channel</th>  
+    <th>Reference</th> 
+  </tr>
+ </thead>
+ <tbody>
+  {% for tx in transactions %}
+  <tr>
+    <td>{{ tx.date }}</td>
+    <td>{{ tx.description }}</td>
+    <td>{{ tx.debit|floatformat:2 }}</td>
+    <td>{{ tx.credit|floatformat:2 }}</td>
+    <td>{{ tx.balance|floatformat:2 }}</td>
+    <td>{{ tx.channel }}</td>
+    <td>{{ tx.transaction_reference }}</td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="7">No transactions found.</td></tr>
+  {% endfor %}
+ </tbody>
+</table>
+
+<p>
+
+</p>
+
+<p><a href="{% url 'statements:list' %}">← Back to list</a></p>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Uploaded Statements</h2>
+<p><a href="{% url 'statements:upload' %}">Upload New</a></p>
+
+<ul>
+  {% for stmt in statements %}
+    <li>
+      {{ stmt.uploaded_at|date:"Y-m-d H:i" }} – {{ stmt.title }}
+      {% if stmt.processed %}
+        [<a href="{% url 'statements:detail' stmt.pk %}">View</a>]
+      {% endif %}
+    </li>
+  {% empty %}
+    <li>No statements yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,18 @@
+Below is a compact JSON payload summarizing representative pages from a bank statement.
+
+Payload:
+
+{
+  "pages": [
+    {
+      "page_number": 1,
+      "content": "K kuda.\nStatement\nAccount\nDate\nILAH, KAMILU ABDULRAHMAN\n2013716080\n07/10/2024 - - 07/10/2025\n167 SHAIBU KAZAURE\nSTREET, KANO, KANO\nOpening Balance\nClosing Balance\n₦100.00\n₦5,100.00\nSummary\nMoney in\nMoney out\n₦10,100.00\n₦5,100.00\nDate/Time\nMoney In\nMoney out\nCategory\nTo / From\nDescription\nBalance\n14/05/25\n₦100.00\nairtime\nairtime purchase\n₦0.00\n23:08:23\n2347049794301\n30/05/25\ninward\nAbdulrahman Kamilu\nkip:opay/abdulrahman\n18:41:52\n₦1,000.00\nkamilu/transfer from\ntransfer\n₦1,000.00\nIlah/9029189750/Paycom(Opay)\nabdulrah\n30/05/25\n₦1,000.00\nbills\nkedco prepaid\n₦0.00\n18:42:23\npurchase\ntransfer from\n12/08/25\ninward\nAbdulrahman Kamilu\n09:37:28\n₦1,000.00\nabdulrahman kamilu\ntransfer\n₦1,000.00\nIlah/9029189750/Paycom(Opay)\nilah\n12/08/25\n₦1,000.00\nairtime\nairtime purchase\n₦0.00\n09:37:44\n2347049794301\nreversal of airtime\n12/08/25\n₦1,000.00\nairtime\npurchase\n₦1,000.00\n09:38:35\n2347049794301\n12/08/25\nairtime\nairtime purchase\n₦1,000.00\n₦0.00\n09:39:23\n2347049794301\nreversal of airtime\n12/08/25\n₦1,000.00\nairtime\n09:39:27\npurchase\n₦1,000.00\n2347049794301\n20/08/25\n₦1,000.00\nairtime\nairtime purchase\n₦0.00\n10:55:33\n2347049794301\nKuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).\nlicensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial\nMICROFINANCE KUDA aba nk\nLagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.\nRC\n796975\nAccount Number 2013716080\nPage 1 of 2"
+    },
+    {
+      "page_number": 2,
+      "content": "K kuda.\nStatement\ntransfer from\n23/09/25\ninward\nAbdulrahman Kamilu\n₦6,100.00\nabdulrahman kamilu\n12:42:00\ntransfer\n₦6,100.00\nIlah/9029189750/Paycom(Opay)\nilah\n03/10/25\n₦1,000.00\nbills\nkedco prepaid\n₦5,100.00\n18:47:51\npurchase\nKuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).\nlicensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial\nWORDFINANCE KUDA K aba nk BANKLINES\nLagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.\nRC\n796975\nAccount Number 2013716080\nPage 2 of 2"
+    }
+  ]
+}
+
+Please identify which tables/pages contain transaction rows and map the ORIGINAL column names to the canonical roles requested. Output only a single JSON object following the schema described in the system instructions.

@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/Users/macbookpro/Documents/bankbot/banklytik/statements/deepseek_column_detection.py", line 108, in run_column_detection_with_deepseek
+    payload = build_deepseek_sampling_payload(blocks)
+TypeError: build_deepseek_sampling_payload() missing 1 required positional argument: 'sampled_pages'

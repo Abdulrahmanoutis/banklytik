@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BankLytik</title>
+</head>
+<body>
+    <nav>
+        {% if user.is_authenticated %}
+            Logged in as {{ user.username }} |
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a> |
+            <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+    </nav>
+    <hr>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <!-- highlight.js for code syntax -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

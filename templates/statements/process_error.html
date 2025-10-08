@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Processing Error</h2>
+  <p>{{ error_message }}</p>
+  <a href="{% url 'statements:list' %}">Back to Statements</a>
+{% endblock %}

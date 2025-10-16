@@ -9,7 +9,7 @@
         "Money In": "credit",
         "Money out": "debit",
         "Category": "other",
-        "To / From": "description",
+        "To / From": "other",
         "Description": "description",
         "Balance": "balance"
       }
@@ -22,11 +22,11 @@
         "Money In": "credit",
         "Money out": "debit",
         "Category": "other",
-        "To / From": "description",
+        "To / From": "other",
         "Description": "description",
         "Balance": "balance"
       }
     }
   ],
-  "reasoning_summary": "Both pages contain transaction tables with identical headers showing date, amounts, description fields, and balance columns."
+  "reasoning_summary": "Both pages contain transaction tables with identical headers showing date/time, money in/out, category, to/from, description, and balance columns."
 }

@@ -28,5 +28,5 @@
       }
     }
   ],
-  "reasoning_summary": "Both pages contain transaction tables with identical headers showing transaction time, value date, description, debit/credit amounts, balance, channel, and transaction reference."
+  "reasoning_summary": "Both pages contain transaction tables with identical headers showing transaction time, value date, description, debit/credit amounts, balance, channel, and reference columns."
 }

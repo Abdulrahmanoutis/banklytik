@@ -1,22 +1,32 @@
 {
-  "transaction_table_pages": [2],
+  "transaction_table_pages": [1, 2],
   "tables": [
     {
-      "page": 2,
-      "original_header": ["2025 Feb 24 07:36", "24Feb 2025", "Airtime", "-100.00", "12,262.51", "E-Channel", "25022400100403432067589", "01", "2025 Feb 24 07:45", "Feb 2025"],
+      "page": 1,
+      "original_header": ["Trans. Time", "Value Date", "Description", "Debit/Credit(W)", "Balance(N)", "Channel", "Transaction Reference"],
       "column_mapping": {
-        "2025 Feb 24 07:36": "date",
-        "24Feb 2025": "value_date",
-        "Airtime": "description",
-        "-100.00": "debit",
-        "12,262.51": "balance",
-        "E-Channel": "channel",
-        "25022400100403432067589": "transaction_reference",
-        "01": "other",
-        "2025 Feb 24 07:45": "other",
-        "Feb 2025": "other"
+        "Trans. Time": "date",
+        "Value Date": "value_date",
+        "Description": "description",
+        "Debit/Credit(W)": "debit_credit",
+        "Balance(N)": "balance",
+        "Channel": "channel",
+        "Transaction Reference": "transaction_reference"
+      }
+    },
+    {
+      "page": 2,
+      "original_header": ["Trans. Time", "Value Date", "Description", "Debit/Credit(W)", "Balance(N)", "Channel", "Transaction Reference"],
+      "column_mapping": {
+        "Trans. Time": "date",
+        "Value Date": "value_date",
+        "Description": "description",
+        "Debit/Credit(W)": "debit_credit",
+        "Balance(N)": "balance",
+        "Channel": "channel",
+        "Transaction Reference": "transaction_reference"
       }
     }
   ],
-  "reasoning_summary": "Page 2 contains transaction-like data with date, description, debit, balance, and channel fields, while page 1 only has account summary information."
+  "reasoning_summary": "Both pages contain structured transaction tables with identical headers showing transaction details including date, description, amounts, and balances."
 }

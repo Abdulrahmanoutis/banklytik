@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DeepSeek Test</title>
+</head>
+<body>
+    <h1>DeepSeek API Test</h1>
+    
+    {% if success %}
+        <div style="color: green;">
+            <h2>✅ SUCCESS!</h2>
+            <p><strong>Response:</strong> {{ response }}</p>
+        </div>
+    {% else %}
+        <div style="color: red;">
+            <h2>❌ FAILED</h2>
+            <p><strong>Error:</strong> {{ error }}</p>
+        </div>
+    {% endif %}
+    
+    <a href="{% url 'statements:list' %}">Back to Statements</a>
+</body>
+</html>

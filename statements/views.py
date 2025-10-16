@@ -1,17 +1,18 @@
+
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from datetime import datetime
 
 import tempfile
 import os
 import uuid
 import boto3
 import pandas as pd
-import io
 import json
 import logging
 
@@ -24,8 +25,6 @@ from .textract_utils import (
     extract_combined_table,
     sample_representative_pages,
 )
-from .deepseek_utils import build_sample_json, build_deepseek_prompt, call_deepseek
-from .sandbox import run_user_code_in_sandbox
 from .cleaning_utils import robust_clean_dataframe   # ✅ fallback cleaner
 
 logger = logging.getLogger(__name__)
@@ -103,28 +102,16 @@ def reprocess_statement(request, pk):
     Deletes old transactions, sets processed=False, then calls process_statement.
     """
     stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
-
-    # Clear old transactions
     stmt.transactions.all().delete()
-
-    # Reset processed flag
     stmt.processed = False
     stmt.save()
-
-    # Redirect to the existing process pipeline
     return redirect("statements:process", pk=stmt.pk)
 
 
 @login_required
 def process_statement(request, pk):
     """
-    Processing pipeline:
-    1. Load Textract blocks from cache (S3) if available, otherwise call Textract & save JSON.
-    2. Extract combined table -> df_raw.
-    3. Send sampled JSON to DeepSeek -> get cleaning code.
-    4. Execute cleaning code in sandbox.
-    5. If sandbox fails, fallback to robust_clean_dataframe.
-    6. Save transactions to DB.
+    New processing pipeline with table-based approach
     """
     stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
 
@@ -132,11 +119,10 @@ def process_statement(request, pk):
         return redirect("statements:list")
 
     s3 = get_s3_client()
-    blocks = None
     json_key = f"{stmt.title}.json"
 
-    # 1. Use cached JSON if available
     try:
+        # 1️⃣ Load Textract JSON (same as before)
         if s3_key_exists(settings.AWS_S3_BUCKET, json_key):
             obj = s3.get_object(Bucket=settings.AWS_S3_BUCKET, Key=json_key)
             blocks_data = json.loads(obj["Body"].read().decode("utf-8"))
@@ -144,8 +130,6 @@ def process_statement(request, pk):
             job_id = start_textract_job(stmt.title)
             wait_for_job(job_id)
             blocks_data = {"Blocks": get_all_blocks(job_id)}
-
-            # cache in S3
             s3.put_object(
                 Bucket=settings.AWS_S3_BUCKET,
                 Key=json_key,
@@ -153,101 +137,95 @@ def process_statement(request, pk):
                 ContentType="application/json",
             )
 
-        # ✅ Always extract "Blocks" list
         blocks = blocks_data.get("Blocks", blocks_data)
-        from .deepseek_column_detection import run_column_detection_with_deepseek
-
-        print("DEBUG: Type of blocks before DeepSeek:", type(blocks))
         if isinstance(blocks, str):
-            try:
-                blocks = json.loads(blocks)
-                print("DEBUG: Parsed stringified blocks into JSON successfully.")
-            except Exception as e:
-                print("DEBUG: Failed to parse blocks JSON:", e)
+            blocks = json.loads(blocks)
 
-# 🔍 TEMP TEST: Run DeepSeek to detect transaction columns
-        column_detection_result = run_column_detection_with_deepseek(blocks, stmt.pk)
-        print("DEBUG: DeepSeek column detection result:", column_detection_result)
+        print(f"DEBUG: Textract returned {len(blocks)} blocks")
 
-        if not isinstance(blocks, list):
-            raise ValueError("Textract JSON did not contain a valid 'Blocks' list.")
+        # In your process_statement function, add this after table extraction:
 
-        # 🔍 Debug logs
-        logger.info("Textract returned %s blocks", len(blocks))
-        print("DEBUG: Textract returned", len(blocks), "blocks")
+# 2️⃣ Extract ALL tables (NEW)
+        from .textract_utils import extract_all_tables
+        tables = extract_all_tables(blocks)
 
-    except Exception as e:
-        stmt.error_message = f"Textract failed: {e}"
-        stmt.save()
-        return render(
-            request,
-            "statements/process_error.html",
-            {"error_message": str(e), "statement": stmt},
-        )
+        # Debug: Print table info
+        for table in tables:
+            print(f"DEBUG: Table {table['table_id']} - Page {table['page']} - Shape: {table['df'].shape}")
+            print(f"DEBUG: Headers: {table['df'].iloc[0].tolist() if not table['df'].empty else 'Empty'}")
 
-      # 2. Build raw df
-    try:
-        df_raw = extract_combined_table(blocks)
-        logger.info("Extracted raw DF shape: %s", df_raw.shape)
-        print("DEBUG: Raw DataFrame shape:", df_raw.shape)
-        print("DEBUG: Raw DataFrame head:\n", df_raw.head(10))
+        # 🆕 NEW: Save complete tables for DeepSeek
+        from .table_serializer import save_complete_tables_for_deepseek
+        complete_tables_payload = save_complete_tables_for_deepseek(tables, stmt.pk)
 
-        # 💾 DEBUG: Save extracted Textract blocks and raw table for offline analysis
+# 3️⃣ Process tables directly (continue with your existing code...)
+
+        # 3️⃣ Process tables directly (NEW - skip DeepSeek for now)
         try:
-            debug_dir = os.path.join(settings.BASE_DIR, "debug_exports")
-            os.makedirs(debug_dir, exist_ok=True)
+            from .direct_processor import process_tables_directly
+            df_clean = process_tables_directly(tables)
+            print(f"DEBUG: Direct processor returned shape: {df_clean.shape}")
+            
+            # If direct processor fails, fallback to combined table
+            if df_clean.empty:
+                raise ValueError("Direct processor returned empty DataFrame")
+                
+        except Exception as e:
+            print(f"DEBUG: Direct processor failed: {e}")
+            # Fallback to original approach
+            from .textract_utils import extract_combined_table
+            from .cleaning_utils import robust_clean_dataframe
+            df_raw = extract_combined_table(blocks)
+            df_clean = robust_clean_dataframe(df_raw)
 
-            # Save Textract blocks (full response)
-            textract_json_path = os.path.join(debug_dir, f"textract_blocks_{stmt.pk}.json")
-            with open(textract_json_path, "w") as f:
-                json.dump(blocks, f, indent=2)
-
-            # Save extracted raw table
-            raw_df_json_path = os.path.join(debug_dir, f"raw_table_{stmt.pk}.json")
-            df_raw.to_json(raw_df_json_path, orient="records", indent=2)
-
-            print(f"DEBUG: Saved Textract blocks → {textract_json_path}")
-            print(f"DEBUG: Saved raw DataFrame → {raw_df_json_path}")
-        except Exception as debug_e:
-            print("DEBUG: Failed to save debug JSON:", debug_e)
-
-    except Exception as e:
-        stmt.error_message = f"Failed to parse tables: {e}"
-        stmt.save()
-        return render(
-            request,
-            "statements/process_error.html",
-            {"error_message": str(e), "statement": stmt},
-        )
-
-    # 3. Call DeepSeek
-    try:
-        sampled_blocks = sample_representative_pages(blocks)
-        sampled_pages = sorted({b.get("Page") for b in sampled_blocks if b.get("Page")})
-        sample_json = build_sample_json(blocks, sampled_pages)
-
-        prompt = build_deepseek_prompt(sample_json)
-        cleaning_code = call_deepseek(prompt)
-
-        # 4️⃣ Run DeepSeek Stage 2 Cleaning
-        from .deepseek_cleaning_generation import run_stage2_cleaning_with_deepseek
-
-        df_clean = run_stage2_cleaning_with_deepseek(df_raw, deepseek_stage1_result, stmt_pk=statement.pk)
-
+        print(f"DEBUG: Final cleaned DataFrame shape: {df_clean.shape}")
 
     except Exception as e:
-        logger.warning("Sandbox cleaning failed or returned invalid result, falling back: %s", e)
-        print("DEBUG: Entering fallback cleaner because sandbox failed.")
+        print(f"DEBUG: Processing failed: {e}")
+        # Fallback to original approach
+        from .textract_utils import extract_combined_table
+        from .cleaning_utils import robust_clean_dataframe
+        df_raw = extract_combined_table(blocks)
         df_clean = robust_clean_dataframe(df_raw)
-        print("DEBUG: Fallback cleaner returned shape:", df_clean.shape)
-        print(df_clean.head(10))
 
-    # 5. Save cleaned transactions
+    # 6️⃣ Save transactions (same as before)
     try:
+        stmt.transactions.all().delete()
+        transactions_created = 0
+        skipped_transactions = 0
+        
         for _, row in df_clean.iterrows():
+            # Get date value and handle conversion SAFELY
+            date_val = row.get("date")
+            
+            # Skip rows with invalid dates
+            if (pd.isna(date_val) or 
+                date_val is None or
+                str(date_val) in ['NaT', 'None', ''] or
+                str(date_val).startswith('NaT')):
+                skipped_transactions += 1
+                continue
+                
+            # Convert to Python datetime SAFELY
+            try:
+                if hasattr(date_val, 'to_pydatetime'):
+                    date_val = date_val.to_pydatetime()
+                elif isinstance(date_val, pd.Timestamp):
+                    date_val = date_val.to_pydatetime()
+                elif isinstance(date_val, datetime):
+                    # Already a Python datetime, no conversion needed
+                    pass
+                else:
+                    # Try to parse as string
+                    date_val = datetime.fromisoformat(str(date_val))
+            except Exception as e:
+                print(f"DEBUG: Failed to convert date {date_val}: {e}")
+                skipped_transactions += 1
+                continue
+                
             Transaction.objects.create(
                 statement=stmt,
-                date=row.get("date"),
+                date=date_val,
                 description=row.get("description", ""),
                 debit=row.get("debit", 0.0),
                 credit=row.get("credit", 0.0),
@@ -255,11 +233,15 @@ def process_statement(request, pk):
                 channel=row.get("channel", "OTHER"),
                 transaction_reference=row.get("transaction_reference", ""),
             )
+            transactions_created += 1
 
         stmt.processed = True
         stmt.error_message = ""
         stmt.save()
-
+        
+        print(f"DEBUG: Successfully created {transactions_created} transactions")
+        print(f"DEBUG: Skipped {skipped_transactions} invalid transactions")
+        
     except Exception as e:
         stmt.error_message = f"Failed saving transactions: {e}"
         stmt.save()
@@ -282,4 +264,43 @@ def statement_detail(request, pk):
         {"statement": stmt, "transactions": transactions},
     )
 
+
+@login_required
+def export_tables_for_deepseek(request, pk):
+    """
+    Export all extracted tables as JSON for DeepSeek analysis
+    """
+    stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
     
+    try:
+        # Load Textract JSON
+        s3 = get_s3_client()
+        json_key = f"{stmt.title}.json"
+        
+        if s3_key_exists(settings.AWS_S3_BUCKET, json_key):
+            obj = s3.get_object(Bucket=settings.AWS_S3_BUCKET, Key=json_key)
+            blocks_data = json.loads(obj["Body"].read().decode("utf-8"))
+            blocks = blocks_data.get("Blocks", blocks_data)
+            
+            # Extract tables
+            from .textract_utils import extract_all_tables
+            tables = extract_all_tables(blocks)
+            
+            # Save complete tables
+            from .table_serializer import save_complete_tables_for_deepseek
+            payload = save_complete_tables_for_deepseek(tables, stmt.pk)
+            
+            return render(request, 'statements/export_success.html', {
+                'statement': stmt,
+                'table_count': len(payload['tables']),
+                'file_path': f"debug_exports/complete_tables_{stmt.pk}.json"
+            })
+        else:
+            return render(request, 'statements/export_error.html', {
+                'error': 'No Textract data found for this statement'
+            })
+            
+    except Exception as e:
+        return render(request, 'statements/export_error.html', {
+            'error': str(e)
+        })

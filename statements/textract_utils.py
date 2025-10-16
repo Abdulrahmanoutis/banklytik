@@ -1,10 +1,10 @@
-import time
 import boto3
+import time
+import json
 import pandas as pd
-from collections import defaultdict
 from django.conf import settings
 
-
+# Textract client setup
 def get_textract_client():
     return boto3.client(
         "textract",
@@ -13,180 +13,225 @@ def get_textract_client():
         region_name=settings.AWS_REGION,
     )
 
-
-def start_textract_job(s3_key: str) -> str:
-    client = get_textract_client()
-    response = client.start_document_analysis(
+# Start Textract job
+def start_textract_job(s3_key):
+    textract = get_textract_client()
+    response = textract.start_document_analysis(
         DocumentLocation={"S3Object": {"Bucket": settings.AWS_S3_BUCKET, "Name": s3_key}},
         FeatureTypes=["TABLES"],
     )
     return response["JobId"]
 
-
-def wait_for_job(job_id: str):
-    client = get_textract_client()
+# Wait for job completion
+def wait_for_job(job_id, poll_interval=5):
+    textract = get_textract_client()
     while True:
-        result = client.get_document_analysis(JobId=job_id)
-        status = result["JobStatus"]
-        if status in ("SUCCEEDED", "FAILED"):
-            if status == "FAILED":
-                raise RuntimeError("Textract job failed.")
-            return
-        time.sleep(5)
+        response = textract.get_document_analysis(JobId=job_id)
+        status = response["JobStatus"]
+        if status in ["SUCCEEDED", "FAILED"]:
+            return status
+        time.sleep(poll_interval)
 
-
-def get_all_blocks(job_id: str) -> list:
-    client = get_textract_client()
+# Get all blocks from Textract
+def get_all_blocks(job_id):
+    textract = get_textract_client()
     blocks = []
     next_token = None
-
     while True:
         if next_token:
-            response = client.get_document_analysis(JobId=job_id, NextToken=next_token)
+            response = textract.get_document_analysis(
+                JobId=job_id, NextToken=next_token
+            )
         else:
-            response = client.get_document_analysis(JobId=job_id)
+            response = textract.get_document_analysis(JobId=job_id)
         blocks.extend(response.get("Blocks", []))
         next_token = response.get("NextToken")
         if not next_token:
             break
-
     return blocks
 
+# Helper function to extract text from a cell
+def extract_text_from_cell(cell_block, all_blocks_dict):
+    """Extract actual text content from a Textract cell block"""
+    text_parts = []
+    
+    # Get child relationships
+    if 'Relationships' in cell_block:
+        for relationship in cell_block['Relationships']:
+            if relationship['Type'] == 'CHILD':
+                for child_id in relationship['Ids']:
+                    child_block = all_blocks_dict.get(child_id)
+                    if child_block and child_block.get('BlockType') in ['WORD', 'LINE']:
+                        text_parts.append(child_block.get('Text', ''))
+    
+    return ' '.join(text_parts) if text_parts else ""
 
-def extract_tables_as_json(blocks: list) -> list:
+# Convert table blocks to DataFrame
+def table_blocks_to_dataframe(table_blocks, all_blocks_dict):
     """
-    Convert Textract blocks into a JSON-friendly list of tables.
-    Each table = list of rows, where each row = list of cell strings.
+    Convert Textract table blocks to a pandas DataFrame with actual text
     """
-    block_map = {b["Id"]: b for b in blocks}
-    table_blocks = [b for b in blocks if b["BlockType"] == "TABLE"]
-    results = []
-
-    for table in table_blocks:
-        rows = {}
-        for rel in table.get("Relationships", []):
-            if rel["Type"] == "CHILD":
-                for cid in rel["Ids"]:
-                    cell = block_map.get(cid)
-                    if cell and cell["BlockType"] == "CELL":
-                        row_idx = cell["RowIndex"]
-                        col_idx = cell["ColumnIndex"]
-
-                        text = ""
-                        for subrel in cell.get("Relationships", []):
-                            for wid in subrel.get("Ids", []):
-                                word = block_map.get(wid)
-                                if word["BlockType"] == "WORD":
-                                    text += word.get("Text", "") + " "
-                                elif word["BlockType"] == "SELECTION_ELEMENT":
-                                    if word.get("SelectionStatus") == "SELECTED":
-                                        text += "[X] "
-                        rows.setdefault(row_idx, {})
-                        rows[row_idx][col_idx] = text.strip()
-
-        # Sort rows and cols
-        table_data = []
-        for r in sorted(rows.keys()):
-            row_data = []
-            for c in sorted(rows[r].keys()):
-                row_data.append(rows[r][c])
-            table_data.append(row_data)
-
-        results.append(table_data)
-
-    return results
-
-
-def extract_combined_table(blocks: list) -> pd.DataFrame:
-    """
-    Combine all TABLE blocks from Textract into one pandas DataFrame.
-    Falls back to LINE blocks if no TABLES are detected.
-    """
-    block_map = {b["Id"]: b for b in blocks}
-    table_blocks = [b for b in blocks if b.get("BlockType") == "TABLE"]
-    table_blocks.sort(key=lambda b: b.get("Page", 0))
-
-    all_rows = []
-    for table in table_blocks:
-        cells = []
-        for rel in table.get("Relationships", []) or []:
-            if rel.get("Type") == "CHILD":
-                for cid in rel.get("Ids", []):
-                    cell = block_map.get(cid)
-                    if not cell or cell.get("BlockType") != "CELL":
-                        continue
-                    row = cell["RowIndex"]
-                    col = cell["ColumnIndex"]
-                    text = ""
-                    for crel in cell.get("Relationships", []) or []:
-                        if crel.get("Type") == "CHILD":
-                            for wid in crel.get("Ids", []):
-                                w = block_map.get(wid)
-                                if not w:
-                                    continue
-                                if w.get("BlockType") == "WORD":
-                                    text += (w.get("Text") or "") + " "
-                                elif w.get("BlockType") == "SELECTION_ELEMENT":
-                                    if w.get("SelectionStatus") == "SELECTED":
-                                        text += "[X] "
-                    cells.append({"row": row, "col": col, "text": text.strip()})
-
-        if not cells:
-            continue
-
-        max_row = max(c["row"] for c in cells)
-        max_col = max(c["col"] for c in cells)
-        table_map = defaultdict(dict)
-        for c in cells:
-            table_map[c["row"]][c["col"]] = c["text"]
-
-        for r in range(1, max_row + 1):
-            row_vals = [table_map[r].get(c, "") for c in range(1, max_col + 1)]
-            all_rows.append(row_vals)
-
-    # ✅ Fallback: if no TABLE blocks, try LINE blocks
-    if not all_rows:
-        line_blocks = [b for b in blocks if b.get("BlockType") == "LINE"]
-        if line_blocks:
-            all_rows = [[b.get("Text", "")] for b in line_blocks]
-
-    if not all_rows:
+    if not table_blocks:
         return pd.DataFrame()
+    
+    # Group cells by row and column
+    rows = {}
+    for cell in table_blocks:
+        if cell.get('BlockType') != 'CELL':
+            continue
+            
+        row_index = cell.get('RowIndex', 0)
+        col_index = cell.get('ColumnIndex', 0)
+        
+        # Extract actual text from cell
+        text = extract_text_from_cell(cell, all_blocks_dict)
+        
+        if row_index not in rows:
+            rows[row_index] = {}
+        rows[row_index][col_index] = text
+    
+    if not rows:
+        return pd.DataFrame()
+    
+    # Convert to DataFrame
+    max_cols = max(max(rows[r].keys()) for r in rows) if rows else 0
+    data = []
+    
+    for row_idx in sorted(rows.keys()):
+        row_data = []
+        for col_idx in range(1, max_cols + 1):
+            row_data.append(rows[row_idx].get(col_idx, ''))
+        data.append(row_data)
+    
+    return pd.DataFrame(data)
 
-    return pd.DataFrame(all_rows)
+# Get page number from table blocks
+def _get_table_page(table_blocks):
+    """Get the page number from table blocks"""
+    if table_blocks and 'Page' in table_blocks[0]:
+        return table_blocks[0].get('Page', 1)
+    return 1
 
-
-def process_textract_to_json(s3_key: str) -> dict:
+# Extract all tables from Textract blocks
+def extract_all_tables(blocks):
     """
-    Main entrypoint:
-    1. Run Textract on S3 PDF
-    2. Collect blocks
-    3. Return structured JSON tables
+    Extract all tables from Textract blocks and return them as separate DataFrames
+    with metadata about each table.
     """
-    job_id = start_textract_job(s3_key)
-    wait_for_job(job_id)
-    blocks = get_all_blocks(job_id)
-    tables = extract_tables_as_json(blocks)
-    return {"tables": tables}
+    # Create a dictionary of all blocks by ID for text lookup
+    all_blocks_dict = {block['Id']: block for block in blocks if 'Id' in block}
+    
+    tables = []
+    current_table = []
+    in_table = False
+    table_id = 0
+    
+    print(f"DEBUG: Processing {len(blocks)} blocks")
+    
+    for block in blocks:
+        if block.get('BlockType') == 'TABLE':
+            if current_table:  # Save previous table
+                try:
+                    df = table_blocks_to_dataframe(current_table, all_blocks_dict)
+                    if not df.empty:
+                        tables.append({
+                            'table_id': table_id,
+                            'page': _get_table_page(current_table),
+                            'df': df,
+                            'block_count': len(current_table)
+                        })
+                        table_id += 1
+                        print(f"DEBUG: Found table {table_id} with {len(current_table)} blocks")
+                except Exception as e:
+                    print(f"DEBUG: Failed to convert table blocks to DataFrame: {e}")
+                current_table = []
+            in_table = True
+        elif block.get('BlockType') == 'CELL' and in_table:
+            current_table.append(block)
+        elif in_table and block.get('BlockType') not in ['CELL', 'TABLE']:
+            in_table = False
+            if current_table:  # Save table when exiting table mode
+                try:
+                    df = table_blocks_to_dataframe(current_table, all_blocks_dict)
+                    if not df.empty:
+                        tables.append({
+                            'table_id': table_id,
+                            'page': _get_table_page(current_table),
+                            'df': df,
+                            'block_count': len(current_table)
+                        })
+                        table_id += 1
+                        print(f"DEBUG: Found table {table_id} with {len(current_table)} blocks")
+                except Exception as e:
+                    print(f"DEBUG: Failed to convert table blocks to DataFrame: {e}")
+                current_table = []
+    
+    # Don't forget the last table
+    if current_table:
+        try:
+            df = table_blocks_to_dataframe(current_table, all_blocks_dict)
+            if not df.empty:
+                tables.append({
+                    'table_id': table_id,
+                    'page': _get_table_page(current_table),
+                    'df': df,
+                    'block_count': len(current_table)
+                })
+                print(f"DEBUG: Found final table {table_id} with {len(current_table)} blocks")
+        except Exception as e:
+            print(f"DEBUG: Failed to convert final table blocks to DataFrame: {e}")
+    
+    print(f"DEBUG: Extracted {len(tables)} tables from Textract")
+    return tables
 
-
-def sample_representative_pages(blocks: list) -> list:
+# Original table extraction (for fallback)
+def extract_combined_table(blocks):
     """
-    Extract representative pages (first, second, and last) from Textract blocks.
-    Handles cases where the document has only 1 or 2 pages.
+    Original method to extract tables - used as fallback
     """
-    pages = sorted({b.get("Page", 0) for b in blocks if "Page" in b})
+    print("DEBUG: Using original extract_combined_table (fallback)")
+    
+    try:
+        # Try to extract tables using the new method first
+        tables = extract_all_tables(blocks)
+        if tables:
+            # For fallback, combine all tables into one
+            all_data = []
+            for table in tables:
+                df = table['df']
+                if not df.empty:
+                    all_data.append(df)
+            
+            if all_data:
+                combined_df = pd.concat(all_data, ignore_index=True)
+                print(f"DEBUG: Combined {len(all_data)} tables into shape: {combined_df.shape}")
+                return combined_df
+    except Exception as e:
+        print(f"DEBUG: New table extraction failed in fallback: {e}")
+    
+    # If everything fails, return empty DataFrame
+    return pd.DataFrame()
 
-    if not pages:
-        return []
+# Sampling functions (for DeepSeek payload)
+def sample_representative_pages(blocks, max_pages=3):
+    """Sample representative pages from Textract blocks"""
+    pages = {}
+    for block in blocks:
+        page_num = block.get("Page", 1)
+        if page_num not in pages:
+            pages[page_num] = []
+        pages[page_num].append(block)
+    
+    # Return first few pages
+    sampled_pages = []
+    for page_num in sorted(pages.keys())[:max_pages]:
+        sampled_pages.append({
+            "page": page_num,
+            "blocks": pages[page_num][:50]  # Limit blocks per page
+        })
+    return sampled_pages
 
-    selected_pages = [pages[0]]
-
-    if len(pages) > 1:
-        selected_pages.append(pages[1])
-
-    if len(pages) > 2:
-        selected_pages.append(pages[-1])
-
-    sampled_blocks = [b for b in blocks if b.get("Page") in selected_pages]
-    return sampled_blocks
+def build_deepseek_sampling_payload(blocks, sampled_pages=3):
+    """Build payload for DeepSeek analysis"""
+    pages = sample_representative_pages(blocks, sampled_pages)
+    return {"sampled_pages": pages}

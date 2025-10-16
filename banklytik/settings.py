@@ -81,3 +81,7 @@ DEEPSEEK_API_BASE = os.getenv("DEEPSEEK_API_BASE")
 
 OPENAI_API_KEY = DEEPSEEK_API_KEY
 OPENAI_API_BASE = DEEPSEEK_API_BASE
+
+# DeepSeek API Configuration
+#DEEPSEEK_API_KEY = "your-actual-deepseek-api-key"
+#DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"

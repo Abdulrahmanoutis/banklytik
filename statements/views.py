@@ -25,7 +25,8 @@ from .textract_utils import (
     extract_combined_table,
     sample_representative_pages,
 )
-from .cleaning_utils import robust_clean_dataframe   # ✅ fallback cleaner
+from .cleaning_utils import robust_clean_dataframe
+from .textract_utils import detect_table_structure
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,7 @@ def s3_key_exists(bucket, key):
         return False
 
 
+# ---------- VIEWS ----------
 class StatementListView(LoginRequiredMixin, ListView):
     model = BankStatement
     template_name = "statements/statement_list.html"
@@ -97,10 +99,6 @@ class StatementUploadView(LoginRequiredMixin, CreateView):
 
 @login_required
 def reprocess_statement(request, pk):
-    """
-    Allow user to re-run the statement processing using cached Textract JSON.
-    Deletes old transactions, sets processed=False, then calls process_statement.
-    """
     stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
     stmt.transactions.all().delete()
     stmt.processed = False
@@ -110,9 +108,6 @@ def reprocess_statement(request, pk):
 
 @login_required
 def process_statement(request, pk):
-    """
-    New processing pipeline with table-based approach
-    """
     stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
 
     if stmt.processed:
@@ -122,7 +117,7 @@ def process_statement(request, pk):
     json_key = f"{stmt.title}.json"
 
     try:
-        # 1️⃣ Load Textract JSON (same as before)
+        # 1️⃣ Load Textract JSON
         if s3_key_exists(settings.AWS_S3_BUCKET, json_key):
             obj = s3.get_object(Bucket=settings.AWS_S3_BUCKET, Key=json_key)
             blocks_data = json.loads(obj["Body"].read().decode("utf-8"))
@@ -143,38 +138,28 @@ def process_statement(request, pk):
 
         print(f"DEBUG: Textract returned {len(blocks)} blocks")
 
-        # In your process_statement function, add this after table extraction:
-
-# 2️⃣ Extract ALL tables (NEW)
+        # 2️⃣ Extract all tables
         from .textract_utils import extract_all_tables
         tables = extract_all_tables(blocks)
 
-        # Debug: Print table info
         for table in tables:
             print(f"DEBUG: Table {table['table_id']} - Page {table['page']} - Shape: {table['df'].shape}")
             print(f"DEBUG: Headers: {table['df'].iloc[0].tolist() if not table['df'].empty else 'Empty'}")
+            structure_type = detect_table_structure(table["df"])
+            print(f"DEBUG: Table {table['table_id']} structure detected as: {structure_type}")
 
-        # 🆕 NEW: Save complete tables for DeepSeek
         from .table_serializer import save_complete_tables_for_deepseek
         complete_tables_payload = save_complete_tables_for_deepseek(tables, stmt.pk)
 
-# 3️⃣ Process tables directly (continue with your existing code...)
-
-        # 3️⃣ Process tables directly (NEW - skip DeepSeek for now)
+        # 3️⃣ Process tables directly
         try:
             from .direct_processor import process_tables_directly
             df_clean = process_tables_directly(tables)
             print(f"DEBUG: Direct processor returned shape: {df_clean.shape}")
-            
-            # If direct processor fails, fallback to combined table
             if df_clean.empty:
                 raise ValueError("Direct processor returned empty DataFrame")
-                
         except Exception as e:
             print(f"DEBUG: Direct processor failed: {e}")
-            # Fallback to original approach
-            from .textract_utils import extract_combined_table
-            from .cleaning_utils import robust_clean_dataframe
             df_raw = extract_combined_table(blocks)
             df_clean = robust_clean_dataframe(df_raw)
 
@@ -182,66 +167,57 @@ def process_statement(request, pk):
 
     except Exception as e:
         print(f"DEBUG: Processing failed: {e}")
-        # Fallback to original approach
-        from .textract_utils import extract_combined_table
-        from .cleaning_utils import robust_clean_dataframe
         df_raw = extract_combined_table(blocks)
         df_clean = robust_clean_dataframe(df_raw)
 
-    # 6️⃣ Save transactions (same as before)
+    # 6️⃣ Save transactions (lossless + raw date)
     try:
         stmt.transactions.all().delete()
         transactions_created = 0
-        skipped_transactions = 0
-        
+        flagged_transactions = 0
+
         for _, row in df_clean.iterrows():
-            # Get date value and handle conversion SAFELY
+            raw_date_str = str(row.get("date", ""))  # Always preserve original date string
             date_val = row.get("date")
-            
-            # Skip rows with invalid dates
-            if (pd.isna(date_val) or 
-                date_val is None or
-                str(date_val) in ['NaT', 'None', ''] or
-                str(date_val).startswith('NaT')):
-                skipped_transactions += 1
-                continue
-                
-            # Convert to Python datetime SAFELY
+            parsed_date = None
+
             try:
+                # Try safe conversions
                 if hasattr(date_val, 'to_pydatetime'):
-                    date_val = date_val.to_pydatetime()
+                    parsed_date = date_val.to_pydatetime()
                 elif isinstance(date_val, pd.Timestamp):
-                    date_val = date_val.to_pydatetime()
+                    parsed_date = date_val.to_pydatetime()
                 elif isinstance(date_val, datetime):
-                    # Already a Python datetime, no conversion needed
-                    pass
+                    parsed_date = date_val
                 else:
-                    # Try to parse as string
-                    date_val = datetime.fromisoformat(str(date_val))
+                    parsed_date = datetime.fromisoformat(str(date_val))
             except Exception as e:
                 print(f"DEBUG: Failed to convert date {date_val}: {e}")
-                skipped_transactions += 1
-                continue
-                
+                parsed_date = None
+                flagged_transactions += 1
+
+            # Always save raw_date (even if parsed_date exists)
             Transaction.objects.create(
                 statement=stmt,
-                date=date_val,
+                date=parsed_date.date() if parsed_date else None,
+                raw_date=raw_date_str,
                 description=row.get("description", ""),
                 debit=row.get("debit", 0.0),
                 credit=row.get("credit", 0.0),
                 balance=row.get("balance", 0.0),
-                channel=row.get("channel", "OTHER"),
+                channel=row.get("channel", "EMPTY"),
                 transaction_reference=row.get("transaction_reference", ""),
             )
+
             transactions_created += 1
 
         stmt.processed = True
         stmt.error_message = ""
         stmt.save()
-        
-        print(f"DEBUG: Successfully created {transactions_created} transactions")
-        print(f"DEBUG: Skipped {skipped_transactions} invalid transactions")
-        
+
+        print(f"DEBUG: ✅ Successfully created {transactions_created} transactions")
+        print(f"DEBUG: ⚠️ {flagged_transactions} transactions had malformed or invalid dates")
+
     except Exception as e:
         stmt.error_message = f"Failed saving transactions: {e}"
         stmt.save()
@@ -267,40 +243,32 @@ def statement_detail(request, pk):
 
 @login_required
 def export_tables_for_deepseek(request, pk):
-    """
-    Export all extracted tables as JSON for DeepSeek analysis
-    """
     stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
-    
+
     try:
-        # Load Textract JSON
         s3 = get_s3_client()
         json_key = f"{stmt.title}.json"
-        
+
         if s3_key_exists(settings.AWS_S3_BUCKET, json_key):
             obj = s3.get_object(Bucket=settings.AWS_S3_BUCKET, Key=json_key)
             blocks_data = json.loads(obj["Body"].read().decode("utf-8"))
             blocks = blocks_data.get("Blocks", blocks_data)
-            
-            # Extract tables
+
             from .textract_utils import extract_all_tables
             tables = extract_all_tables(blocks)
-            
-            # Save complete tables
+
             from .table_serializer import save_complete_tables_for_deepseek
             payload = save_complete_tables_for_deepseek(tables, stmt.pk)
-            
-            return render(request, 'statements/export_success.html', {
-                'statement': stmt,
-                'table_count': len(payload['tables']),
-                'file_path': f"debug_exports/complete_tables_{stmt.pk}.json"
+
+            return render(request, "statements/export_success.html", {
+                "statement": stmt,
+                "table_count": len(payload["tables"]),
+                "file_path": f"debug_exports/complete_tables_{stmt.pk}.json"
             })
         else:
-            return render(request, 'statements/export_error.html', {
-                'error': 'No Textract data found for this statement'
+            return render(request, "statements/export_error.html", {
+                "error": "No Textract data found for this statement"
             })
-            
+
     except Exception as e:
-        return render(request, 'statements/export_error.html', {
-            'error': str(e)
-        })
+        return render(request, "statements/export_error.html", {"error": str(e)})

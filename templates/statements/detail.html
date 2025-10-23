@@ -10,38 +10,53 @@
   </a>
 </p>
 
-<table border="1" cellpadding="8">
- <thead>
-  <tr>
-    <th>Date</th>
-    <th>Description</th>
-    <th>Debit</th>
-    <th>Credit</th>
-    <th>Balance</th>
-    <th>Channel</th>  
-    <th>Reference</th> 
-  </tr>
- </thead>
- <tbody>
-  {% for tx in transactions %}
-  <tr>
-    <td>{{ tx.date }}</td>
-    <td>{{ tx.description }}</td>
-    <td>{{ tx.debit|floatformat:2 }}</td>
-    <td>{{ tx.credit|floatformat:2 }}</td>
-    <td>{{ tx.balance|floatformat:2 }}</td>
-    <td>{{ tx.channel }}</td>
-    <td>{{ tx.transaction_reference }}</td>
-  </tr>
-  {% empty %}
-  <tr><td colspan="7">No transactions found.</td></tr>
-  {% endfor %}
- </tbody>
+<table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%;">
+  <thead style="background-color: #f2f2f2;">
+    <tr>
+      <th>Date</th>
+      <th>Raw Date</th>
+      <th>Description</th>
+      <th>Debit</th>
+      <th>Credit</th>
+      <th>Balance</th>
+      <th>Channel</th>  
+      <th>Reference</th> 
+    </tr>
+  </thead>
+  <tbody>
+    {% for tx in transactions %}
+    <tr>
+      <!-- ✅ Normal parsed date -->
+      <td>
+        {% if tx.date %}
+          {{ tx.date|date:"M. d, Y" }}
+        {% else %}
+          <span style="color: gray;">—</span>
+        {% endif %}
+      </td>
+
+      <!-- ✅ Raw unparsed or invalid date -->
+      <td>
+        {% if tx.raw_date %}
+          <span style="color: #c0392b;">{{ tx.raw_date }}</span>
+        {% else %}
+          <span style="color: gray;">—</span>
+        {% endif %}
+      </td>
+
+      <!-- ✅ Rest of transaction fields -->
+      <td>{{ tx.description }}</td>
+      <td>{{ tx.debit|floatformat:2 }}</td>
+      <td>{{ tx.credit|floatformat:2 }}</td>
+      <td>{{ tx.balance|floatformat:2 }}</td>
+      <td>{{ tx.channel|default:"EMPTY" }}</td>
+      <td>{{ tx.transaction_reference|default:"—" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="8">No transactions found.</td></tr>
+    {% endfor %}
+  </tbody>
 </table>
-
-<p>
-
-</p>
 
 <p><a href="{% url 'statements:list' %}">← Back to list</a></p>
 {% endblock %}

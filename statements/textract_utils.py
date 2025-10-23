@@ -4,6 +4,8 @@ import json
 import pandas as pd
 from django.conf import settings
 
+import re
+
 # Textract client setup
 def get_textract_client():
     return boto3.client(
@@ -235,3 +237,22 @@ def build_deepseek_sampling_payload(blocks, sampled_pages=3):
     """Build payload for DeepSeek analysis"""
     pages = sample_representative_pages(blocks, sampled_pages)
     return {"sampled_pages": pages}
+
+
+def detect_table_structure(df):
+    """
+    Detect whether a Textract-extracted table has headers or starts with data.
+    Returns: "with_headers" or "data_only" or "empty"
+    """
+    import pandas as pd
+    if df is None or df.empty:
+        return "empty"
+
+    # Convert first row to lowercase strings
+    first_row = df.iloc[0].astype(str).str.lower().tolist()
+    first_row_str = " ".join(first_row)
+
+    header_indicators = ["trans", "date", "desc", "value", "debit", "credit", "balance", "channel", "reference"]
+    has_headers = any(h in first_row_str for h in header_indicators)
+
+    return "with_headers" if has_headers else "data_only"

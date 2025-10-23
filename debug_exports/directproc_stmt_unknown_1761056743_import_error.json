@@ -1,0 +1,5 @@
+{
+  "error": "Failed to import cleaning utilities",
+  "exception": "cannot import name 'extract_channel' from 'statements.cleaning_utils' (/Users/macbookpro/Documents/bankbot/banklytik/statements/cleaning_utils.py)",
+  "trace": "Traceback (most recent call last):\n  File \"/Users/macbookpro/Documents/bankbot/banklytik/statements/direct_processor.py\", line 51, in process_tables_directly\n    from .cleaning_utils import (\nImportError: cannot import name 'extract_channel' from 'statements.cleaning_utils' (/Users/macbookpro/Documents/bankbot/banklytik/statements/cleaning_utils.py)\n"
+}

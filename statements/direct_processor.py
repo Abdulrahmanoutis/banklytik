@@ -1,255 +1,261 @@
+# statements/direct_processor.py
+import os
+import traceback
+import json
 import pandas as pd
 import re
 from datetime import datetime
+from django.conf import settings
 
-def parse_nigerian_date(date_val):
-    """Parse Nigerian date formats"""
-    # Handle Series/DataFrame input properly
-    if hasattr(date_val, 'empty'):
-        if date_val.empty:
-            return None
-        # If it's a Series, apply function to each element
-        return date_val.apply(parse_nigerian_date)
-    
-    if pd.isna(date_val) or not date_val:
-        return None
-    
-    date_str = str(date_val).strip()
-    if not date_str or date_str in ['None', 'NaT', '']:
-        return None
-    
-    # Fix common OCR issues
-    date_str = re.sub(r'\.', ' ', date_str)  # Replace dots with spaces
-    date_str = re.sub(r':\s*:', ':', date_str)  # Fix double colons
-    date_str = re.sub(r'(\d{2}):\s+(\d{2})', r'\1:\2', date_str)  # Remove spaces in time
-    date_str = re.sub(r'(\d{4}\s+[A-Za-z]+\s+)(\d{2})(\d{2}:\d{2})', r'\1\2 \3', date_str)
-    date_str = re.sub(r':$', '', date_str)  # Remove trailing colons
-    date_str = re.sub(r'\s+', ' ', date_str).strip()
-    
-    # Try multiple date formats
-    formats = [
-        "%Y %b %d %H:%M:%S",  # "2025 Feb 23 08:05:38"
-        "%Y %b %d %H:%M %S",  # "2025 Feb 23 08:05 38"  
-        "%Y %b %d %H:%M",     # "2025 Feb 23 08:05"
-        "%d %b %Y %H:%M %S",  # "23 Feb 2025 09:05 38"
-        "%d %b %Y %H:%M:%S",  # "23 Feb 2025 11:11:40"
-        "%d %b %Y %H:%M",     # "23 Feb 2025 09:05"
-        "%Y %b %d",           # "2025 Feb 23"
-        "%d %b %Y",           # "23 Feb 2025"
-        "%b %Y",              # "Feb 2025" - set day to 1
-    ]
-    
-    for fmt in formats:
-        try:
-            parsed = datetime.strptime(date_str, fmt)
-            # If the format doesn't include day, set to 1st of month
-            if fmt in ["%b %Y"]:
-                parsed = parsed.replace(day=1)
-            return parsed
-        except ValueError:
-            continue
-    
-    return None
+# Debug folder
+DEBUG_DIR = os.path.join(getattr(settings, "BASE_DIR", "."), "debug_exports")
+os.makedirs(DEBUG_DIR, exist_ok=True)
 
-def clean_amount(value):
-    """Clean amount values"""
-    if pd.isna(value): 
-        return 0.0
-    s = str(value).replace("₦", "").replace(",", "").replace(" ", "")
-    s = re.sub(r"[^0-9.\-]", "", s)
-    try: 
-        return float(s)
-    except Exception: 
-        return 0.0
 
-def extract_channel(description):
-    """Extract channel from description"""
-    if pd.isna(description) or not description:
-        return "OTHER"
-        
-    d = str(description).upper()
-    if "ATM" in d: return "ATM"
-    if "POS" in d: return "POS"
-    if "TRANSFER" in d: return "TRANSFER"
-    if "AIRTIME" in d: return "AIR TIME"
-    if "CHARGE" in d or "USSD" in d: return "CHARGES"
-    return "OTHER"
-
-def is_summary_table(headers):
-    """Check if this is a summary table (not transactions)"""
-    header_str = ' '.join(str(h).lower() for h in headers)
-    summary_indicators = ['opening balance', 'closing balance', 'date printed', 'start date', 'end date']
-    return any(indicator in header_str for indicator in summary_indicators)
-
-def is_transaction_table(headers):
-    """Check if this is a transaction table"""
-    header_str = ' '.join(str(h).lower() for h in headers)
-    transaction_indicators = ['trans. time', 'value date', 'description', 'debit/credit', 'balance', 'channel', 'transaction reference']
-    return any(indicator in header_str for indicator in transaction_indicators)
-
-def process_tables_directly(tables):
-    """
-    Process tables directly using known structure - should extract all 33 transactions
-    """
-    all_transactions = []
-    
-    for table in tables:
-        df = table['df']
-        
-        # Skip tables that are too small
-        if df.empty or len(df) < 2:
-            continue
-            
-        # Get headers (first row)
-        headers = df.iloc[0].tolist()
-        
-        # Skip summary tables (like Table 0)
-        if is_summary_table(headers):
-            print(f"DEBUG: Skipping summary table {table['table_id']}")
-            continue
-            
-        # Check if this is a proper transaction table
-        if is_transaction_table(headers):
-            print(f"DEBUG: Processing transaction table {table['table_id']} with {len(df)-1} rows")
-            
-            # Use first row as header, rest as data
-            df_table = df.iloc[1:].copy()
-            df_table.columns = headers
-            
-            # Clean the data
-            cleaned_df = clean_transaction_dataframe(df_table)
-            if not cleaned_df.empty:
-                all_transactions.append(cleaned_df)
-                print(f"DEBUG: Table {table['table_id']} contributed {len(cleaned_df)} transactions")
-        else:
-            # Check if this might be a transaction table without headers (like Table 2)
-            # Look at the data pattern to determine if it's transactions
-            if len(df.columns) >= 5:  # Transaction tables usually have multiple columns
-                # Check if first data row looks like a transaction
-                first_data_row = df.iloc[0].tolist() if len(df) > 0 else []
-                first_row_str = ' '.join(str(cell) for cell in first_data_row).lower()
-                
-                # If it has date patterns and amounts, it's likely transactions
-                has_date = any(keyword in first_row_str for keyword in ['2025', 'feb', 'jan', 'mar', 'apr'])
-                has_amount = any('₦' in str(cell) or '.' in str(cell) for cell in first_data_row)
-                
-                if has_date and has_amount:
-                    print(f"DEBUG: Table {table['table_id']} appears to be transaction data without headers")
-                    print(f"DEBUG: Using known column structure for transactions")
-                    
-                    # Use known column structure for transaction tables
-                    known_headers = ['Trans. Time', 'Value Date', 'Description', 'Debit/Credit(W)', 'Balance(N)', 'Channel', 'Transaction Reference']
-                    df_table = df.copy()
-                    
-                    # If we have fewer columns, adjust
-                    if len(df_table.columns) < len(known_headers):
-                        known_headers = known_headers[:len(df_table.columns)]
-                    
-                    df_table.columns = known_headers[:len(df_table.columns)]
-                    cleaned_df = clean_transaction_dataframe(df_table)
-                    if not cleaned_df.empty:
-                        all_transactions.append(cleaned_df)
-                        print(f"DEBUG: Table {table['table_id']} contributed {len(cleaned_df)} transactions")
-    
-    if all_transactions:
-        final_df = pd.concat(all_transactions, ignore_index=True)
-        print(f"DEBUG: Combined {len(all_transactions)} tables into {len(final_df)} transactions")
-        return final_df
-    else:
-        print("DEBUG: No transaction tables found")
-        return pd.DataFrame()
-
-def clean_transaction_dataframe(df):
-    """Clean transaction DataFrame using the structure we know from CSV"""
-    if df.empty:
-        return df
-        
-    # Create a copy to avoid SettingWithCopyWarning
-    df_clean = df.copy()
-    
-    # Debug: show what we're working with
-    print(f"DEBUG: Cleaning DataFrame with columns: {list(df_clean.columns)}")
-    print(f"DEBUG: First few rows:")
-    print(df_clean.head(2))
-    
+# ---------- Helper utilities (local, small, self-contained) ----------
+def safe_save(obj, filename):
+    path = os.path.join(DEBUG_DIR, filename)
     try:
-        # Rename columns to standard names
-        column_mapping = {}
-        for col in df_clean.columns:
-            col_str = str(col)
-            col_lower = col_str.lower()
-            if 'trans. time' in col_lower or ('date' in col_lower and 'value' not in col_lower):
-                column_mapping[col] = 'date'
-            elif 'value date' in col_lower:
-                column_mapping[col] = 'value_date'
-            elif 'description' in col_lower:
-                column_mapping[col] = 'description'
-            elif 'debit/credit' in col_lower:
-                column_mapping[col] = 'debit_credit'
-            elif 'balance' in col_lower:
-                column_mapping[col] = 'balance'
-            elif 'channel' in col_lower:
-                column_mapping[col] = 'channel'
-            elif 'transaction reference' in col_lower:
-                column_mapping[col] = 'transaction_reference'
-        
-        df_clean = df_clean.rename(columns=column_mapping)
-        print(f"DEBUG: After renaming - Columns: {list(df_clean.columns)}")
-        
-        # Parse dates - handle Series properly
-        if 'date' in df_clean.columns:
-            df_clean['date'] = df_clean['date'].apply(lambda x: parse_nigerian_date(x) if not pd.isna(x) else None)
-        
-        if 'value_date' in df_clean.columns:
-            df_clean['value_date'] = df_clean['value_date'].apply(lambda x: parse_nigerian_date(x) if not pd.isna(x) else None)
-        
-        # Handle debit/credit column
-        if 'debit_credit' in df_clean.columns:
-            df_clean['debit'] = 0.0
-            df_clean['credit'] = 0.0
-            
-            for idx, value in df_clean['debit_credit'].items():
-                if pd.isna(value):
-                    continue
-                str_val = str(value)
-                amount = clean_amount(str_val)
-                
-                if '-' in str_val:
-                    df_clean.at[idx, 'debit'] = amount
-                elif '+' in str_val:
-                    df_clean.at[idx, 'credit'] = amount
-        
-        # Clean balance
-        if 'balance' in df_clean.columns:
-            df_clean['balance'] = df_clean['balance'].apply(clean_amount)
-        
-        # Extract channel if not present
-        if 'channel' not in df_clean.columns and 'description' in df_clean.columns:
-            df_clean['channel'] = df_clean['description'].apply(extract_channel)
-        
-        # Ensure we have all required columns
-        required_columns = ['date', 'description', 'debit', 'credit', 'balance', 'channel', 'transaction_reference']
-        for col in required_columns:
-            if col not in df_clean.columns:
-                df_clean[col] = "" if col == 'description' else 0.0
-        
-        # Remove rows with invalid dates
-        if 'date' in df_clean.columns:
-            before_removal = len(df_clean)
-            df_clean = df_clean[df_clean['date'].notna()]
-            after_removal = len(df_clean)
-            removed_count = before_removal - after_removal
-            if removed_count > 0:
-                print(f"DEBUG: Removed {removed_count} rows with invalid dates")
-        
-        # Select final columns
-        final_columns = [col for col in required_columns if col in df_clean.columns]
-        
-        print(f"DEBUG: Cleaned DataFrame shape: {df_clean[final_columns].shape}")
-        return df_clean[final_columns]
-        
+        with open(path, "w", encoding="utf-8") as f:
+            if isinstance(obj, (dict, list)):
+                json.dump(obj, f, indent=2, default=str)
+            else:
+                f.write(str(obj))
     except Exception as e:
-        print(f"DEBUG: Error in clean_transaction_dataframe: {e}")
-        import traceback
-        print(f"DEBUG: Traceback: {traceback.format_exc()}")
+        print("DEBUG: Failed to write debug file", path, e)
+
+
+def detect_table_structure(df: pd.DataFrame) -> str:
+    """Return 'with_headers' or 'data_only' or 'empty'."""
+    if df is None or df.empty:
+        return "empty"
+    first_row = df.iloc[0].astype(str).str.lower().tolist()
+    first_row_str = " ".join(first_row)
+    header_indicators = ["trans", "date", "description", "debit", "credit", "balance", "value date"]
+    has_headers = any(h in first_row_str for h in header_indicators)
+    return "with_headers" if has_headers else "data_only"
+
+
+# ---------- Main processing function ----------
+def process_tables_directly(tables, stmt_pk=None):
+    """
+    Main entry — process a list of table dicts (each table contains 'df', 'table_id', 'page', ...).
+    This function is defensive: it will capture exceptions, write debug artifacts, and return either
+    a cleaned DataFrame or an empty DataFrame.
+    """
+    debug_run_id = f"stmt_{stmt_pk or 'unknown'}_{int(datetime.utcnow().timestamp())}"
+    safe_save({"tables_count": len(tables)}, f"directproc_{debug_run_id}_meta.json")
+
+    # Lazy imports from cleaning_utils to avoid import-time failure if cleaning_utils is broken.
+    try:
+        from .cleaning_utils import (
+            normalize_text,
+            parse_date_str,
+            clean_amount,
+            extract_channel,
+        )
+    except Exception as e:
+        tb = traceback.format_exc()
+        err = {"error": "Failed to import cleaning utilities", "exception": str(e), "trace": tb}
+        print("DEBUG: Direct processor import error:", err)
+        safe_save(err, f"directproc_{debug_run_id}_import_error.json")
+        # Return empty DataFrame so upstream falls back
         return pd.DataFrame()
+
+    all_transactions = []
+    table_reports = []
+
+    try:
+        for table in tables:
+            try:
+                table_id = table.get("table_id", "unknown")
+                page = table.get("page", "unknown")
+                df = table.get("df")
+                report = {"table_id": table_id, "page": page, "original_shape": None}
+                if df is None:
+                    report["skipped_reason"] = "no_df"
+                    table_reports.append(report)
+                    continue
+
+                report["original_shape"] = list(df.shape)
+
+                # quick cleanup: ensure every cell normalized string for header detection
+                df_preview = df.head(5).astype(str).replace("nan", "", regex=False)
+                report["preview_rows"] = df_preview.values.tolist()
+
+                # detect structure
+                structure = detect_table_structure(df)
+                report["structure"] = structure
+
+                # skip too small or obviously not transaction (but keep sample)
+                if df.empty or len(df) < 1:
+                    report["skipped_reason"] = "empty_or_too_small"
+                    table_reports.append(report)
+                    continue
+
+                # If the first row looks like headers, take them
+                if structure == "with_headers":
+                    headers = df.iloc[0].tolist()
+                    report["detected_headers"] = headers
+                    # data rows start at next row
+                    df_table = df.iloc[1:].copy().reset_index(drop=True)
+                    # set columns to detected headers (normalize text)
+                    df_table.columns = [normalize_text(h) for h in headers]
+                else:
+                    # data_only -> assign known column positions
+                    report["detected_headers"] = None
+                    known_headers = [
+                        "Trans. Time",
+                        "Value Date",
+                        "Description",
+                        "Debit/Credit(W)",
+                        "Balance(N)",
+                        "Channel",
+                        "Transaction Reference",
+                    ]
+                    df_table = df.copy().reset_index(drop=True)
+                    # If there are fewer columns, trim known_headers
+                    ncols = len(df_table.columns)
+                    assigned = known_headers[:ncols]
+                    df_table.columns = assigned
+                    report["assigned_headers"] = assigned
+
+                # Save a CSV snapshot for debugging
+                csv_name = f"table_{table_id}_page_{page}_snapshot_{debug_run_id}.csv"
+                try:
+                    df_table.to_csv(os.path.join(DEBUG_DIR, csv_name), index=False)
+                except Exception:
+                    safe_save({"error": "failed_to_save_csv"}, f"table_{table_id}_page_{page}_snapshot_{debug_run_id}.json")
+
+                # Clean table using robust in-function steps (not relying on external code to avoid raising)
+                cleaned = _clean_table_dataframe(df_table, normalize_text, parse_date_str, clean_amount, extract_channel)
+
+                # Add metadata and append if not empty
+                report["before_rows"] = len(df_table)
+                report["after_rows"] = len(cleaned)
+                table_reports.append(report)
+
+                if not cleaned.empty:
+                    all_transactions.append(cleaned)
+                    print(f"DEBUG: Table {table_id} contributed {len(cleaned)} transactions")
+                else:
+                    print(f"DEBUG: Table {table_id} yielded 0 transactions after cleaning")
+
+            except Exception as e_table:
+                # capture any per-table exception and continue
+                tb = traceback.format_exc()
+                print(f"DEBUG: Exception processing table {table.get('table_id')}: {e_table}")
+                safe_save({"table": table.get("table_id"), "error": str(e_table), "trace": tb},
+                          f"directproc_{debug_run_id}_table_{table.get('table_id')}_error.json")
+                table_reports.append({"table_id": table.get("table_id"), "error": str(e_table)})
+                continue
+
+        # merge all
+        if all_transactions:
+            final_df = pd.concat(all_transactions, ignore_index=True)
+        else:
+            final_df = pd.DataFrame()
+
+        # final validations: check duplicates and obvious invalid rows
+        if not final_df.empty:
+            # normalize columns expected
+            expected = ["date", "value_date", "description", "debit", "credit", "balance", "channel", "transaction_reference"]
+            for c in expected:
+                if c not in final_df.columns:
+                    final_df[c] = pd.NA
+
+            # create a small report
+            final_report = {
+                "tables_processed": len(table_reports),
+                "rows_extracted": int(len(final_df)),
+                "table_reports": table_reports,
+            }
+            safe_save(final_report, f"directproc_{debug_run_id}_final_report.json")
+        else:
+            final_report = {"tables_processed": len(table_reports), "rows_extracted": 0, "table_reports": table_reports}
+            safe_save(final_report, f"directproc_{debug_run_id}_final_report.json")
+
+        return final_df
+
+    except Exception as e:
+        tb = traceback.format_exc()
+        print("DEBUG: Unexpected error in process_tables_directly:", e)
+        safe_save({"error": str(e), "trace": tb}, f"directproc_{debug_run_id}_fatal_error.json")
+        return pd.DataFrame()
+
+
+# ---------- Internal cleaning helper ----------
+def _clean_table_dataframe(df_table, normalize_text, parse_date_str, clean_amount, extract_channel):
+    """
+    Clean one table DataFrame in lossless debug mode.
+    Keeps invalid rows and marks errors in 'row_issue'.
+    """
+    df = df_table.copy()
+
+    # Normalize every cell safely
+    df = df.map(lambda v: normalize_text(v) if pd.notna(v) else "")
+
+    # --- Rename columns dynamically ---
+    rename_map = {}
+    for col in df.columns:
+        cl = str(col).lower()
+        if "trans" in cl and "time" in cl:
+            rename_map[col] = "date"
+        elif "value" in cl and "date" in cl:
+            rename_map[col] = "value_date"
+        elif "desc" in cl:
+            rename_map[col] = "description"
+        elif "debit" in cl and "credit" in cl or "debit/credit" in cl:
+            rename_map[col] = "debit_credit"
+        elif "balance" in cl:
+            rename_map[col] = "balance"
+        elif "channel" in cl:
+            rename_map[col] = "channel"
+        elif "ref" in cl:
+            rename_map[col] = "transaction_reference"
+    df.rename(columns=rename_map, inplace=True)
+
+    # --- Safe conversions ---
+    df["date"] = df.get("date", pd.Series([""] * len(df))).apply(parse_date_str)
+    df["value_date"] = df.get("value_date", pd.Series([""] * len(df))).apply(parse_date_str)
+    df["balance"] = df.get("balance", pd.Series([""] * len(df))).apply(clean_amount)
+
+    dc = df.get("debit_credit", pd.Series(["0"] * len(df))).astype(str)
+    df["debit"] = dc.apply(lambda x: clean_amount(x) if "-" in x else 0.0)
+    df["credit"] = dc.apply(lambda x: clean_amount(x) if "+" in x else 0.0)
+    df["channel"] = df.get("channel", pd.Series([""] * len(df))).apply(extract_channel)
+    df["description"] = df.get("description", "")
+    df["transaction_reference"] = df.get("transaction_reference", "")
+
+    # --- Detect issues per row ---
+    def detect_issues(row):
+        issues = []
+        if isinstance(row["date"], str) and "INVALID_DATE" in row["date"]:
+            issues.append("invalid_date")
+        if isinstance(row["value_date"], str) and "INVALID_DATE" in row["value_date"]:
+            issues.append("invalid_value_date")
+        if isinstance(row["balance"], str) and "INVALID_AMOUNT" in row["balance"]:
+            issues.append("invalid_balance")
+        if row["channel"] == "EMPTY":
+            issues.append("missing_channel")
+        return ", ".join(issues)
+
+    df["row_issue"] = df.apply(detect_issues, axis=1)
+
+    # --- Column order ---
+    cols = ["date", "value_date", "description", "debit", "credit", "balance", "channel", "transaction_reference", "row_issue"]
+    for c in cols:
+        if c not in df.columns:
+            df[c] = pd.NA
+    df = df[cols]
+
+    # --- Extra debugging: flag invalid date rows ---
+    invalid_dates = df[df["date"].astype(str).str.startswith("INVALID_DATE")]
+    if not invalid_dates.empty:
+        print(f"DEBUG: Found {len(invalid_dates)} rows with invalid date formats.")
+        print(invalid_dates[["date", "description", "row_issue"]].head(5))
+
+    # Save CSV snapshot for inspection
+    stamp = int(datetime.utcnow().timestamp())
+    df.to_csv(os.path.join(DEBUG_DIR, f"cleaned_table_snapshot_{stamp}.csv"), index=False)
+    return df

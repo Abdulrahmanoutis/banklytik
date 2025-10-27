@@ -26,6 +26,8 @@ class Transaction(models.Model):
     # 🆕 Raw date text exactly as extracted from PDF
     raw_date = models.CharField(max_length=255, blank=True, null=True)
     
+    value_date = models.DateField(null=True, blank=True)
+    
     # 💬 Other fields
     description = models.TextField()
     debit = models.FloatField(default=0)

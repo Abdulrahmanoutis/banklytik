@@ -10,45 +10,57 @@
 
 <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%;">
   <thead style="background-color: #f2f2f2;">
-    <tr>
-      <th>Parsed Date</th>
-      <th>Raw Date</th>
-      <th>Description</th>
-      <th>Debit</th>
-      <th>Credit</th>
-      <th>Balance</th>
-      <th>Channel</th>
-      <th>Reference</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for tx in transactions %}
-    <tr>
-      <td>
-        {% if tx.date %}
-          {{ tx.date|date:"Y-m-d" }}{% if tx.date.hour %} {{ tx.date|time:"H:i" }}{% endif %}
-        {% else %}
-          <span style="color: red;">❌ Unparsed</span>
-        {% endif %}
-      </td>
-      <td>
-        {% if tx.raw_date %}
-          <span style="color: #c0392b; font-family: monospace;">{{ tx.raw_date }}</span>
-        {% else %}
-          —
-        {% endif %}
-      </td>
-      <td>{{ tx.description }}</td>
-      <td>{{ tx.debit|floatformat:2 }}</td>
-      <td>{{ tx.credit|floatformat:2 }}</td>
-      <td>{{ tx.balance|floatformat:2 }}</td>
-      <td>{{ tx.channel|default:"EMPTY" }}</td>
-      <td>{{ tx.transaction_reference|default:"—" }}</td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="8">No transactions found.</td></tr>
-    {% endfor %}
-  </tbody>
+  <tr>
+    <th>Parsed Date</th>
+    <th>Value Date</th> <!-- 🆕 Add this -->
+    <th>Raw Date</th>
+    <th>Description</th>
+    <th>Debit</th>
+    <th>Credit</th>
+    <th>Balance</th>
+    <th>Channel</th>  
+    <th>Reference</th> 
+  </tr>
+</thead>
+ <tbody>
+  {% for tx in transactions %}
+  <tr>
+    <td>
+      {% if tx.date %}
+        {{ tx.date|date:"M. d, Y" }}
+      {% else %}
+        <span style="color: red;" title="Date could not be parsed">❌ Unparsed</span>
+      {% endif %}
+    </td>
+
+    <!-- 🆕 Value Date column -->
+    <td>
+      {% if tx.value_date %}
+        {{ tx.value_date|date:"M. d, Y" }}
+      {% else %}
+        <span style="color: gray;">—</span>
+      {% endif %}
+    </td>
+
+    <td>
+      {% if tx.raw_date %}
+        <span style="color: #c0392b; font-family: monospace;">{{ tx.raw_date }}</span>
+      {% else %}
+        <span style="color: gray;">—</span>
+      {% endif %}
+    </td>
+
+    <td>{{ tx.description }}</td>
+    <td>{{ tx.debit|floatformat:2 }}</td>
+    <td>{{ tx.credit|floatformat:2 }}</td>
+    <td>{{ tx.balance|floatformat:2 }}</td>
+    <td>{{ tx.channel|default:"EMPTY" }}</td>
+    <td>{{ tx.transaction_reference|default:"—" }}</td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="9">No transactions found.</td></tr>
+  {% endfor %}
+</tbody>
 </table>
 
 <p><a href="{% url 'statements:list' %}">← Back to list</a></p>

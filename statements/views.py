@@ -142,6 +142,8 @@ def save_transactions_from_dataframe(stmt, df_clean):
             statement=stmt,
             date=parsed_date_value,
             raw_date=raw_date_text,
+            # 🆕 Include parsed value date
+            value_date=row.get("value_date") if "value_date" in row else None,
             description=row.get("description", "") or "",
             debit=row.get("debit", 0.0) or 0.0,
             credit=row.get("credit", 0.0) or 0.0,

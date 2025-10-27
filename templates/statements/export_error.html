@@ -1,13 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Export Failed</title>
-</head>
-<body>
-    <h1>❌ Export Failed</h1>
-    
-    <p><strong>Error:</strong> {{ error }}</p>
-    
-    <a href="{% url 'statements:detail' pk=statement.pk %}">Back to Statement</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<h2 style="color: #c0392b;">❌ Export Failed</h2>
+
+<p>
+  <strong>Error:</strong> {{ error }}
+</p>
+
+<hr>
+
+<p>
+  <a href="{% url 'statements:list' %}" class="btn btn-secondary">
+    ← Back to Statements List
+  </a>
+</p>
+{% endblock %}

@@ -1,9 +1,7 @@
 {% extends "base.html" %}
-
 {% block content %}
 <h2>Transactions for {{ statement.title }}</h2>
 
-<!-- 🔄 Reprocess Button -->
 <p>
   <a href="{% url 'statements:reprocess' statement.pk %}" class="btn btn-warning">
     🔄 Reprocess Statement
@@ -13,7 +11,7 @@
 <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%;">
   <thead style="background-color: #f2f2f2;">
     <tr>
-      <th>Date</th>
+      <th>Parsed Date</th>
       <th>Raw Date</th>
       <th>Description</th>
       <th>Debit</th>
@@ -26,27 +24,20 @@
   <tbody>
     {% for tx in transactions %}
     <tr>
-      <!-- Date column: show parsed date when available; otherwise, show raw_date in red -->
       <td>
         {% if tx.date %}
-          {{ tx.date|date:"M. d, Y" }}
-        {% elif tx.raw_date %}
-          <span style="color:#c0392b;" title="Unparsed/invalid date (see Raw Date)">{{ tx.raw_date }}</span>
+          {{ tx.date|date:"Y-m-d" }}{% if tx.date.hour %} {{ tx.date|time:"H:i" }}{% endif %}
         {% else %}
-          <span style="color: gray;">—</span>
+          <span style="color: red;">❌ Unparsed</span>
         {% endif %}
       </td>
-
-      <!-- Raw Date column: always show raw extracted text (red if present) -->
       <td>
         {% if tx.raw_date %}
-          <span style="color:#c0392b;">{{ tx.raw_date }}</span>
+          <span style="color: #c0392b; font-family: monospace;">{{ tx.raw_date }}</span>
         {% else %}
-          <span style="color: gray;">—</span>
+          —
         {% endif %}
       </td>
-
-      <!-- Rest of transaction fields -->
       <td>{{ tx.description }}</td>
       <td>{{ tx.debit|floatformat:2 }}</td>
       <td>{{ tx.credit|floatformat:2 }}</td>

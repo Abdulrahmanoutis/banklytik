@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Fix Missing Space Between Day and Time",
+    "regex": "(\\d{4}\\s+[A-Za-z]{3,}\\s+)(\\d{2})(\\d{2}:\\d{2}\\s+\\d{2})",
+    "replace": "\\1\\2 \\3",
+    "notes": "Fixes '2025 Feb 2310:00 48' → '2025 Feb 23 10:00 48'"
+  },
+  {
+    "title": "Fix Missing Space Without Seconds",
+    "regex": "(\\d{4}\\s+[A-Za-z]{3,}\\s+)(\\d{2})(\\d{2}:\\d{2})",
+    "replace": "\\1\\2 \\3",
+    "notes": "Fixes '2025 Feb 2310:00' → '2025 Feb 23 10:00'"
+  },
+  {
+    "title": "Fix Day-Month-Year With No Space",
+    "regex": "(\\d{2})([A-Za-z]{3,})(\\d{4}\\s+\\d{2}:\\d{2})",
+    "replace": "\\1 \\2 \\3",
+    "notes": "Fixes '23Feb2025 10:00' → '23 Feb 2025 10:00'"
+  },
+  {
+    "title": "Fix Extra Colon Before Seconds",
+    "regex": "(\\d{4}\\s+[A-Za-z]{3,}\\s+\\d{2}\\s+\\d{2}:\\d{2}):\\s+(\\d{2})",
+    "replace": "\\1 \\2",
+    "notes": "Fixes '2025 Feb 23 20:11: 58' → '2025 Feb 23 20:11 58'"
+  }
+]

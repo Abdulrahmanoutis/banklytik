@@ -1,17 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Tables Exported</title>
-</head>
-<body>
-    <h1>✅ Tables Successfully Exported!</h1>
-    
-    <p><strong>Statement:</strong> {{ statement.title }}</p>
-    <p><strong>Tables Found:</strong> {{ table_count }}</p>
-    <p><strong>File:</strong> {{ file_path }}</p>
-    
-    <p>The complete table data has been saved and is ready to send to DeepSeek.</p>
-    
-    <a href="{% url 'statements:detail' pk=statement.pk %}">Back to Statement</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<h2>✅ Tables Exported Successfully</h2>
+
+<p>
+  <strong>Statement:</strong> {{ statement.title }} <br>
+  <strong>Total Tables Extracted:</strong> {{ table_count }} <br>
+  <strong>Saved To:</strong>
+  <code>{{ file_path }}</code>
+</p>
+
+<hr>
+
+<p>
+  <a href="{% url 'statements:detail' statement.pk %}" class="btn btn-primary">
+    ← Back to Statement Details
+  </a>
+</p>
+
+<p style="margin-top: 20px;">
+  You can now send this exported file to DeepSeek AI for further analysis.
+</p>
+{% endblock %}

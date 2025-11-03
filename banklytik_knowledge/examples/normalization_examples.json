@@ -1,0 +1,4 @@
+[
+  { "input": "TRF- TO MR. BELLO", "expected": "Transfer to Mr. Bello" },
+  { "input": "AIRTME ", "expected": "Airtime" }
+]

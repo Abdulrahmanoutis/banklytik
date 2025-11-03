@@ -1,0 +1,3 @@
+[
+  { "input": "POS TRANSFER MR. JOHN", "expected": "POS Transfer Mr. John" }
+]

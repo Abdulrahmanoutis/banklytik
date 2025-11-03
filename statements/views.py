@@ -31,6 +31,8 @@ from .textract_utils import (
 from .cleaning_utils import robust_clean_dataframe
 from .direct_processor import process_tables_directly
 from .cleaning_utils import parse_date_str
+from banklytik_core.deepseek_adapter import get_deepseek_patterns
+
 
 logger = logging.getLogger(__name__)
 
@@ -38,11 +40,14 @@ logger = logging.getLogger(__name__)
 # ------------------ AWS HELPERS ------------------
 
 def get_s3_client():
+    """Return a boto3 S3 client configured with correct region and endpoint"""
+    region = getattr(settings, "AWS_REGION", getattr(settings, "AWS_S3_REGION_NAME", "eu-west-2"))
     return boto3.client(
         "s3",
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        region_name=getattr(settings, "AWS_REGION", "us-east-1"),
+        region_name=region,
+        endpoint_url=f"https://s3.{region}.amazonaws.com",
     )
 
 
@@ -224,6 +229,12 @@ def reprocess_statement(request, pk):
 
 @login_required
 def process_statement(request, pk):
+    # Ensure DeepSeek rules are loaded before cleaning
+    try:
+        deepseek_rules = get_deepseek_patterns()
+        print(f"✅ DeepSeek preloaded with {len(deepseek_rules)} rules.")
+    except Exception as e:
+        print(f"⚠️ DeepSeek preload failed: {e}")
     stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
     if stmt.processed:
         return redirect("statements:list")

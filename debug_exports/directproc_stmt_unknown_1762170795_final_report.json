@@ -1,0 +1,18 @@
+{
+  "tables_processed": 3,
+  "rows_extracted": 0,
+  "table_reports": [
+    {
+      "table_id": 0,
+      "error": "The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all()."
+    },
+    {
+      "table_id": 1,
+      "error": "expected string or bytes-like object"
+    },
+    {
+      "table_id": 2,
+      "error": "expected string or bytes-like object"
+    }
+  ]
+}

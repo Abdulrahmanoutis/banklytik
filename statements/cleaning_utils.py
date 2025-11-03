@@ -6,7 +6,32 @@ import pandas as pd
 from datetime import datetime
 import logging
 
+from banklytik_core.knowledge_loader import get_rules
+from banklytik_core.deepseek_adapter import get_deepseek_patterns
+
+
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------
+# HELPER: Apply one regex rule safely (used by dynamic rule system)
+# ---------------------------------------------------------------------
+def apply_rule_once(text, pattern, replacement):
+    """
+    Apply a single regex-based rule to text safely.
+    Returns (new_text, changed: bool)
+    """
+    try:
+        new_text = re.sub(pattern, replacement, text)
+        changed = new_text != text
+        if changed:
+            logger.debug(f"🧩 Rule applied: '{pattern}' -> '{replacement}'")
+            logger.debug(f"Before: '{text}'")
+            logger.debug(f"After : '{new_text}'")
+        return new_text, changed
+    except re.error as e:
+        logger.warning(f"⚠️ Invalid regex in rule: {pattern} — {e}")
+        return text, False
+
 
 # ---------------------------------------------------------------------
 # TEXT NORMALIZATION
@@ -22,54 +47,106 @@ def normalize_text(value):
     return s.strip()
 
 # ---------------------------------------------------------------------
-# DATE PARSING (Robust with OCR Fix)
+# DATE PARSING (Robust with OCR Fix + Dynamic Rules)
 # ---------------------------------------------------------------------
 def fix_missing_space_date(date_str):
     """
-    Fix dates with missing space between day and time or small OCR glitches like:
-    "2025 Feb 2310:00 48" -> "2025 Feb 23 10:00 48"
-    "2025 Feb 23 20:11: 58" -> "2025 Feb 23 20:11:58"
+    Fix OCR spacing and colon issues in date strings.
+    Dynamically applies regex rules from both:
+    1. DeepSeek knowledge (deepseek_knowledge.json)
+    2. Knowledge base (dates_rules.md)
+    Then falls back to internal static patterns.
+    Always returns a valid string (never None).
     """
     if not isinstance(date_str, str):
-        return date_str
+        return "" if date_str is None else str(date_str)
 
-    # Pattern 1: Year Month DayTime Seconds
-    pattern1 = r'(\d{4}\s+[A-Za-z]{3,}\s+)(\d{2})(\d{2}:\d{2}\s+\d{2})'
-    fixed1 = re.sub(pattern1, r'\1\2 \3', date_str)
-    if fixed1 != date_str:
-        print(f"DEBUG: Fixed missing space pattern1: '{date_str}' -> '{fixed1}'")
-        return fixed1
+    changed_any = False
 
-    # Pattern 2: Year Month DayTime (no seconds)
-    pattern2 = r'(\d{4}\s+[A-Za-z]{3,}\s+)(\d{2})(\d{2}:\d{2})'
-    fixed2 = re.sub(pattern2, r'\1\2 \3', date_str)
-    if fixed2 != date_str:
-        print(f"DEBUG: Fixed missing space pattern2: '{date_str}' -> '{fixed2}'")
-        return fixed2
+    # --- Step 1: Load DeepSeek rules ---
+    deepseek_rules = []
+    try:
+        from banklytik_core.deepseek_adapter import get_deepseek_patterns
+        deepseek_rules = get_deepseek_patterns() or []
+    except Exception as e:
+        print(f"⚠️ DeepSeek load failed: {e}")
 
-    # Pattern 3: 23Feb2025 10:00 -> 23 Feb 2025 10:00
-    pattern3 = r'(\d{2})([A-Za-z]{3,})(\d{4}\s+\d{2}:\d{2})'
-    fixed3 = re.sub(pattern3, r'\1 \2 \3', date_str)
-    if fixed3 != date_str:
-        print(f"DEBUG: Fixed missing space pattern3: '{date_str}' -> '{fixed3}'")
-        return fixed3
+    if deepseek_rules:
+        print("✅ Loaded DeepSeek rules:", len(deepseek_rules))
+        for rule_text in deepseek_rules:
+            pattern_match = re.search(r"Regex:\s*(.+?)\s+Replace:", rule_text)
+            replace_match = re.search(r"Replace:\s*(.+?)(?:\s+Notes:|$)", rule_text)
+            if pattern_match and replace_match:
+                pattern = pattern_match.group(1).strip()
+                replacement = replace_match.group(1).strip()
+                try:
+                    new_str = re.sub(pattern, replacement, date_str)
+                    if new_str != date_str:
+                        print(f"DEBUG: DeepSeek applied pattern '{pattern}'")
+                        print(f"       '{date_str}' -> '{new_str}'")
+                        date_str = new_str
+                        changed_any = True
+                except re.error as e:
+                    print(f"⚠️ Regex error in DeepSeek rule '{pattern}': {e}")
 
-    # Pattern 4: Generic fallback - e.g. "2310:00" -> "23 10:00"
-    pattern4 = r'(\d{2})(\d{2}:\d{2})'
-    def repl(m): return f"{m.group(1)} {m.group(2)}"
-    fixed4 = re.sub(pattern4, repl, date_str)
-    if fixed4 != date_str:
-        print(f"DEBUG: Fixed missing space pattern4: '{date_str}' -> '{fixed4}'")
-        return fixed4
+    # --- Step 2: Load static KB rules ---
+    kb_rules = []
+    try:
+        from banklytik_core.knowledge_loader import get_rules
+        kb_rules = get_rules("dates") or []
+    except Exception as e:
+        print(f"⚠️ Knowledge base load failed: {e}")
 
-    # 🩹 Pattern 5: Fix "extra space before seconds" issue, e.g. "20:11: 58"
-    pattern5 = r'(\d{2}:\d{2}):\s+(\d{2})'
-    fixed5 = re.sub(pattern5, r'\1:\2', date_str)
-    if fixed5 != date_str:
-        print(f"DEBUG: Fixed colon-space pattern5: '{date_str}' -> '{fixed5}'")
-        return fixed5
+    if kb_rules:
+        for rule_text in kb_rules:
+            pattern_match = re.search(r"Regex:\s*(.+)", rule_text)
+            replace_match = re.search(r"Replace:\s*(.+)", rule_text)
+            if pattern_match and replace_match:
+                pattern = pattern_match.group(1).strip()
+                replacement = replace_match.group(1).strip()
+                try:
+                    new_str = re.sub(pattern, replacement, date_str)
+                    if new_str != date_str:
+                        print(f"DEBUG: KB rule applied: '{pattern}'")
+                        date_str = new_str
+                        changed_any = True
+                except re.error as e:
+                    print(f"⚠️ Regex error in KB rule '{pattern}': {e}")
 
-    return date_str
+    # --- Step 3: Apply fallback internal patterns ---
+    internal_patterns = [
+        # Pattern 1: Missing space between day and time (with seconds)
+        (r'(\d{4}\s+[A-Za-z]{3,}\s+)(\d{2})(\d{2}:\d{2}\s+\d{2})', r'\1\2 \3', "pattern1"),
+        # Pattern 2: Missing space between day and time (no seconds)
+        (r'(\d{4}\s+[A-Za-z]{3,}\s+)(\d{2})(\d{2}:\d{2})', r'\1\2 \3', "pattern2"),
+        # Pattern 3: 23Feb2025 10:00 → 23 Feb 2025 10:00
+        (r'(\d{2})([A-Za-z]{3,})(\d{4}\s+\d{2}:\d{2})', r'\1 \2 \3', "pattern3"),
+        # Pattern 4: Generic fallback “2310:00” → “23 10:00”
+        (r'(\d{2})(\d{2}:\d{2})', r'\1 \2', "pattern4"),
+        # Pattern 5: Colon-space issue “20:11: 58” → “20:11 58”
+        (r'(\d{2}:\d{2}):\s+(\d{2})', r'\1 \2', "pattern5"),
+    ]
+
+    for pattern, replacement, label in internal_patterns:
+        try:
+            new_str = re.sub(pattern, replacement, date_str)
+            if new_str != date_str:
+                print(f"DEBUG: Fixed {label}: '{date_str}' -> '{new_str}'")
+                date_str = new_str
+                changed_any = True
+        except re.error as e:
+            print(f"⚠️ Regex error in internal rule {label}: {e}")
+
+    # --- Step 4: Final safety and return ---
+    if changed_any:
+        print(f"DEBUG: Final fixed date string: '{date_str}'")
+
+    # Always return a valid string
+    if not isinstance(date_str, str) or date_str is None:
+        return ""
+    return str(date_str).strip()
+
+
 
 
 
@@ -87,22 +164,22 @@ def parse_date_str(date_str):
 
     print(f"DEBUG: Attempting to parse date: '{s}'")
 
-    # Step 1: Fix malformed OCR spacing
-    s_fixed = fix_missing_space_date(s)
-    if s_fixed != s:
-        print(f"DEBUG: Applied space fix: '{s}' -> '{s_fixed}'")
-        s = s_fixed
+    # 🧩 Step 1: Normalize OCR spacing before parsing
+    corrected = fix_missing_space_date(s)
+    if corrected != s:
+        print(f"DEBUG: Applied fix_missing_space_date: '{s}' -> '{corrected}'")
+        s = corrected
 
-    # Step 2: Try dateparser
+    # 🧩 Step 2: Try dateparser first
     try:
         parsed = dateparser.parse(
             s,
             settings={
-                'DATE_ORDER': 'DMY',
-                'PREFER_DAY_OF_MONTH': 'first',
-                'PREFER_DATES_FROM': 'current_period',
-                'RETURN_AS_TIMEZONE_AWARE': False
-            }
+                "DATE_ORDER": "DMY",
+                "PREFER_DAY_OF_MONTH": "first",
+                "PREFER_DATES_FROM": "current_period",
+                "RETURN_AS_TIMEZONE_AWARE": False,
+            },
         )
         if parsed:
             print(f"DEBUG: dateparser successfully parsed '{s}' -> {parsed}")
@@ -110,11 +187,10 @@ def parse_date_str(date_str):
     except Exception as e:
         print(f"DEBUG: dateparser failed for '{s}': {e}")
 
-    # Step 3: Try manual datetime formats
+    # 🧩 Step 3: Manual fallback formats
     s_clean = re.sub(r"[.,-]", " ", s)
     s_clean = re.sub(r"\s+", " ", s_clean).strip()
-
-    formats = [
+    for fmt in [
         "%Y %b %d %H:%M %S",
         "%Y %b %d %H:%M:%S",
         "%Y %b %d %H:%M",
@@ -127,19 +203,17 @@ def parse_date_str(date_str):
         "%d/%m/%Y",
         "%d-%m-%Y",
         "%m/%d/%Y",
-    ]
-
-    for fmt in formats:
+    ]:
         try:
             parsed = datetime.strptime(s_clean, fmt)
             if fmt == "%b %Y":
                 parsed = parsed.replace(day=1)
-            print(f"DEBUG: strptime successfully parsed '{s}' -> {parsed} using format '{fmt}'")
+            print(f"DEBUG: strptime successfully parsed '{s}' -> {parsed} using '{fmt}'")
             return parsed
         except ValueError:
             continue
 
-    # Step 4: Try pandas fallback
+    # 🧩 Step 4: Pandas fallback
     try:
         parsed = pd.to_datetime(s_clean, errors="coerce", dayfirst=True)
         if not pd.isna(parsed):
@@ -204,37 +278,29 @@ def robust_clean_dataframe(df_raw):
     df = df_raw.copy()
     df = df.applymap(lambda v: normalize_text(v) if pd.notna(v) else "")
 
-    # Basic column normalization
     headers = [
         "Trans. Time", "Value Date", "Description",
         "Debit/Credit(W)", "Balance(N)", "Channel", "Transaction Reference"
     ]
     df.columns = headers[:len(df.columns)]
 
-    # Debug: print first few date strings
     print("DEBUG: First 5 date strings in 'Trans. Time':")
     for i, date_str in enumerate(df["Trans. Time"].head(5)):
         print(f"  {i}: '{date_str}'")
 
-    # Preserve raw date
     df["raw_date"] = df["Trans. Time"]
-
-    # Apply cleaning functions
     df["date"] = df["Trans. Time"].apply(parse_date_str)
     df["value_date"] = df["Value Date"].apply(parse_date_str)
     df["description"] = df["Description"]
     df["balance"] = df["Balance(N)"].apply(clean_amount)
 
-    # Split Debit/Credit column
     dc = df["Debit/Credit(W)"].astype(str)
     df["debit"] = dc.apply(lambda x: clean_amount(x) if "-" in x else 0.0)
     df["credit"] = dc.apply(lambda x: clean_amount(x) if "+" in x else 0.0)
 
-    # Infer channel and reference
     df["channel"] = df["Channel"].apply(extract_channel)
     df["transaction_reference"] = df["Transaction Reference"]
 
-    # Detect row-level issues
     def detect_issues(row):
         issues = []
         if row["date"] is None:

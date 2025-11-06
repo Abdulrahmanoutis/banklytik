@@ -20,6 +20,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "accounts",
     "statements",
+    "banklytik_core.apps.BanklytikCoreConfig",
+
 ]
 
 MIDDLEWARE = [

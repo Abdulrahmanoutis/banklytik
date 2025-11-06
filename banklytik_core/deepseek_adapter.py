@@ -39,6 +39,87 @@ def get_deepseek_patterns():
     data = load_deepseek_knowledge()
     return data.get("regex_rules", [])
 
+
+
+def merge_suggestions_into_knowledge():
+    """
+    Merge DeepSeek suggestions (deepseek_suggestions.json)
+    into the main DeepSeek knowledge file (deepseek_knowledge.json).
+    Automatically fixes structure issues (dict vs list),
+    avoids duplicates, and reloads knowledge after merge.
+    """
+    base_dir = os.path.dirname(os.path.dirname(__file__))
+    knowledge_path = os.path.join(base_dir, "banklytik_knowledge", "deepseek_knowledge.json")
+    suggestions_path = os.path.join(base_dir, "banklytik_knowledge", "deepseek_suggestions.json")
+
+    if not os.path.exists(suggestions_path):
+        print("⚠️ No deepseek_suggestions.json found.")
+        return False
+
+    # Load suggestions safely
+    with open(suggestions_path, "r") as f:
+        try:
+            suggestions = json.load(f)
+        except json.JSONDecodeError:
+            print("⚠️ deepseek_suggestions.json is invalid JSON.")
+            return False
+
+    if not isinstance(suggestions, list):
+        print("⚠️ Suggestions file must contain a list. Auto-wrapping in list.")
+        suggestions = [suggestions]
+
+    # Load or create main knowledge base
+    if os.path.exists(knowledge_path):
+        with open(knowledge_path, "r") as f:
+            try:
+                knowledge_data = json.load(f)
+            except json.JSONDecodeError:
+                print("⚠️ Knowledge file was empty or invalid. Resetting.")
+                knowledge_data = []
+    else:
+        print("⚠️ No DeepSeek knowledge file found. Creating new one.")
+        knowledge_data = []
+
+    # Fix wrong structure: sometimes a dict is stored instead of a list
+    if isinstance(knowledge_data, dict):
+        print("⚠️ DeepSeek knowledge file is a dict. Converting to list...")
+        knowledge_data = [knowledge_data]
+
+    # Deduplicate based on JSON string comparison
+    existing_rules_str = {json.dumps(rule, sort_keys=True) for rule in knowledge_data if isinstance(rule, dict)}
+    new_rules = []
+
+    for s in suggestions:
+        if not isinstance(s, dict):
+            print("⚠️ Skipping non-dict rule:", s)
+            continue
+        rule_str = json.dumps(s, sort_keys=True)
+        if rule_str not in existing_rules_str:
+            knowledge_data.append(s)
+            existing_rules_str.add(rule_str)
+            new_rules.append(s)
+
+    if not new_rules:
+        print("ℹ️ No new rules to merge — everything is already up-to-date.")
+        return False
+
+    # Save updated knowledge base
+    with open(knowledge_path, "w") as f:
+        json.dump(knowledge_data, f, indent=2)
+
+    print(f"✅ Merged {len(new_rules)} new DeepSeek suggestions into live knowledge base.")
+
+    # Reload DeepSeek knowledge dynamically
+    try:
+        from banklytik_core.knowledge_loader import reload_knowledge
+        reload_knowledge()
+        print("🔁 DeepSeek knowledge reloaded successfully.")
+    except Exception as e:
+        print(f"⚠️ Could not reload knowledge automatically: {e}")
+
+    return True
+
+
 def add_new_pattern(rule_text):
     """
     Add a new regex rule or correction example to the DeepSeek knowledge file.

@@ -58,6 +58,24 @@ def s3_key_exists(bucket, key):
         return True
     except Exception:
         return False
+    
+    
+def save_debug_textract_json(blocks_data, stmt_pk):
+    """
+    Save the raw Textract JSON output locally for debugging and AI training.
+    """
+    try:
+        debug_dir = os.path.join(getattr(settings, "BASE_DIR", "."), "debug_exports")
+        os.makedirs(debug_dir, exist_ok=True)
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        path = os.path.join(debug_dir, f"analyzeDocResponse_{stmt_pk}_{timestamp}.json")
+
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(blocks_data, f, indent=2)
+        print(f"✅ Saved local Textract JSON to {path}")
+    except Exception as e:
+        print(f"⚠️ Failed to save local Textract JSON: {e}")
+
 
 
 # ------------------ DATE PARSING HELPERS ------------------
@@ -124,13 +142,27 @@ def enhanced_date_parsing(date_str):
 def save_transactions_from_dataframe(stmt, df_clean):
     """
     Saves transactions safely, handling invalid/NaT dates.
+    Prevents Series/array ambiguity by coercing all values to strings or floats.
     """
     stmt.transactions.all().delete()
     transactions_created = 0
     flagged_transactions = 0
 
     for _, row in df_clean.iterrows():
-        raw_date_text = str(row.get("date", "")).strip()
+        # Defensive getters (avoid Series ambiguity)
+        def safe_get(col, default=""):
+            val = row.get(col, default)
+            # If Series or list → pick first valid item
+            if isinstance(val, (pd.Series, list)):
+                if len(val) > 0:
+                    return val.iloc[0] if isinstance(val, pd.Series) else val[0]
+                return default
+            # Handle NaN and weird Pandas types
+            if pd.isna(val):
+                return default
+            return val
+
+        raw_date_text = str(safe_get("date", "")).strip()
         parsed_date = parse_date_str(raw_date_text)
 
         parsed_date_value = None
@@ -143,18 +175,33 @@ def save_transactions_from_dataframe(stmt, df_clean):
         else:
             flagged_transactions += 1
 
+        # Coerce numeric and text fields safely
+        try:
+            debit_val = float(safe_get("debit", 0.0) or 0.0)
+        except Exception:
+            debit_val = 0.0
+
+        try:
+            credit_val = float(safe_get("credit", 0.0) or 0.0)
+        except Exception:
+            credit_val = 0.0
+
+        try:
+            balance_val = float(safe_get("balance", 0.0) or 0.0)
+        except Exception:
+            balance_val = 0.0
+
         Transaction.objects.create(
             statement=stmt,
             date=parsed_date_value,
             raw_date=raw_date_text,
-            # 🆕 Include parsed value date
-            value_date=row.get("value_date") if "value_date" in row else None,
-            description=row.get("description", "") or "",
-            debit=row.get("debit", 0.0) or 0.0,
-            credit=row.get("credit", 0.0) or 0.0,
-            balance=row.get("balance", 0.0) or 0.0,
-            channel=row.get("channel", "EMPTY") or "EMPTY",
-            transaction_reference=row.get("transaction_reference", "") or "",
+            value_date=safe_get("value_date", None),
+            description=str(safe_get("description", "")).strip(),
+            debit=debit_val,
+            credit=credit_val,
+            balance=balance_val,
+            channel=str(safe_get("channel", "EMPTY") or "EMPTY"),
+            transaction_reference=str(safe_get("transaction_reference", "") or ""),
         )
 
         transactions_created += 1
@@ -261,7 +308,9 @@ def process_statement(request, pk):
         if isinstance(blocks, str):
             blocks = json.loads(blocks)
 
+        save_debug_textract_json(blocks_data, stmt.pk)
         tables = extract_all_tables(blocks)
+        
 
         try:
             df_clean = process_tables_directly(tables)

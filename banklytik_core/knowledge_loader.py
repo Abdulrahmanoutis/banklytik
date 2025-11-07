@@ -76,3 +76,51 @@ try:
     print("🤖 Auto-exported updated knowledge to DeepSeek JSON.")
 except Exception as e:
     print(f"⚠️ DeepSeek auto-export skipped: {e}")
+
+
+
+def load_bank_rules(bank: str, base_dir=None):
+    """
+    Load additional rules/examples for a specific bank (if present).
+    This appends rules into the global _knowledge_data.
+    Directory layout expected:
+      banklytik_knowledge/rules/<bank_lower>/*.md or *.json
+    """
+    global _knowledge_data
+
+    if base_dir is None:
+        base_dir = os.path.join(os.getcwd(), "banklytik_knowledge")
+
+    if not bank or bank.upper() == "UNKNOWN":
+        return False
+
+    bank_dir = os.path.join(base_dir, "rules", bank.lower())
+    if not os.path.isdir(bank_dir):
+        # no bank-specific rules found (not an error)
+        return False
+
+    # Walk bank_dir and load files similarly to reload_knowledge()
+    for root, _, files in os.walk(bank_dir):
+        for fname in files:
+            file_path = os.path.join(root, fname)
+            rel_path = os.path.relpath(file_path, base_dir)
+            # section for bank rules can be 'dates', 'amounts', etc. or 'rules'
+            # we simply append to 'rules' under a bank namespace
+            section = "rules"
+            try:
+                if fname.endswith(".md"):
+                    content = _load_text_file(file_path)
+                    if content:
+                        # store under rules -> <bank>: [ ... ]
+                        _knowledge_data["rules"].setdefault(f"{bank.lower()}", []).append(content)
+                elif fname.endswith(".json"):
+                    content = _load_json_file(file_path)
+                    if content:
+                        _knowledge_data["examples"].setdefault(f"{bank.lower()}", []).extend(
+                            content if isinstance(content, list) else [content]
+                        )
+            except Exception as e:
+                print(f"⚠️ Failed to load bank-specific file {file_path}: {e}")
+
+    print(f"✅ Bank-specific rules loaded for: {bank}")
+    return True

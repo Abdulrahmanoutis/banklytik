@@ -1,6 +1,6 @@
+# banklytik_core/apps.py
 from django.apps import AppConfig
 import logging
-
 logger = logging.getLogger(__name__)
 
 class BanklytikCoreConfig(AppConfig):
@@ -9,11 +9,10 @@ class BanklytikCoreConfig(AppConfig):
 
     def ready(self):
         """
-        Initialize DeepSeek on Django startup using isolated loader
-        (prevents circular imports between apps and knowledge modules).
+        Schedule delayed DeepSeek initialization on startup.
         """
         try:
             from banklytik_core.startup_loader import safe_initialize_deepseek
             safe_initialize_deepseek()
         except Exception as e:
-            logger.warning(f"⚠️ DeepSeek startup failed: {e}")
+            logger.warning(f"⚠️ DeepSeek startup scheduling failed: {e}")

@@ -1,0 +1,10 @@
+date,value_date,description,description,debit,credit,balance,channel,transaction_reference,row_issue
+2025-05-14 23:08:23,,,airtime purchase 2347049794301,0.0,0.0,0.0,AIRTIME,,
+2025-05-30 18:41:52,,Abdulrahman Kamilu Ilah/9029189750/Paycom(Opay),kip:opay/abdulrahman kamilu/transfer from abdulrah,0.0,0.0,1000.0,TRANSFER,,
+2025-05-30 18:42:23,,,kedco prepaid purchase,0.0,0.0,0.0,OTHER,,
+2025-08-12 09:37:28,,Abdulrahman Kamilu Ilah/9029189750/Paycom(Opay),transfer from abdulrahman kamilu ilah,0.0,0.0,1000.0,TRANSFER,,
+2025-08-12 09:37:44,,,airtime purchase 2347049794301,0.0,0.0,0.0,AIRTIME,,
+2025-08-12 09:38:35,,,reversal of airtime purchase 2347049794301,0.0,0.0,1000.0,AIRTIME,,
+2025-08-12 09:39:23,,,airtime purchase 2347049794301,0.0,0.0,0.0,AIRTIME,,
+2025-08-12 09:39:27,,,reversal of airtime purchase 2347049794301,0.0,0.0,1000.0,AIRTIME,,
+2025-08-20 10:55:33,,,airtime purchase 2347049794301,0.0,0.0,0.0,AIRTIME,,

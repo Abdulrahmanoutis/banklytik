@@ -1,0 +1,56 @@
+[
+  {
+    "row_index": 0,
+    "raw_date": "14/05/25 23:08:23",
+    "parsed_date": "2025-05-14 23:08:23",
+    "description": "description                                  \ndescription    airtime purchase 2347049794301\nName: 0, dtype: object"
+  },
+  {
+    "row_index": 1,
+    "raw_date": "30/05/25 18:41:52",
+    "parsed_date": "2025-05-30 18:41:52",
+    "description": "description      Abdulrahman Kamilu Ilah/9029189750/Paycom(Opay)\ndescription    kip:opay/abdulrahman kamilu/transfer from abdu...\nName: 1, dtype: object"
+  },
+  {
+    "row_index": 2,
+    "raw_date": "30/05/25 18:42:23",
+    "parsed_date": "2025-05-30 18:42:23",
+    "description": "description                          \ndescription    kedco prepaid purchase\nName: 2, dtype: object"
+  },
+  {
+    "row_index": 3,
+    "raw_date": "12/08/25 09:37:28",
+    "parsed_date": "2025-08-12 09:37:28",
+    "description": "description    Abdulrahman Kamilu Ilah/9029189750/Paycom(Opay)\ndescription              transfer from abdulrahman kamilu ilah\nName: 3, dtype: object"
+  },
+  {
+    "row_index": 4,
+    "raw_date": "12/08/25 09:37:44",
+    "parsed_date": "2025-08-12 09:37:44",
+    "description": "description                                  \ndescription    airtime purchase 2347049794301\nName: 4, dtype: object"
+  },
+  {
+    "row_index": 5,
+    "raw_date": "12/08/25 09:38:35",
+    "parsed_date": "2025-08-12 09:38:35",
+    "description": "description                                              \ndescription    reversal of airtime purchase 2347049794301\nName: 5, dtype: object"
+  },
+  {
+    "row_index": 6,
+    "raw_date": "12/08/25 09:39:23",
+    "parsed_date": "2025-08-12 09:39:23",
+    "description": "description                                  \ndescription    airtime purchase 2347049794301\nName: 6, dtype: object"
+  },
+  {
+    "row_index": 7,
+    "raw_date": "12/08/25 09:39:27",
+    "parsed_date": "2025-08-12 09:39:27",
+    "description": "description                                              \ndescription    reversal of airtime purchase 2347049794301\nName: 7, dtype: object"
+  },
+  {
+    "row_index": 8,
+    "raw_date": "20/08/25 10:55:33",
+    "parsed_date": "2025-08-20 10:55:33",
+    "description": "description                                  \ndescription    airtime purchase 2347049794301\nName: 8, dtype: object"
+  }
+]

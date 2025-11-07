@@ -140,7 +140,12 @@ def fix_missing_space_date(date_str):
 
 
 def parse_date_str(date_str):
-    """Robust multi-strategy date parser with DeepSeek learning log integration."""
+    """Robust multi-strategy date parser with enhanced Kuda/Access format support."""
+    import re
+    import pandas as pd
+    from datetime import datetime
+    import dateparser
+
     if pd.isna(date_str):
         return None
 
@@ -148,15 +153,15 @@ def parse_date_str(date_str):
     if s.lower() in ["", "nan", "none", "null", "0.0"]:
         return None
 
-    print(f"DEBUG: Attempting to parse date: '{s}'")
+    # Normalize spaces and separators
+    s = re.sub(r"(\d{1,2})([A-Za-z]{3,})(\d{4})", r"\1 \2 \3", s)
+    s = re.sub(r"(\d{4})([A-Za-z]{3,})(\d{1,2})", r"\1 \2 \3", s)
+    s = re.sub(r"(\d{2})([A-Za-z]{3,})(\d{2})", r"\1 \2 \3", s)
+    s = re.sub(r"[\t\r\n]+", " ", s)
+    s = re.sub(r"\s{2,}", " ", s).strip()
+    s = s.replace("  ", " ")
 
-    # 🧩 Step 1: Normalize OCR spacing
-    s_fixed = fix_missing_space_date(s)
-    if s_fixed != s:
-        print(f"DEBUG: Applied fix_missing_space_date: '{s}' -> '{s_fixed}'")
-        s = s_fixed
-
-    # 🧩 Step 2: Try dateparser
+    # --- 1. Try dateparser first ---
     try:
         parsed = dateparser.parse(
             s,
@@ -168,45 +173,45 @@ def parse_date_str(date_str):
             },
         )
         if parsed:
-            print(f"DEBUG: dateparser successfully parsed '{s}' -> {parsed}")
             return parsed
-    except Exception as e:
-        print(f"DEBUG: dateparser failed for '{s}': {e}")
+    except Exception:
+        pass
 
-    # 🧩 Step 3: Try known formats
-    s_clean = re.sub(r"[.,-]", " ", s)
-    s_clean = re.sub(r"\s+", " ", s_clean).strip()
-
-    formats = [
-        "%Y %b %d %H:%M %S", "%Y %b %d %H:%M:%S", "%Y %b %d %H:%M",
-        "%d %b %Y %H:%M %S", "%d %b %Y %H:%M:%S", "%d %b %Y %H:%M",
-        "%Y %b %d", "%d %b %Y", "%b %Y",
-        "%d/%m/%Y", "%d-%m-%Y", "%m/%d/%Y",
+    # --- 2. Manual known formats ---
+    common_formats = [
+        "%d %b %Y %I:%M %p",  # 15 Oct 2025 07:32 PM
+        "%b %d, %Y %H:%M:%S",
+        "%b %d, %Y %I:%M %p",
+        "%d %b, %Y %H:%M",
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S",
+        "%d/%m/%Y %H:%M",
+        "%d-%m-%Y %H:%M",
+        "%d %b %Y",
+        "%b %d %Y",
     ]
-
-    for fmt in formats:
+    for fmt in common_formats:
         try:
-            parsed = datetime.strptime(s_clean, fmt)
-            if fmt == "%b %Y":
-                parsed = parsed.replace(day=1)
-            print(f"DEBUG: strptime successfully parsed '{s}' -> {parsed} using '{fmt}'")
+            parsed = datetime.strptime(s, fmt)
             return parsed
-        except ValueError:
+        except Exception:
             continue
 
-    # 🧩 Step 4: Pandas fallback
+    # --- 3. Fallback using pandas ---
     try:
-        parsed = pd.to_datetime(s_clean, errors="coerce", dayfirst=True)
+        parsed = pd.to_datetime(s, errors="coerce", dayfirst=True)
         if not pd.isna(parsed):
-            print(f"DEBUG: pandas successfully parsed '{s}' -> {parsed}")
             return parsed.to_pydatetime()
-    except Exception as e:
-        print(f"DEBUG: pandas failed for '{s}': {e}")
+    except Exception:
+        pass
 
-    # 🧩 Step 5: Log failed parsing for DeepSeek learning
-    log_failed_date(s, "unparsed_after_all_methods")
+    # --- 4. Log unparsed date for DeepSeek learning ---
+    try:
+        from banklytik_core.deepseek_rule_generator import log_failed_date
+        log_failed_date(s, "unparsed_kuda_like_date")
+    except Exception:
+        pass
 
-    print(f"DEBUG: All parsing methods failed for: '{s}'")
     return None
 
 

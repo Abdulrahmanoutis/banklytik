@@ -62,6 +62,56 @@ def process_tables_directly(tables, stmt_pk=None):
         # Return empty DataFrame so upstream falls back
         return pd.DataFrame()
 
+    # -----------------------
+    # Bank detection & knowledge load (new)
+    # -----------------------
+    detected_bank = "UNKNOWN"
+    try:
+        # Collect a small sample of text from the tables to run bank detection on
+        sample_texts = []
+        for t in tables[:6]:  # limit to first few tables for speed
+            df_sample = t.get("df")
+            if df_sample is None:
+                continue
+            # take first 3 rows and first 6 columns as text sample
+            try:
+                sample_rows = df_sample.head(3).astype(str).fillna("").values.tolist()
+                for r in sample_rows:
+                    sample_texts.append(" ".join([str(c) for c in r[:6]]))
+            except Exception:
+                continue
+        joined_sample = " ".join(sample_texts)[:20000]  # cap length
+        if joined_sample.strip():
+            try:
+                # local import to avoid circular issues
+                from .bank_detection import detect_bank_from_text
+                detected_bank = detect_bank_from_text(joined_sample)
+            except Exception as e:
+                print("DEBUG: bank_detection failed:", e)
+                detected_bank = "UNKNOWN"
+    except Exception as e:
+        print("DEBUG: Unexpected error during bank detection sample collection:", e)
+        detected_bank = "UNKNOWN"
+
+    # Try to load base knowledge and bank-specific rules (lazy import)
+    try:
+        from banklytik_core.knowledge_loader import reload_knowledge, load_bank_rules
+        try:
+            reload_knowledge()
+        except Exception as e:
+            print("DEBUG: reload_knowledge() failed:", e)
+        # Attempt to load bank-specific rules (no-op if none found)
+        try:
+            loaded_bank_rules = False
+            if detected_bank and detected_bank != "UNKNOWN":
+                loaded_bank_rules = load_bank_rules(detected_bank)
+            safe_save({"detected_bank": detected_bank, "loaded_bank_rules": bool(loaded_bank_rules)},
+                      f"directproc_{debug_run_id}_bankinfo.json")
+        except Exception as e:
+            print("DEBUG: load_bank_rules failed:", e)
+    except Exception as e:
+        print("DEBUG: Could not import knowledge_loader to load bank rules:", e)
+
     all_transactions = []
     table_reports = []
 
@@ -71,7 +121,7 @@ def process_tables_directly(tables, stmt_pk=None):
                 table_id = table.get("table_id", "unknown")
                 page = table.get("page", "unknown")
                 df = table.get("df")
-                report = {"table_id": table_id, "page": page, "original_shape": None}
+                report = {"table_id": table_id, "page": page, "original_shape": None, "detected_bank": detected_bank}
                 if df is None:
                     report["skipped_reason"] = "no_df"
                     table_reports.append(report)
@@ -97,10 +147,19 @@ def process_tables_directly(tables, stmt_pk=None):
                 if structure == "with_headers":
                     headers = df.iloc[0].tolist()
                     report["detected_headers"] = headers
-                    # data rows start at next row
-                    df_table = df.iloc[1:].copy().reset_index(drop=True)
-                    # set columns to detected headers (normalize text)
-                    df_table.columns = [normalize_text(h) for h in headers]
+
+                    # --- NEW: AI-assisted header normalization ---
+                    try:
+                        from .header_detector import detect_headers_ai
+                        mapping = detect_headers_ai(headers)
+                        normalized_headers = [mapping.get(h, h) for h in headers]
+                        report["ai_header_mapping"] = mapping
+                        df_table = df.iloc[1:].copy().reset_index(drop=True)
+                        df_table.columns = normalized_headers
+                    except Exception as e:
+                        print("DEBUG: header_detector failed:", e)
+                        df_table = df.iloc[1:].copy().reset_index(drop=True)
+                        df_table.columns = [normalize_text(h) for h in headers]
                 else:
                     # data_only -> assign known column positions
                     report["detected_headers"] = None
@@ -136,8 +195,10 @@ def process_tables_directly(tables, stmt_pk=None):
                 table_reports.append(report)
 
                 if not cleaned.empty:
+                    # annotate with detected bank at row level for traceability
+                    cleaned["detected_bank"] = detected_bank
                     all_transactions.append(cleaned)
-                    print(f"DEBUG: Table {table_id} contributed {len(cleaned)} transactions")
+                    print(f"DEBUG: Table {table_id} contributed {len(cleaned)} transactions (bank={detected_bank})")
                 else:
                     print(f"DEBUG: Table {table_id} yielded 0 transactions after cleaning")
 
@@ -169,10 +230,11 @@ def process_tables_directly(tables, stmt_pk=None):
                 "tables_processed": len(table_reports),
                 "rows_extracted": int(len(final_df)),
                 "table_reports": table_reports,
+                "detected_bank": detected_bank,
             }
             safe_save(final_report, f"directproc_{debug_run_id}_final_report.json")
         else:
-            final_report = {"tables_processed": len(table_reports), "rows_extracted": 0, "table_reports": table_reports}
+            final_report = {"tables_processed": len(table_reports), "rows_extracted": 0, "table_reports": table_reports, "detected_bank": detected_bank}
             safe_save(final_report, f"directproc_{debug_run_id}_final_report.json")
 
         return final_df
@@ -187,15 +249,20 @@ def process_tables_directly(tables, stmt_pk=None):
 # ---------- Internal cleaning helper ----------
 def _clean_table_dataframe(df_table, normalize_text, parse_date_str, clean_amount, extract_channel):
     """
-    Clean one table DataFrame in lossless debug mode.
-    Keeps invalid rows and marks errors in 'row_issue'.
+    Clean one table DataFrame safely.
+    Handles Series-to-scalar issues and logs invalid dates.
     """
+    import pandas as pd
+    from datetime import datetime
+    import os, json
+
     df = df_table.copy()
 
-    # Normalize every cell safely
-    df = df.map(lambda v: normalize_text(v) if pd.notna(v) else "")
+    # normalize all cells
+    df = df.apply(lambda col: col.map(lambda v: normalize_text(v) if pd.notna(v) else ""))
 
-    # --- Rename columns dynamically ---
+
+    # --- Dynamic column rename mapping ---
     rename_map = {}
     for col in df.columns:
         cl = str(col).lower()
@@ -207,6 +274,10 @@ def _clean_table_dataframe(df_table, normalize_text, parse_date_str, clean_amoun
             rename_map[col] = "description"
         elif "debit" in cl and "credit" in cl or "debit/credit" in cl:
             rename_map[col] = "debit_credit"
+        elif "debit" in cl:
+            rename_map[col] = "debit"
+        elif "credit" in cl:
+            rename_map[col] = "credit"
         elif "balance" in cl:
             rename_map[col] = "balance"
         elif "channel" in cl:
@@ -215,47 +286,77 @@ def _clean_table_dataframe(df_table, normalize_text, parse_date_str, clean_amoun
             rename_map[col] = "transaction_reference"
     df.rename(columns=rename_map, inplace=True)
 
-    # --- Safe conversions ---
-    df["date"] = df.get("date", pd.Series([""] * len(df))).apply(parse_date_str)
-    df["value_date"] = df.get("value_date", pd.Series([""] * len(df))).apply(parse_date_str)
-    df["balance"] = df.get("balance", pd.Series([""] * len(df))).apply(clean_amount)
+    # Ensure required columns exist
+    for c in ["date","value_date","description","debit","credit","balance","channel","transaction_reference"]:
+        if c not in df.columns:
+            df[c] = ""
 
-    dc = df.get("debit_credit", pd.Series(["0"] * len(df))).astype(str)
-    df["debit"] = dc.apply(lambda x: clean_amount(x) if "-" in x else 0.0)
-    df["credit"] = dc.apply(lambda x: clean_amount(x) if "+" in x else 0.0)
-    df["channel"] = df.get("channel", pd.Series([""] * len(df))).apply(extract_channel)
-    df["description"] = df.get("description", "")
-    df["transaction_reference"] = df.get("transaction_reference", "")
+    # --- Parse and clean columns safely ---
+    df["date"] = df["date"].apply(lambda x: parse_date_str(x) if isinstance(x,str) or not pd.isna(x) else None)
+    df["value_date"] = df["value_date"].apply(lambda x: parse_date_str(x) if isinstance(x,str) or not pd.isna(x) else None)
 
-    # --- Detect issues per row ---
+    df["balance"] = df["balance"].apply(lambda x: clean_amount(x) if isinstance(x,(str,int,float)) else 0.0)
+
+    if "debit_credit" in df.columns:
+        dc = df["debit_credit"].astype(str)
+        df["debit"] = dc.apply(lambda x: clean_amount(x) if "-" in x else 0.0)
+        df["credit"] = dc.apply(lambda x: clean_amount(x) if "+" in x else 0.0)
+    else:
+        df["debit"] = df["debit"].apply(lambda x: clean_amount(x) if isinstance(x,(str,int,float)) else 0.0)
+        df["credit"] = df["credit"].apply(lambda x: clean_amount(x) if isinstance(x,(str,int,float)) else 0.0)
+
+    df["channel"] = df["channel"].apply(lambda x: extract_channel(str(x)) if pd.notna(x) else "EMPTY")
+
+    # --- Detect issues ---
     def detect_issues(row):
         issues = []
-        if isinstance(row["date"], str) and "INVALID_DATE" in row["date"]:
+        date_val = row.get("date", None)
+        bal_val = row.get("balance", None)
+        chan_val = row.get("channel", None)
+
+        # force to scalar strings
+        if isinstance(date_val, (pd.Series, list)):
+            date_val = date_val.iloc[0] if isinstance(date_val, pd.Series) else (date_val[0] if date_val else None)
+        if isinstance(bal_val, (pd.Series, list)):
+            bal_val = bal_val.iloc[0] if isinstance(bal_val, pd.Series) else (bal_val[0] if bal_val else None)
+        if isinstance(chan_val, (pd.Series, list)):
+            chan_val = chan_val.iloc[0] if isinstance(chan_val, pd.Series) else (chan_val[0] if chan_val else None)
+
+        if date_val is None or (isinstance(date_val, str) and "INVALID_DATE" in date_val):
             issues.append("invalid_date")
-        if isinstance(row["value_date"], str) and "INVALID_DATE" in row["value_date"]:
-            issues.append("invalid_value_date")
-        if isinstance(row["balance"], str) and "INVALID_AMOUNT" in row["balance"]:
+        if isinstance(bal_val, str) and "INVALID_AMOUNT" in bal_val:
             issues.append("invalid_balance")
-        if row["channel"] == "EMPTY":
+        if str(chan_val).strip().upper() == "EMPTY":
             issues.append("missing_channel")
+
         return ", ".join(issues)
+
 
     df["row_issue"] = df.apply(detect_issues, axis=1)
 
-    # --- Column order ---
-    cols = ["date", "value_date", "description", "debit", "credit", "balance", "channel", "transaction_reference", "row_issue"]
+    # --- Date debug log ---
+    try:
+        debug_dir = os.path.join(os.getcwd(), "debug_exports")
+        os.makedirs(debug_dir, exist_ok=True)
+        timestamp = int(datetime.utcnow().timestamp())
+        log_path = os.path.join(debug_dir, f"date_debug_table_{timestamp}.json")
+        date_logs = []
+        for i, row in df.iterrows():
+            date_logs.append({
+                "row_index": int(i),
+                "raw_date": str(df_table.iloc[i,0]) if len(df_table.columns)>0 else "",
+                "parsed_date": str(row.get("date")),
+                "description": str(row.get("description"))
+            })
+        with open(log_path,"w",encoding="utf-8") as f:
+            json.dump(date_logs,f,indent=2,default=str)
+        print(f"✅ Saved date debug log to {log_path}")
+    except Exception as e:
+        print(f"⚠️ Failed to save date debug log: {e}")
+
+    # enforce consistent column order
+    cols = ["date","value_date","description","debit","credit","balance","channel","transaction_reference","row_issue"]
     for c in cols:
         if c not in df.columns:
-            df[c] = pd.NA
-    df = df[cols]
-
-    # --- Extra debugging: flag invalid date rows ---
-    invalid_dates = df[df["date"].astype(str).str.startswith("INVALID_DATE")]
-    if not invalid_dates.empty:
-        print(f"DEBUG: Found {len(invalid_dates)} rows with invalid date formats.")
-        print(invalid_dates[["date", "description", "row_issue"]].head(5))
-
-    # Save CSV snapshot for inspection
-    stamp = int(datetime.utcnow().timestamp())
-    df.to_csv(os.path.join(DEBUG_DIR, f"cleaned_table_snapshot_{stamp}.csv"), index=False)
-    return df
+            df[c] = ""
+    return df[cols]

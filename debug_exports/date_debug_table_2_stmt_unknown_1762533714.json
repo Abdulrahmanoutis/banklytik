@@ -1,0 +1,10 @@
+[
+  {
+    "table_id": 2,
+    "page": 2,
+    "row_index": 0,
+    "raw_date": "date                     bills\ndate    kedco prepaid purchase\nName: 0, dtype: object",
+    "parsed": "date    None\ndate    None\nName: 0, dtype: object",
+    "description": ""
+  }
+]

@@ -187,7 +187,56 @@ def process_tables_directly(tables, stmt_pk=None):
                     safe_save({"error": "failed_to_save_csv"}, f"table_{table_id}_page_{page}_snapshot_{debug_run_id}.json")
 
                 # Clean table using robust in-function steps (not relying on external code to avoid raising)
-                cleaned = _clean_table_dataframe(df_table, normalize_text, parse_date_str, clean_amount, extract_channel)
+                # Ensure df_table is a valid DataFrame before cleaning
+                if not isinstance(df_table, pd.DataFrame):
+                    print(f"⚠️ Table {table_id} has non-DataFrame df_table ({type(df_table)}); skipping.")
+                    report["skipped_reason"] = f"invalid_type_{type(df_table)}"
+                    table_reports.append(report)
+                    continue
+
+                # Defensive: sometimes df_table becomes Series for single-row tables
+                if isinstance(df_table, pd.Series):
+                    df_table = df_table.to_frame().T.reset_index(drop=True)
+
+                
+                try:
+                    # 🔍 Diagnostic: show what type/shape the incoming df_table is
+                    print(f"DEBUG: Cleaning table {table_id} (page={page}) type={type(df_table)}")
+                    if isinstance(df_table, pd.DataFrame):
+                        print(f"DEBUG: df_table shape={df_table.shape}, columns={list(df_table.columns)}")
+                        print(f"DEBUG: First 3 rows preview:\n{df_table.head(3)}")
+                    else:
+                        print(f"DEBUG: df_table is NOT a DataFrame (type={type(df_table)})")
+
+                    cleaned = _clean_table_dataframe(
+                        df_table,
+                        normalize_text,
+                        parse_date_str,
+                        clean_amount,
+                        extract_channel,
+                        table_id=table_id,
+                        page=page,
+                        debug_run_id=debug_run_id,
+                    )
+                except Exception as e_clean:
+                    tb = traceback.format_exc()
+                    print(f"DEBUG: Cleaning failed for table {table_id}: {e_clean}")
+                    safe_save({
+                        "table_id": table_id,
+                        "error": str(e_clean),
+                        "trace": tb,
+                        "df_type": str(type(df_table)),
+                        "df_columns": list(df_table.columns) if hasattr(df_table, "columns") else None,
+                        "df_shape": df_table.shape if hasattr(df_table, "shape") else None,
+                        "df_sample": df_table.head(5).astype(str).values.tolist() if isinstance(df_table, pd.DataFrame) else str(df_table)
+                    }, f"directproc_{debug_run_id}_table_{table_id}_clean_error.json")
+                    report["error"] = str(e_clean)
+                    table_reports.append(report)
+                    continue
+
+
+           
+
 
                 # Add metadata and append if not empty
                 report["before_rows"] = len(df_table)
@@ -247,22 +296,49 @@ def process_tables_directly(tables, stmt_pk=None):
 
 
 # ---------- Internal cleaning helper ----------
-def _clean_table_dataframe(df_table, normalize_text, parse_date_str, clean_amount, extract_channel):
+def _clean_table_dataframe(df_table, normalize_text, parse_date_str, clean_amount, extract_channel,
+                           table_id=None, page=None, debug_run_id=None):
     """
-    Clean one table DataFrame safely.
-    Handles Series-to-scalar issues and logs invalid dates.
+    Clean one table DataFrame safely and robustly.
+
+    - Coerces any Series -> scalar where needed to avoid ambiguous truth-value errors.
+    - Uses per-column normalization with `.apply(... .map(...))` to avoid deprecated applymap issues.
+    - Returns a DataFrame with stable columns:
+       ["date","value_date","description","debit","credit","balance","channel","transaction_reference","row_issue"]
+    - Writes a per-table date debug log to debug_exports/date_debug_table_<debug_run_id>_<table_id>.json
     """
     import pandas as pd
-    from datetime import datetime
     import os, json
+    from datetime import datetime
 
-    df = df_table.copy()
+    # Defensive conversion: if a single-row DataFrame became a Series, convert back
+    if isinstance(df_table, pd.Series):
+        df = df_table.to_frame().T.reset_index(drop=True)
+    else:
+        df = df_table.copy()
+        
+    # --- Fix duplicate and empty column names ---
+    df.columns = [str(c).strip() if str(c).strip() != "" else f"col_{i}" for i, c in enumerate(df.columns)]
 
-    # normalize all cells
-    df = df.apply(lambda col: col.map(lambda v: normalize_text(v) if pd.notna(v) else ""))
+    # Drop exact duplicate column names by keeping first occurrence
+    deduped_cols = []
+    for c in df.columns:
+        if c not in deduped_cols:
+            deduped_cols.append(c)
+    df = df.loc[:, deduped_cols]
 
+    # If any column label repeats, rename remaining duplicates with suffixes
+    df = df.loc[:, ~df.columns.duplicated()].copy()
 
-    # --- Dynamic column rename mapping ---
+    print(f"DEBUG: Normalizing columns → {list(df.columns)}")
+    # Normalize every cell safely (column-wise)
+    try:
+        df = df.apply(lambda col: col.map(lambda v: normalize_text(v) if pd.notna(v) else ""))
+    except Exception:
+        # fallback: coerce all to str
+        df = df.applymap(lambda v: str(v) if pd.notna(v) else "")
+
+    # --- Rename columns dynamically (tolerant matching) ---
     rename_map = {}
     for col in df.columns:
         cl = str(col).lower()
@@ -270,93 +346,164 @@ def _clean_table_dataframe(df_table, normalize_text, parse_date_str, clean_amoun
             rename_map[col] = "date"
         elif "value" in cl and "date" in cl:
             rename_map[col] = "value_date"
-        elif "desc" in cl:
+        elif "desc" in cl or "narr" in cl or "detail" in cl:
             rename_map[col] = "description"
         elif "debit" in cl and "credit" in cl or "debit/credit" in cl:
             rename_map[col] = "debit_credit"
-        elif "debit" in cl:
+        elif "debit" in cl and "credit" not in cl:
             rename_map[col] = "debit"
-        elif "credit" in cl:
+        elif "credit" in cl and "debit" not in cl:
             rename_map[col] = "credit"
         elif "balance" in cl:
             rename_map[col] = "balance"
-        elif "channel" in cl:
+        elif "channel" in cl or "mode" in cl or "type" in cl or "category" in cl:
             rename_map[col] = "channel"
-        elif "ref" in cl:
+        elif "ref" in cl or "txn" in cl or "id" in cl:
             rename_map[col] = "transaction_reference"
-    df.rename(columns=rename_map, inplace=True)
+    if rename_map:
+        df.rename(columns=rename_map, inplace=True)
 
-    # Ensure required columns exist
-    for c in ["date","value_date","description","debit","credit","balance","channel","transaction_reference"]:
+    # Ensure expected columns exist as scalar series
+    expected_cols = ["date", "value_date", "description", "debit", "credit", "balance", "channel", "transaction_reference"]
+    for c in expected_cols:
         if c not in df.columns:
-            df[c] = ""
+            df[c] = pd.Series([""] * len(df), dtype=object)
 
-    # --- Parse and clean columns safely ---
-    df["date"] = df["date"].apply(lambda x: parse_date_str(x) if isinstance(x,str) or not pd.isna(x) else None)
-    df["value_date"] = df["value_date"].apply(lambda x: parse_date_str(x) if isinstance(x,str) or not pd.isna(x) else None)
+    # --- Safe parsing and conversions ---
+    # Use apply on series (safe scalar per-cell)
+    try:
+        df["date"] = df["date"].apply(lambda x: parse_date_str(x) if (not (pd.isna(x) or str(x).strip() == "")) else None)
+    except Exception:
+        # fallback: ensure no crash; mark as None
+        df["date"] = pd.Series([None] * len(df))
 
-    df["balance"] = df["balance"].apply(lambda x: clean_amount(x) if isinstance(x,(str,int,float)) else 0.0)
+    try:
+        df["value_date"] = df["value_date"].apply(lambda x: parse_date_str(x) if (not (pd.isna(x) or str(x).strip() == "")) else None)
+    except Exception:
+        df["value_date"] = pd.Series([None] * len(df))
 
+    # Balance / amount cleaning
+    def safe_clean_amount(v):
+        try:
+            return clean_amount(v)
+        except Exception:
+            try:
+                # ensure numeric fallback
+                if isinstance(v, (int, float)):
+                    return float(v)
+                s = str(v).strip()
+                s = s.replace(",", "")
+                return float(s) if s not in ["", "NaN", "nan"] else 0.0
+            except Exception:
+                return 0.0
+
+    df["balance"] = df["balance"].apply(safe_clean_amount)
+
+    # Handle combined debit/credit or separate columns
     if "debit_credit" in df.columns:
         dc = df["debit_credit"].astype(str)
-        df["debit"] = dc.apply(lambda x: clean_amount(x) if "-" in x else 0.0)
-        df["credit"] = dc.apply(lambda x: clean_amount(x) if "+" in x else 0.0)
+        df["debit"] = dc.apply(lambda x: safe_clean_amount(x) if "-" in x else 0.0)
+        df["credit"] = dc.apply(lambda x: safe_clean_amount(x) if "+" in x else 0.0)
     else:
-        df["debit"] = df["debit"].apply(lambda x: clean_amount(x) if isinstance(x,(str,int,float)) else 0.0)
-        df["credit"] = df["credit"].apply(lambda x: clean_amount(x) if isinstance(x,(str,int,float)) else 0.0)
+        df["debit"] = df["debit"].apply(lambda x: safe_clean_amount(x))
+        df["credit"] = df["credit"].apply(lambda x: safe_clean_amount(x))
 
-    df["channel"] = df["channel"].apply(lambda x: extract_channel(str(x)) if pd.notna(x) else "EMPTY")
+    # Channel and description as cleaned strings
+    df["channel"] = df["channel"].apply(lambda x: extract_channel(str(x)) if (not pd.isna(x) and str(x).strip() != "") else "EMPTY")
+    df["description"] = df["description"].apply(lambda x: str(x).strip() if not pd.isna(x) else "")
+    df["transaction_reference"] = df["transaction_reference"].apply(lambda x: str(x).strip() if not pd.isna(x) else "")
 
-    # --- Detect issues ---
+    # --- Detect issues per row (no ambiguous boolean checks) ---
     def detect_issues(row):
         issues = []
-        date_val = row.get("date", None)
-        bal_val = row.get("balance", None)
-        chan_val = row.get("channel", None)
+        # extract scalars defensively
+        date_val = row.get("date") if hasattr(row, "get") else (row["date"] if "date" in row else None)
+        balance_val = row.get("balance") if hasattr(row, "get") else (row["balance"] if "balance" in row else 0.0)
+        channel_val = row.get("channel") if hasattr(row, "get") else (row["channel"] if "channel" in row else "EMPTY")
 
-        # force to scalar strings
-        if isinstance(date_val, (pd.Series, list)):
-            date_val = date_val.iloc[0] if isinstance(date_val, pd.Series) else (date_val[0] if date_val else None)
-        if isinstance(bal_val, (pd.Series, list)):
-            bal_val = bal_val.iloc[0] if isinstance(bal_val, pd.Series) else (bal_val[0] if bal_val else None)
-        if isinstance(chan_val, (pd.Series, list)):
-            chan_val = chan_val.iloc[0] if isinstance(chan_val, pd.Series) else (chan_val[0] if chan_val else None)
+        # coerce types
+        try:
+            dv = date_val
+            if isinstance(dv, pd.Series):
+                dv = dv.iloc[0] if len(dv) > 0 else None
+        except Exception:
+            dv = date_val
 
-        if date_val is None or (isinstance(date_val, str) and "INVALID_DATE" in date_val):
+        try:
+            bv = balance_val
+            if isinstance(bv, pd.Series):
+                bv = bv.iloc[0] if len(bv) > 0 else "INVALID_AMOUNT"
+        except Exception:
+            bv = balance_val
+
+        try:
+            cv = channel_val
+            if isinstance(cv, pd.Series):
+                cv = cv.iloc[0] if len(cv) > 0 else "EMPTY"
+        except Exception:
+            cv = channel_val
+
+        if dv is None or (isinstance(dv, str) and "INVALID_DATE" in dv):
             issues.append("invalid_date")
-        if isinstance(bal_val, str) and "INVALID_AMOUNT" in bal_val:
+        if isinstance(bv, str) and "INVALID_AMOUNT" in bv:
             issues.append("invalid_balance")
-        if str(chan_val).strip().upper() == "EMPTY":
+        if str(cv).strip().upper() == "EMPTY":
             issues.append("missing_channel")
 
         return ", ".join(issues)
 
-
     df["row_issue"] = df.apply(detect_issues, axis=1)
 
-    # --- Date debug log ---
+    # --- Column order and ensure presence ---
+    cols = ["date", "value_date", "description", "debit", "credit", "balance", "channel", "transaction_reference", "row_issue"]
+    for c in cols:
+        if c not in df.columns:
+            df[c] = pd.Series([pd.NA] * len(df))
+
+    df = df[cols]
+
+    # --- Date debug logging (raw -> parsed) ---
     try:
-        debug_dir = os.path.join(os.getcwd(), "debug_exports")
+        debug_dir = DEBUG_DIR if 'DEBUG_DIR' in globals() else os.path.join(os.getcwd(), "debug_exports")
         os.makedirs(debug_dir, exist_ok=True)
-        timestamp = int(datetime.utcnow().timestamp())
-        log_path = os.path.join(debug_dir, f"date_debug_table_{timestamp}.json")
+        timestamp = debug_run_id or datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        tid = table_id or "unknown"
+        p = page or "unknown"
+        log_path = os.path.join(debug_dir, f"date_debug_table_{tid}_{timestamp}.json")
         date_logs = []
-        for i, row in df.iterrows():
+        # Attempt to get raw date column from original df_table if present; fallback to df["date"] string
+        for i in range(len(df)):
+            raw_val = ""
+            try:
+                if isinstance(df_table, pd.DataFrame) and "date" in df_table.columns:
+                    raw_val = str(df_table.iloc[i][df_table.columns.get_loc("date")]) if "date" in df_table.columns else ""
+                else:
+                    # fallback: try first column from original table
+                    if isinstance(df_table, pd.DataFrame) and len(df_table.columns) > 0:
+                        raw_val = str(df_table.iloc[i, 0])
+            except Exception:
+                raw_val = ""
+            parsed_val = df["date"].iloc[i]
+            desc = df["description"].iloc[i] if "description" in df.columns else ""
             date_logs.append({
+                "table_id": tid,
+                "page": p,
                 "row_index": int(i),
-                "raw_date": str(df_table.iloc[i,0]) if len(df_table.columns)>0 else "",
-                "parsed_date": str(row.get("date")),
-                "description": str(row.get("description"))
+                "raw_date": raw_val,
+                "parsed": str(parsed_val),
+                "description": str(desc),
             })
-        with open(log_path,"w",encoding="utf-8") as f:
-            json.dump(date_logs,f,indent=2,default=str)
+        with open(log_path, "w", encoding="utf-8") as f:
+            json.dump(date_logs, f, indent=2, default=str)
         print(f"✅ Saved date debug log to {log_path}")
     except Exception as e:
         print(f"⚠️ Failed to save date debug log: {e}")
 
-    # enforce consistent column order
-    cols = ["date","value_date","description","debit","credit","balance","channel","transaction_reference","row_issue"]
-    for c in cols:
-        if c not in df.columns:
-            df[c] = ""
-    return df[cols]
+    # Save a CSV snapshot for inspection (non-fatal)
+    try:
+        stamp = int(datetime.utcnow().timestamp())
+        df.to_csv(os.path.join(debug_dir, f"cleaned_table_snapshot_{table_id or 't'}_{stamp}.csv"), index=False)
+    except Exception:
+        pass
+
+    return df

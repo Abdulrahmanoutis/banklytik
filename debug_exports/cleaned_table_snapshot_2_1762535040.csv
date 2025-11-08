@@ -1,0 +1,2 @@
+date,date,value_date,description,debit,credit,balance,channel,transaction_reference,row_issue
+,,,,0.0,0.0,0.0,EMPTY,,"invalid_date, missing_channel"

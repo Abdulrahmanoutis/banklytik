@@ -274,58 +274,108 @@ def reprocess_statement(request, pk):
     return redirect("statements:process", pk=stmt.pk)
 
 
+
 @login_required
 def process_statement(request, pk):
-    # Ensure DeepSeek rules are loaded before cleaning
+    """
+    Processes a single bank statement.
+    Supports both online (AWS Textract) and offline (local JSON) modes.
+    DeepSeek remains active in all cases.
+    """
+    # 🧠 Ensure DeepSeek rules are loaded before cleaning
     try:
         deepseek_rules = get_deepseek_patterns()
         print(f"✅ DeepSeek preloaded with {len(deepseek_rules)} rules.")
+        print("🤖 DeepSeek learning system active (offline-compatible).")
     except Exception as e:
         print(f"⚠️ DeepSeek preload failed: {e}")
+
     stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
     if stmt.processed:
         return redirect("statements:list")
 
+    # --- S3 and Textract setup ---
     s3 = get_s3_client()
     json_key = f"{stmt.title}.json"
+    blocks = None
+    blocks_data = None
+
+    # Check offline mode flag
+    offline_mode = getattr(settings, "BANKLYTIK_OFFLINE_MODE", False)
+    print(f"⚙️ BANKLYTIK_OFFLINE_MODE = {offline_mode}")
 
     try:
-        if s3_key_exists(settings.AWS_S3_BUCKET, json_key):
-            obj = s3.get_object(Bucket=settings.AWS_S3_BUCKET, Key=json_key)
-            blocks_data = json.loads(obj["Body"].read().decode("utf-8"))
-        else:
-            job_id = start_textract_job(stmt.title)
-            wait_for_job(job_id)
-            blocks_data = {"Blocks": get_all_blocks(job_id)}
-            s3.put_object(
-                Bucket=settings.AWS_S3_BUCKET,
-                Key=json_key,
-                Body=json.dumps(blocks_data).encode("utf-8"),
-                ContentType="application/json",
+        if offline_mode:
+            # --- OFFLINE MODE ---
+            local_json_path = os.path.join(
+                settings.BASE_DIR,
+                "debug_exports",
+                f"analyzeDocResponse_{stmt.pk}_offline.json"
             )
 
+            if not os.path.exists(local_json_path):
+                raise FileNotFoundError(
+                    f"Offline mode enabled but local Textract JSON not found: {local_json_path}"
+                )
+
+            with open(local_json_path, "r", encoding="utf-8") as f:
+                blocks_data = json.load(f)
+
+            print(f"✅ Loaded local Textract JSON for statement {stmt.pk} → {local_json_path}")
+
+        else:
+            # --- ONLINE MODE (AWS Textract + S3) ---
+            if s3_key_exists(settings.AWS_S3_BUCKET, json_key):
+                obj = s3.get_object(Bucket=settings.AWS_S3_BUCKET, Key=json_key)
+                blocks_data = json.loads(obj["Body"].read().decode("utf-8"))
+                print(f"✅ Retrieved Textract JSON from S3 for statement {stmt.pk}")
+            else:
+                print("⚙️ Running Textract job via AWS...")
+                job_id = start_textract_job(stmt.title)
+                wait_for_job(job_id)
+                blocks_data = {"Blocks": get_all_blocks(job_id)}
+
+                s3.put_object(
+                    Bucket=settings.AWS_S3_BUCKET,
+                    Key=json_key,
+                    Body=json.dumps(blocks_data).encode("utf-8"),
+                    ContentType="application/json",
+                )
+                print(f"✅ Uploaded new Textract JSON to S3 for statement {stmt.pk}")
+
+        # --- Normalize and save Textract debug file ---
         blocks = blocks_data.get("Blocks", blocks_data)
         if isinstance(blocks, str):
             blocks = json.loads(blocks)
 
+        # Save for debugging
         save_debug_textract_json(blocks_data, stmt.pk)
-        tables = extract_all_tables(blocks)
-        
+        print(f"💾 Debug Textract JSON saved for statement {stmt.pk}")
 
+        # --- Extract tables from Textract blocks ---
+        tables = extract_all_tables(blocks)
+        print(f"🧾 Extracted {len(tables)} tables from Textract data.")
+
+        # --- Clean and normalize tables ---
         try:
             df_clean = process_tables_directly(tables)
             if df_clean.empty:
-                raise ValueError("Direct processor returned empty DataFrame")
-        except Exception:
+                print("⚠️ Direct processor returned empty DataFrame, using fallback.")
+                df_raw = extract_combined_table(blocks)
+                df_clean = robust_clean_dataframe(df_raw)
+        except Exception as e_proc:
+            print(f"⚠️ Direct processor failed: {e_proc}")
             df_raw = extract_combined_table(blocks)
             df_clean = robust_clean_dataframe(df_raw)
 
-    except Exception as e:
-        df_raw = extract_combined_table(blocks)
-        df_clean = robust_clean_dataframe(df_raw)
+    except Exception as e_outer:
+        print(f"❌ Critical failure in process_statement: {e_outer}")
+        df_clean = pd.DataFrame()
 
+    # --- Save transactions to DB ---
     save_transactions_from_dataframe(stmt, df_clean)
     return redirect("statements:detail", pk=stmt.pk)
+
 
 
 @login_required

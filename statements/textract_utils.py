@@ -163,7 +163,7 @@ def table_matrix_to_dataframe(matrix: List[List[str]]):
         return pd.DataFrame()
     df = pd.DataFrame(matrix)
     # drop empty rows
-    df = df.loc[~(df.applymap(lambda x: str(x).strip() == "").all(axis=1))].reset_index(drop=True)
+    df = df.loc[~(df.map(lambda x: str(x).strip() == "").all(axis=1))].reset_index(drop=True)
     # drop empty columns
     nonempty_cols = [i for i in df.columns if not (df[i].astype(str).str.strip() == "").all()]
     if not nonempty_cols:

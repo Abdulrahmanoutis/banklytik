@@ -1,0 +1,20 @@
+{
+  "timestamp": "20251109_075823",
+  "raw_headers": [
+    "23/09/25 12:42:00",
+    "\u20a66,100.00",
+    "",
+    "inward transfer",
+    "Abdulrahman Kamilu Ilah/9029189750/Paycom(Opay)",
+    "transfer from abdulrahman kamilu ilah",
+    "\u20a66,100.00"
+  ],
+  "ai_mapping": {
+    "23/09/25 12:42:00": "23/09/25 12:42:00",
+    "\u20a66,100.00": "\u20a66,100.00",
+    "": "",
+    "inward transfer": "date",
+    "Abdulrahman Kamilu Ilah/9029189750/Paycom(Opay)": "Abdulrahman Kamilu Ilah/9029189750/Paycom(Opay)",
+    "transfer from abdulrahman kamilu ilah": "date"
+  }
+}

@@ -1,0 +1,1133 @@
+{"raw": "14/05/25 23:08:23", "parsed": "2025-05-14T23:08:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:48:36.729749Z"}
+{"raw": "30/05/25 18:41:52", "parsed": "2025-05-30T18:41:52", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:48:36.731028Z"}
+{"raw": "30/05/25 18:42:23", "parsed": "2025-05-30T18:42:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:48:36.731593Z"}
+{"raw": "12/08/25 09:37:28", "parsed": "2025-08-12T09:37:28", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:48:36.732282Z"}
+{"raw": "12/08/25 09:37:44", "parsed": "2025-08-12T09:37:44", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:48:36.733074Z"}
+{"raw": "12/08/25 09:38:35", "parsed": "2025-08-12T09:38:35", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:48:36.733483Z"}
+{"raw": "12/08/25 09:39:23", "parsed": "2025-08-12T09:39:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:48:36.734177Z"}
+{"raw": "12/08/25 09:39:27", "parsed": "2025-08-12T09:39:27", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:48:36.734894Z"}
+{"raw": "20/08/25 10:55:33", "parsed": "2025-08-20T10:55:33", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:48:36.735663Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:48:36.776850Z"}
+{"raw": "2025-05-14 23:08:23", "parsed": "2025-05-14T23:08:23", "method": "pandas:dayfirst", "timestamp": "2025-11-09T07:48:40.163517Z"}
+{"raw": "2025-05-30 18:41:52", "parsed": "2025-05-30T18:41:52", "method": "pandas:dayfirst", "timestamp": "2025-11-09T07:48:42.175681Z"}
+{"raw": "2025-05-30 18:42:23", "parsed": "2025-05-30T18:42:23", "method": "pandas:dayfirst", "timestamp": "2025-11-09T07:48:42.824085Z"}
+{"raw": "2025-08-12 09:37:28", "parsed": "2025-12-08T09:37:28", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:48:43.561829Z"}
+{"raw": "2025-08-12 09:37:44", "parsed": "2025-12-08T09:37:44", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:48:43.588368Z"}
+{"raw": "2025-08-12 09:38:35", "parsed": "2025-12-08T09:38:35", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:48:43.595974Z"}
+{"raw": "2025-08-12 09:39:23", "parsed": "2025-12-08T09:39:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:48:43.609694Z"}
+{"raw": "2025-08-12 09:39:27", "parsed": "2025-12-08T09:39:27", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:48:43.620861Z"}
+{"raw": "2025-08-20 10:55:33", "parsed": "2025-08-20T10:55:33", "method": "pandas:dayfirst", "timestamp": "2025-11-09T07:48:43.627382Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T07:48:43.940638Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:55:52.190642Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:55:56.179990Z"}
+{"raw": "Account", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:55:56.226452Z"}
+{"raw": "Date", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:55:56.273879Z"}
+{"raw": "ILAH, KAMILU ABDULRAHMAN", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:55:56.309753Z"}
+{"raw": "2013716080", "parsed": "2033-10-23T21:34:40", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:55:56.374294Z"}
+{"raw": "07/10/2024 - - 07/10/2025", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:55:56.379590Z"}
+{"raw": "167 SHAIBU KAZAURE", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:55:59.013051Z"}
+{"raw": "STREET, KANO, KANO", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:55:59.044089Z"}
+{"raw": "Opening Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:55:59.077702Z"}
+{"raw": "Closing Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:55:59.106834Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:55:59.188236Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:55:59.695137Z"}
+{"raw": "Summary", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:00.295734Z"}
+{"raw": "Money in", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:00.349569Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:00.409198Z"}
+{"raw": "\u20a610,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:00.463067Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.029327Z"}
+{"raw": "Date/Time", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.429151Z"}
+{"raw": "Money In", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.445810Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.461999Z"}
+{"raw": "Category", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.479375Z"}
+{"raw": "To / From", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.496392Z"}
+{"raw": "Description", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.517131Z"}
+{"raw": "Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.533926Z"}
+{"raw": "14/05/25", "parsed": "2025-05-14T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:01.549935Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.550366Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.763933Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.780462Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:01.797812Z"}
+{"raw": "23:08:23", "parsed": "2025-11-08T23:08:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:01.893205Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:01.895925Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:01.897351Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.897745Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.914045Z"}
+{"raw": "kip:opay/abdulrahman", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.931476Z"}
+{"raw": "18:41:52", "parsed": "2025-11-08T18:41:52", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:01.952364Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:01.959226Z"}
+{"raw": "kamilu/transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:02.232581Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:02.251652Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:02.268427Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:02.746152Z"}
+{"raw": "abdulrah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:02.781402Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:02.797767Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:02.798178Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.052682Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.068305Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:03.085733Z"}
+{"raw": "18:42:23", "parsed": "2025-11-08T18:42:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:03.093346Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.096395Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.113188Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:03.130178Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.130661Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.146624Z"}
+{"raw": "09:37:28", "parsed": "2025-11-08T09:37:28", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:03.164074Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.166625Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.402365Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.428485Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.445006Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.666630Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.698651Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:03.714114Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:03.714515Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:04.082980Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:04.100166Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:04.119668Z"}
+{"raw": "09:37:44", "parsed": "2025-11-08T09:37:44", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:04.127363Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:04.130472Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:04.132333Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:04.152957Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:04.153511Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:04.494985Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:04.511713Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:04.529684Z"}
+{"raw": "09:38:35", "parsed": "2025-11-08T09:38:35", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:04.767319Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:04.769946Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:04.774057Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:04.775681Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:04.794820Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:04.813296Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:05.067084Z"}
+{"raw": "09:39:23", "parsed": "2025-11-08T09:39:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:05.079200Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:05.092938Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:05.097193Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:05.182772Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:05.183713Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:05.700854Z"}
+{"raw": "09:39:27", "parsed": "2025-11-08T09:39:27", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:05.717705Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:05.720424Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:05.739394Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:05.974021Z"}
+{"raw": "20/08/25", "parsed": "2025-08-20T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:05.978035Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:05.979036Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.191292Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.210336Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:06.235137Z"}
+{"raw": "10:55:33", "parsed": "2025-11-08T10:55:33", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:06.247361Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:06.251678Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.253679Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.314121Z"}
+{"raw": "MICROFINANCE KUDA aba nk", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.368344Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.387055Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.477046Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.512736Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.811199Z"}
+{"raw": "Page 1 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.842008Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.865652Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.883928Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.901552Z"}
+{"raw": "23/09/25", "parsed": "2025-09-23T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:06.919762Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.920282Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.937105Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:06.958583Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:07.259585Z"}
+{"raw": "12:42:00", "parsed": "2025-11-08T12:42:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:07.286300Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:07.291524Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:07.331327Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:07.713046Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:07.752197Z"}
+{"raw": "03/10/25", "parsed": "2025-10-03T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:07.780265Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:07.781239Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:08.249912Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:08.265597Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:08.282786Z"}
+{"raw": "18:47:51", "parsed": "2025-11-08T18:47:51", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:08.638019Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:08.647653Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:08.674082Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:08.767032Z"}
+{"raw": "WORDFINANCE KUDA K aba nk BANKLINES", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:08.848778Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:08.872513Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:08.979704Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:08.997696Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:09.270606Z"}
+{"raw": "Page 2 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:09.376251Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:09.417360Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:09.438893Z"}
+{"raw": "Account", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:09.465319Z"}
+{"raw": "Date", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:09.483736Z"}
+{"raw": "ILAH, KAMILU ABDULRAHMAN", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:09.501166Z"}
+{"raw": "2013716080", "parsed": "2033-10-23T21:34:40", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:09.522118Z"}
+{"raw": "07/10/2024 - - 07/10/2025", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:09.526721Z"}
+{"raw": "167 SHAIBU KAZAURE", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:10.115843Z"}
+{"raw": "STREET, KANO, KANO", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:10.141421Z"}
+{"raw": "Opening Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:10.172053Z"}
+{"raw": "Closing Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:10.187613Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:10.219966Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:10.558451Z"}
+{"raw": "Summary", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:10.969350Z"}
+{"raw": "Money in", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:10.987586Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:11.011200Z"}
+{"raw": "\u20a610,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:11.036370Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:11.437522Z"}
+{"raw": "Date/Time", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:11.717809Z"}
+{"raw": "Money In", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:11.735438Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:11.751812Z"}
+{"raw": "Category", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:11.769753Z"}
+{"raw": "To / From", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:11.786436Z"}
+{"raw": "Description", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:11.833803Z"}
+{"raw": "Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:11.884818Z"}
+{"raw": "14/05/25", "parsed": "2025-05-14T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:11.923754Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:11.926715Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:12.246283Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:12.260876Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:12.280930Z"}
+{"raw": "23:08:23", "parsed": "2025-11-08T23:08:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:12.284023Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:12.286474Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:12.287906Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:12.288298Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:12.303827Z"}
+{"raw": "kip:opay/abdulrahman", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:12.321326Z"}
+{"raw": "18:41:52", "parsed": "2025-11-08T18:41:52", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:12.339642Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:12.345347Z"}
+{"raw": "kamilu/transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:12.587491Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:12.606676Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:12.623670Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:12.847866Z"}
+{"raw": "abdulrah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:12.879038Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:12.895389Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:12.896705Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:13.134087Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:13.151155Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:13.191343Z"}
+{"raw": "18:42:23", "parsed": "2025-11-08T18:42:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:13.205638Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:13.217399Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:13.251140Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:13.320675Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:13.321688Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:13.368789Z"}
+{"raw": "09:37:28", "parsed": "2025-11-08T09:37:28", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:13.405488Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:13.408114Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:13.633860Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:13.652476Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:13.669623Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:13.932704Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:13.985331Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:14.008034Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:14.008696Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:14.282829Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:14.303627Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:14.333290Z"}
+{"raw": "09:37:44", "parsed": "2025-11-08T09:37:44", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:14.338425Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:14.342578Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:14.347384Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:14.368718Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:14.369283Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:14.857270Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:14.875664Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:14.900253Z"}
+{"raw": "09:38:35", "parsed": "2025-11-08T09:38:35", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:15.218773Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:15.225810Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:15.232799Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:15.233295Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:15.249503Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:15.268289Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:15.569332Z"}
+{"raw": "09:39:23", "parsed": "2025-11-08T09:39:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:15.573965Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:15.578729Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:15.583638Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:15.603330Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:15.603837Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:16.053097Z"}
+{"raw": "09:39:27", "parsed": "2025-11-08T09:39:27", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:16.075187Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:16.083506Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:16.111252Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:16.441498Z"}
+{"raw": "20/08/25", "parsed": "2025-08-20T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:16.450007Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:16.451280Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:16.767241Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:16.786735Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:16.805414Z"}
+{"raw": "10:55:33", "parsed": "2025-11-08T10:55:33", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:16.808309Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:16.814521Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:16.825756Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:16.892749Z"}
+{"raw": "MICROFINANCE KUDA aba nk", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.078884Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.104176Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.200259Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.218519Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.420862Z"}
+{"raw": "Page 1 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.452504Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.473025Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.488895Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.505207Z"}
+{"raw": "23/09/25", "parsed": "2025-09-23T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:17.521851Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.522316Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.539693Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.561148Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.791284Z"}
+{"raw": "12:42:00", "parsed": "2025-11-08T12:42:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:17.809717Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.816791Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:17.831788Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:18.074094Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:18.170660Z"}
+{"raw": "03/10/25", "parsed": "2025-10-03T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T07:56:18.205606Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:18.206196Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:18.505845Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:18.524007Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:18.552868Z"}
+{"raw": "18:47:51", "parsed": "2025-11-08T18:47:51", "method": "dateparser:DMY", "timestamp": "2025-11-09T07:56:18.853433Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:18.855975Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:18.872302Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:18.921447Z"}
+{"raw": "WORDFINANCE KUDA K aba nk BANKLINES", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:18.972362Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:18.992624Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:19.063688Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:19.077677Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:19.238141Z"}
+{"raw": "Page 2 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:56:19.310078Z"}
+{"raw": "14/05/25 23:08:23", "parsed": "2025-05-14T23:08:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:58:22.988908Z"}
+{"raw": "30/05/25 18:41:52", "parsed": "2025-05-30T18:41:52", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:58:22.992846Z"}
+{"raw": "30/05/25 18:42:23", "parsed": "2025-05-30T18:42:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:58:22.993344Z"}
+{"raw": "12/08/25 09:37:28", "parsed": "2025-08-12T09:37:28", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:58:22.993785Z"}
+{"raw": "12/08/25 09:37:44", "parsed": "2025-08-12T09:37:44", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:58:22.994220Z"}
+{"raw": "12/08/25 09:38:35", "parsed": "2025-08-12T09:38:35", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:58:22.994797Z"}
+{"raw": "12/08/25 09:39:23", "parsed": "2025-08-12T09:39:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:58:22.995492Z"}
+{"raw": "12/08/25 09:39:27", "parsed": "2025-08-12T09:39:27", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:58:22.996161Z"}
+{"raw": "20/08/25 10:55:33", "parsed": "2025-08-20T10:55:33", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T07:58:22.996751Z"}
+{"raw": "date                     bills\ndate    kedco prepaid purchase\nName: 0, dtype: object", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T07:58:23.043120Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T07:58:26.895993Z"}
+{"raw": "14/05/25 23:08:23", "parsed": "2025-05-14T23:08:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T08:08:15.175906Z"}
+{"raw": "30/05/25 18:41:52", "parsed": "2025-05-30T18:41:52", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T08:08:15.178188Z"}
+{"raw": "30/05/25 18:42:23", "parsed": "2025-05-30T18:42:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T08:08:15.179018Z"}
+{"raw": "12/08/25 09:37:28", "parsed": "2025-08-12T09:37:28", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T08:08:15.179817Z"}
+{"raw": "12/08/25 09:37:44", "parsed": "2025-08-12T09:37:44", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T08:08:15.180880Z"}
+{"raw": "12/08/25 09:38:35", "parsed": "2025-08-12T09:38:35", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T08:08:15.182002Z"}
+{"raw": "12/08/25 09:39:23", "parsed": "2025-08-12T09:39:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T08:08:15.183050Z"}
+{"raw": "12/08/25 09:39:27", "parsed": "2025-08-12T09:39:27", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T08:08:15.184243Z"}
+{"raw": "20/08/25 10:55:33", "parsed": "2025-08-20T10:55:33", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T08:08:15.185430Z"}
+{"raw": "date                     bills\ndate    kedco prepaid purchase\nName: 0, dtype: object", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:15.228131Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:18.895728Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:18.946264Z"}
+{"raw": "Account", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:18.997841Z"}
+{"raw": "Date", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:19.029542Z"}
+{"raw": "ILAH, KAMILU ABDULRAHMAN", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:19.072664Z"}
+{"raw": "2013716080", "parsed": "2033-10-23T21:34:40", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:19.133533Z"}
+{"raw": "07/10/2024 - - 07/10/2025", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:19.139167Z"}
+{"raw": "167 SHAIBU KAZAURE", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:21.335693Z"}
+{"raw": "STREET, KANO, KANO", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:21.359459Z"}
+{"raw": "Opening Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:21.379258Z"}
+{"raw": "Closing Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:21.403671Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:21.445929Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:21.811371Z"}
+{"raw": "Summary", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:22.246089Z"}
+{"raw": "Money in", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:22.280681Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:22.323158Z"}
+{"raw": "\u20a610,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:22.364832Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:22.829870Z"}
+{"raw": "Date/Time", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.238475Z"}
+{"raw": "Money In", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.267750Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.282176Z"}
+{"raw": "Category", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.299634Z"}
+{"raw": "To / From", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.315066Z"}
+{"raw": "Description", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.333632Z"}
+{"raw": "Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.350183Z"}
+{"raw": "14/05/25", "parsed": "2025-05-14T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:23.365060Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.365478Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.532049Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.546756Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:23.563170Z"}
+{"raw": "23:08:23", "parsed": "2025-11-08T23:08:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:23.599497Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:23.602035Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:23.605058Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.606306Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.623745Z"}
+{"raw": "kip:opay/abdulrahman", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.643278Z"}
+{"raw": "18:41:52", "parsed": "2025-11-08T18:41:52", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:23.659445Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.661963Z"}
+{"raw": "kamilu/transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.871302Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.889949Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:23.903695Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.178427Z"}
+{"raw": "abdulrah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.203616Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:24.218319Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.219118Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.575139Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.596203Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:24.610209Z"}
+{"raw": "18:42:23", "parsed": "2025-11-08T18:42:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:24.612836Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.615264Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.630243Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:24.646226Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.646707Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.661400Z"}
+{"raw": "09:37:28", "parsed": "2025-11-08T09:37:28", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:24.678036Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.680576Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.878778Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.899705Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:24.917053Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:25.163782Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:25.195183Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:25.207236Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:25.208429Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:25.401546Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:25.416726Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:25.430949Z"}
+{"raw": "09:37:44", "parsed": "2025-11-08T09:37:44", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:25.433537Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:25.436029Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:25.438228Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:25.455923Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:25.456785Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:25.713382Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:25.744694Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:25.768983Z"}
+{"raw": "09:38:35", "parsed": "2025-11-08T09:38:35", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:25.968964Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:25.972932Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:25.976261Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:25.977393Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:25.990161Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:26.006458Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:26.195873Z"}
+{"raw": "09:39:23", "parsed": "2025-11-08T09:39:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:26.198450Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:26.200879Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:26.202347Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:26.219646Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:26.220530Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:26.446004Z"}
+{"raw": "09:39:27", "parsed": "2025-11-08T09:39:27", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:26.459119Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:26.461702Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:26.474882Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:26.661344Z"}
+{"raw": "20/08/25", "parsed": "2025-08-20T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:26.662793Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:26.663193Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:26.885892Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:26.922544Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:26.961567Z"}
+{"raw": "10:55:33", "parsed": "2025-11-08T10:55:33", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:26.966576Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:26.972304Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:26.975184Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.027853Z"}
+{"raw": "MICROFINANCE KUDA aba nk", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.077741Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.094436Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.158239Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.171012Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.314467Z"}
+{"raw": "Page 1 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.340911Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.362972Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.377131Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.391633Z"}
+{"raw": "23/09/25", "parsed": "2025-09-23T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:27.408758Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.409241Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.425573Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.449044Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.639563Z"}
+{"raw": "12:42:00", "parsed": "2025-11-08T12:42:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:27.656561Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.661433Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.675102Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.886224Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.926238Z"}
+{"raw": "03/10/25", "parsed": "2025-10-03T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:27.941053Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:27.942535Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.263136Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.276056Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.292099Z"}
+{"raw": "18:47:51", "parsed": "2025-11-08T18:47:51", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:28.478101Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.481484Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.494477Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.539140Z"}
+{"raw": "WORDFINANCE KUDA K aba nk BANKLINES", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.588561Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.610355Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.674848Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.684857Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.830881Z"}
+{"raw": "Page 2 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.862005Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.882903Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.898684Z"}
+{"raw": "Account", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.914127Z"}
+{"raw": "Date", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.930431Z"}
+{"raw": "ILAH, KAMILU ABDULRAHMAN", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.942673Z"}
+{"raw": "2013716080", "parsed": "2033-10-23T21:34:40", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:28.959964Z"}
+{"raw": "07/10/2024 - - 07/10/2025", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:28.963201Z"}
+{"raw": "167 SHAIBU KAZAURE", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:29.363157Z"}
+{"raw": "STREET, KANO, KANO", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:29.404622Z"}
+{"raw": "Opening Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:29.423125Z"}
+{"raw": "Closing Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:29.439284Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:29.455549Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:29.619358Z"}
+{"raw": "Summary", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:29.848063Z"}
+{"raw": "Money in", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:29.863233Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:29.876124Z"}
+{"raw": "\u20a610,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:29.888820Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.087332Z"}
+{"raw": "Date/Time", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.280080Z"}
+{"raw": "Money In", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.293446Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.305269Z"}
+{"raw": "Category", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.321282Z"}
+{"raw": "To / From", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.334005Z"}
+{"raw": "Description", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.352496Z"}
+{"raw": "Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.368761Z"}
+{"raw": "14/05/25", "parsed": "2025-05-14T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:30.381552Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.381966Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.658339Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.669630Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:30.686121Z"}
+{"raw": "23:08:23", "parsed": "2025-11-08T23:08:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:30.688808Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:30.693623Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:30.696941Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.697583Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.710253Z"}
+{"raw": "kip:opay/abdulrahman", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.727903Z"}
+{"raw": "18:41:52", "parsed": "2025-11-08T18:41:52", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:30.744200Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.746758Z"}
+{"raw": "kamilu/transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.945039Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.961744Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:30.973223Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.173239Z"}
+{"raw": "abdulrah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.203474Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:31.220814Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.221375Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.440216Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.454229Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:31.467812Z"}
+{"raw": "18:42:23", "parsed": "2025-11-08T18:42:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:31.470396Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.473137Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.488062Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:31.504200Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.504626Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.519348Z"}
+{"raw": "09:37:28", "parsed": "2025-11-08T09:37:28", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:31.536502Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.538971Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.787031Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.822287Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:31.854534Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.048238Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.078223Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:32.090785Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.091778Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.285120Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.300132Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:32.316538Z"}
+{"raw": "09:37:44", "parsed": "2025-11-08T09:37:44", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:32.319128Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:32.321588Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.323093Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:32.337739Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.338234Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.538558Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.553280Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.566489Z"}
+{"raw": "09:38:35", "parsed": "2025-11-08T09:38:35", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:32.757542Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:32.762379Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:32.764901Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.765718Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.779406Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:32.795173Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:33.135702Z"}
+{"raw": "09:39:23", "parsed": "2025-11-08T09:39:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:33.141690Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:33.149754Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:33.151785Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:33.167694Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:33.168152Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:33.363573Z"}
+{"raw": "09:39:27", "parsed": "2025-11-08T09:39:27", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:33.378111Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:33.382694Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:33.395781Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:33.590525Z"}
+{"raw": "20/08/25", "parsed": "2025-08-20T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:33.593042Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:33.593665Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:33.786045Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:33.801719Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:33.818336Z"}
+{"raw": "10:55:33", "parsed": "2025-11-08T10:55:33", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:33.820969Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:33.823482Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:33.825906Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:33.872410Z"}
+{"raw": "MICROFINANCE KUDA aba nk", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:33.918728Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:33.936999Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.015242Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.025916Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.182523Z"}
+{"raw": "Page 1 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.253185Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.290857Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.303642Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.319616Z"}
+{"raw": "23/09/25", "parsed": "2025-09-23T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:34.337979Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.338387Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.353038Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.369863Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.592800Z"}
+{"raw": "12:42:00", "parsed": "2025-11-08T12:42:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:34.613360Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.617829Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.633206Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.828709Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.857965Z"}
+{"raw": "03/10/25", "parsed": "2025-10-03T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T08:08:34.869586Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:34.870018Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:35.066319Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:35.085011Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:35.102234Z"}
+{"raw": "18:47:51", "parsed": "2025-11-08T18:47:51", "method": "dateparser:DMY", "timestamp": "2025-11-09T08:08:35.414063Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:35.421718Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:35.453955Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:35.516598Z"}
+{"raw": "WORDFINANCE KUDA K aba nk BANKLINES", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:35.566019Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:35.586216Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:35.659732Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:35.673492Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:35.822086Z"}
+{"raw": "Page 2 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T08:08:35.851283Z"}
+{"raw": "14/05/25 23:08:23", "parsed": "2025-05-14T23:08:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T09:41:19.700261Z"}
+{"raw": "30/05/25 18:41:52", "parsed": "2025-05-30T18:41:52", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T09:41:19.702884Z"}
+{"raw": "30/05/25 18:42:23", "parsed": "2025-05-30T18:42:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T09:41:19.703799Z"}
+{"raw": "12/08/25 09:37:28", "parsed": "2025-08-12T09:37:28", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T09:41:19.705098Z"}
+{"raw": "12/08/25 09:37:44", "parsed": "2025-08-12T09:37:44", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T09:41:19.707276Z"}
+{"raw": "12/08/25 09:38:35", "parsed": "2025-08-12T09:38:35", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T09:41:19.708863Z"}
+{"raw": "12/08/25 09:39:23", "parsed": "2025-08-12T09:39:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T09:41:19.709703Z"}
+{"raw": "12/08/25 09:39:27", "parsed": "2025-08-12T09:39:27", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T09:41:19.710442Z"}
+{"raw": "20/08/25 10:55:33", "parsed": "2025-08-20T10:55:33", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T09:41:19.711140Z"}
+{"raw": "date                     bills\ndate    kedco prepaid purchase\nName: 0, dtype: object", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:19.783874Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:23.913484Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:23.952605Z"}
+{"raw": "Account", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:24.010287Z"}
+{"raw": "Date", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:24.046456Z"}
+{"raw": "ILAH, KAMILU ABDULRAHMAN", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:24.076221Z"}
+{"raw": "2013716080", "parsed": "2033-10-23T21:34:40", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:24.131084Z"}
+{"raw": "07/10/2024 - - 07/10/2025", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:24.134405Z"}
+{"raw": "167 SHAIBU KAZAURE", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:26.134037Z"}
+{"raw": "STREET, KANO, KANO", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:26.195903Z"}
+{"raw": "Opening Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:26.261972Z"}
+{"raw": "Closing Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:26.294130Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:26.328541Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:26.641247Z"}
+{"raw": "Summary", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:26.999043Z"}
+{"raw": "Money in", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.041511Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.073146Z"}
+{"raw": "\u20a610,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.123877Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.433305Z"}
+{"raw": "Date/Time", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.649007Z"}
+{"raw": "Money In", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.662428Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.675281Z"}
+{"raw": "Category", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.687782Z"}
+{"raw": "To / From", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.700728Z"}
+{"raw": "Description", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.716809Z"}
+{"raw": "Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.730498Z"}
+{"raw": "14/05/25", "parsed": "2025-05-14T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:27.742964Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.743379Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.879190Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.892784Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:27.905229Z"}
+{"raw": "23:08:23", "parsed": "2025-11-08T23:08:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:27.941716Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:27.944293Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:27.945726Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.946128Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.958636Z"}
+{"raw": "kip:opay/abdulrahman", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.971724Z"}
+{"raw": "18:41:52", "parsed": "2025-11-08T18:41:52", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:27.986598Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:27.989321Z"}
+{"raw": "kamilu/transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.163474Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.179142Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.193924Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.358436Z"}
+{"raw": "abdulrah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.382622Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:28.394937Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.395439Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.647760Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.659401Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:28.671506Z"}
+{"raw": "18:42:23", "parsed": "2025-11-08T18:42:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:28.675398Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.677845Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.690683Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:28.703796Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.704199Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.716544Z"}
+{"raw": "09:37:28", "parsed": "2025-11-09T09:37:28", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:28.730591Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.733128Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.888669Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.902538Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:28.914717Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.070585Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.095871Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:29.105961Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.107028Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.268292Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.280249Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:29.294586Z"}
+{"raw": "09:37:44", "parsed": "2025-11-09T09:37:44", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:29.297156Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:29.299701Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.301366Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:29.316671Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.317436Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.496468Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.509668Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.521941Z"}
+{"raw": "09:38:35", "parsed": "2025-11-09T09:38:35", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:29.752420Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:29.759340Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:29.762276Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.763214Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.787224Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.809804Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:29.964897Z"}
+{"raw": "09:39:23", "parsed": "2025-11-09T09:39:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:29.967466Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:29.969900Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.971334Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:29.986249Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:29.986646Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.144696Z"}
+{"raw": "09:39:27", "parsed": "2025-11-09T09:39:27", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:30.156378Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.159865Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.171124Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:30.328031Z"}
+{"raw": "20/08/25", "parsed": "2025-08-20T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:30.329476Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.329868Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.487754Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.500043Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:30.513847Z"}
+{"raw": "10:55:33", "parsed": "2025-11-08T10:55:33", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:30.516458Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:30.518889Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.520294Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.562030Z"}
+{"raw": "MICROFINANCE KUDA aba nk", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.602678Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.618006Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.673081Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.684514Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.816955Z"}
+{"raw": "Page 1 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.896156Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.935541Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.954071Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.970400Z"}
+{"raw": "23/09/25", "parsed": "2025-09-23T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:30.988572Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:30.989140Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.001854Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.016565Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.177060Z"}
+{"raw": "12:42:00", "parsed": "2025-11-08T12:42:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:31.190203Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.193755Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.205005Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.361118Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.387787Z"}
+{"raw": "03/10/25", "parsed": "2025-10-03T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:31.400225Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.400713Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.628281Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.638579Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.652335Z"}
+{"raw": "18:47:51", "parsed": "2025-11-08T18:47:51", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:31.807886Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.811316Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.822557Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.863488Z"}
+{"raw": "WORDFINANCE KUDA K aba nk BANKLINES", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.904514Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:31.921702Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.039510Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.055324Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.176213Z"}
+{"raw": "Page 2 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.198779Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.220056Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.232497Z"}
+{"raw": "Account", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.245517Z"}
+{"raw": "Date", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.259141Z"}
+{"raw": "ILAH, KAMILU ABDULRAHMAN", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.278638Z"}
+{"raw": "2013716080", "parsed": "2033-10-23T21:34:40", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:32.295480Z"}
+{"raw": "07/10/2024 - - 07/10/2025", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.297044Z"}
+{"raw": "167 SHAIBU KAZAURE", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.598156Z"}
+{"raw": "STREET, KANO, KANO", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.617787Z"}
+{"raw": "Opening Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.635496Z"}
+{"raw": "Closing Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.649559Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.664034Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.800470Z"}
+{"raw": "Summary", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.959426Z"}
+{"raw": "Money in", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.970507Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.983779Z"}
+{"raw": "\u20a610,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:32.997764Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.255067Z"}
+{"raw": "Date/Time", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.419844Z"}
+{"raw": "Money In", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.433294Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.447524Z"}
+{"raw": "Category", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.461343Z"}
+{"raw": "To / From", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.472762Z"}
+{"raw": "Description", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.489107Z"}
+{"raw": "Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.503014Z"}
+{"raw": "14/05/25", "parsed": "2025-05-14T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:33.515486Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.515933Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.650805Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.664180Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:33.678414Z"}
+{"raw": "23:08:23", "parsed": "2025-11-08T23:08:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:33.681189Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:33.683616Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:33.685036Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.685426Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.697778Z"}
+{"raw": "kip:opay/abdulrahman", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.713348Z"}
+{"raw": "18:41:52", "parsed": "2025-11-08T18:41:52", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:33.729397Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.732087Z"}
+{"raw": "kamilu/transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.903829Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.919454Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:33.934853Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.093017Z"}
+{"raw": "abdulrah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.120093Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:34.132483Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.132934Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.307584Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.333269Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:34.363473Z"}
+{"raw": "18:42:23", "parsed": "2025-11-08T18:42:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:34.369404Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.376545Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.400656Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:34.421565Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.421958Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.433848Z"}
+{"raw": "09:37:28", "parsed": "2025-11-09T09:37:28", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:34.447950Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.450406Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.605498Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.619654Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.632417Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.788743Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.814008Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:34.824476Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.824996Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.983840Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:34.996985Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:35.012512Z"}
+{"raw": "09:37:44", "parsed": "2025-11-09T09:37:44", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:35.015515Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:35.018143Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:35.020063Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:35.035534Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:35.036158Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:35.539824Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:35.558662Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:35.586842Z"}
+{"raw": "09:38:35", "parsed": "2025-11-09T09:38:35", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:35.770292Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:35.772852Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:35.774343Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:35.774756Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:35.787708Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:35.801879Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:35.956520Z"}
+{"raw": "09:39:23", "parsed": "2025-11-09T09:39:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:35.959123Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:35.962678Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:35.964135Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:35.978906Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:35.979371Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.137331Z"}
+{"raw": "09:39:27", "parsed": "2025-11-09T09:39:27", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:36.149781Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.152510Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.165324Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:36.324083Z"}
+{"raw": "20/08/25", "parsed": "2025-08-20T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:36.325626Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.326606Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.483508Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.495969Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:36.508655Z"}
+{"raw": "10:55:33", "parsed": "2025-11-08T10:55:33", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:36.512416Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:36.514918Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.516413Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.556290Z"}
+{"raw": "MICROFINANCE KUDA aba nk", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.600425Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.616022Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.732390Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.758732Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.884516Z"}
+{"raw": "Page 1 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.908071Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.924827Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.937252Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.950254Z"}
+{"raw": "23/09/25", "parsed": "2025-09-23T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:36.964321Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.964765Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.975533Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:36.989881Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.148878Z"}
+{"raw": "12:42:00", "parsed": "2025-11-08T12:42:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:37.163488Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.165994Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.178454Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.334790Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.359076Z"}
+{"raw": "03/10/25", "parsed": "2025-10-03T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T09:41:37.370680Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.371136Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.526291Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.538303Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.551831Z"}
+{"raw": "18:47:51", "parsed": "2025-11-08T18:47:51", "method": "dateparser:DMY", "timestamp": "2025-11-09T09:41:37.756297Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.758781Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.771552Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.867481Z"}
+{"raw": "WORDFINANCE KUDA K aba nk BANKLINES", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.908377Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.926793Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.983289Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:37.997356Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:38.127429Z"}
+{"raw": "Page 2 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T09:41:38.155529Z"}
+{"raw": "14/05/25 23:08:23", "parsed": "2025-05-14T23:08:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T10:03:08.521824Z"}
+{"raw": "30/05/25 18:41:52", "parsed": "2025-05-30T18:41:52", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T10:03:08.523287Z"}
+{"raw": "30/05/25 18:42:23", "parsed": "2025-05-30T18:42:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T10:03:08.523732Z"}
+{"raw": "12/08/25 09:37:28", "parsed": "2025-08-12T09:37:28", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T10:03:08.524459Z"}
+{"raw": "12/08/25 09:37:44", "parsed": "2025-08-12T09:37:44", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T10:03:08.525102Z"}
+{"raw": "12/08/25 09:38:35", "parsed": "2025-08-12T09:38:35", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T10:03:08.525745Z"}
+{"raw": "12/08/25 09:39:23", "parsed": "2025-08-12T09:39:23", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T10:03:08.526462Z"}
+{"raw": "12/08/25 09:39:27", "parsed": "2025-08-12T09:39:27", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T10:03:08.528001Z"}
+{"raw": "20/08/25 10:55:33", "parsed": "2025-08-20T10:55:33", "method": "strptime:%d/%m/%y %H:%M:%S", "timestamp": "2025-11-09T10:03:08.530526Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:08.576269Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:12.273356Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:12.319082Z"}
+{"raw": "Account", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:12.370086Z"}
+{"raw": "Date", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:12.409543Z"}
+{"raw": "ILAH, KAMILU ABDULRAHMAN", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:12.446901Z"}
+{"raw": "2013716080", "parsed": "2033-10-23T21:34:40", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:12.509481Z"}
+{"raw": "07/10/2024 - - 07/10/2025", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:12.516730Z"}
+{"raw": "167 SHAIBU KAZAURE", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:14.886508Z"}
+{"raw": "STREET, KANO, KANO", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:14.912863Z"}
+{"raw": "Opening Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:14.936683Z"}
+{"raw": "Closing Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:14.953760Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:14.970570Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:15.155553Z"}
+{"raw": "Summary", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:15.704510Z"}
+{"raw": "Money in", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:15.755327Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:15.809472Z"}
+{"raw": "\u20a610,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:15.877320Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:16.360932Z"}
+{"raw": "Date/Time", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:16.877969Z"}
+{"raw": "Money In", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:16.925379Z"}
+{"raw": "Money out", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:16.969048Z"}
+{"raw": "Category", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.013687Z"}
+{"raw": "To / From", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.058811Z"}
+{"raw": "Description", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.121210Z"}
+{"raw": "Balance", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.162688Z"}
+{"raw": "14/05/25", "parsed": "2025-05-14T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T10:03:17.194831Z"}
+{"raw": "\u20a6100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.195518Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.403002Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.418200Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:17.435918Z"}
+{"raw": "23:08:23", "parsed": "2025-11-08T23:08:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:17.477301Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:17.480368Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T10:03:17.485257Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.486167Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.500794Z"}
+{"raw": "kip:opay/abdulrahman", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.518514Z"}
+{"raw": "18:41:52", "parsed": "2025-11-08T18:41:52", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:17.536829Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.539321Z"}
+{"raw": "kamilu/transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.743415Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.761255Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:17.777553Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.074392Z"}
+{"raw": "abdulrah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.105827Z"}
+{"raw": "30/05/25", "parsed": "2025-05-30T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T10:03:18.121418Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.121838Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.395685Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.428504Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:18.463581Z"}
+{"raw": "18:42:23", "parsed": "2025-11-08T18:42:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:18.472700Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.478458Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.498010Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T10:03:18.515180Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.517571Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.530785Z"}
+{"raw": "09:37:28", "parsed": "2025-11-09T09:37:28", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:18.550379Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.555298Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.789766Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.819046Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:18.836827Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.049950Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.080060Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T10:03:19.094874Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.095266Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.296765Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.312689Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:19.330092Z"}
+{"raw": "09:37:44", "parsed": "2025-11-09T09:37:44", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:19.336399Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:19.339220Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.340731Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T10:03:19.358413Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.358893Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.628814Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.663021Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.695585Z"}
+{"raw": "09:38:35", "parsed": "2025-11-09T09:38:35", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:19.928275Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:19.931291Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T10:03:19.936264Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.936864Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.950381Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:19.968167Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:20.171267Z"}
+{"raw": "09:39:23", "parsed": "2025-11-09T09:39:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:20.173947Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:20.176515Z"}
+{"raw": "reversal of airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:20.177956Z"}
+{"raw": "12/08/25", "parsed": "2025-08-12T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T10:03:20.196139Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:20.196806Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:20.397376Z"}
+{"raw": "09:39:27", "parsed": "2025-11-09T09:39:27", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:20.412762Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:20.418238Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:20.431580Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:20.630347Z"}
+{"raw": "20/08/25", "parsed": "2025-08-20T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T10:03:20.633807Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:20.635605Z"}
+{"raw": "airtime", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:20.967925Z"}
+{"raw": "airtime purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:20.989197Z"}
+{"raw": "\u20a60.00", "parsed": "2025-11-09T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:21.006234Z"}
+{"raw": "10:55:33", "parsed": "2025-11-08T10:55:33", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:21.008803Z"}
+{"raw": "2347049794301", "parsed": "2044-05-16T22:16:34.301000", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:21.011267Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.012689Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.062543Z"}
+{"raw": "MICROFINANCE KUDA aba nk", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.114950Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.137261Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.207780Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.222497Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.379040Z"}
+{"raw": "Page 1 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.409013Z"}
+{"raw": "K kuda.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.428761Z"}
+{"raw": "Statement", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.444335Z"}
+{"raw": "transfer from", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.460793Z"}
+{"raw": "23/09/25", "parsed": "2025-09-23T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T10:03:21.477290Z"}
+{"raw": "inward", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.477681Z"}
+{"raw": "Abdulrahman Kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.493124Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.510351Z"}
+{"raw": "abdulrahman kamilu", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.715248Z"}
+{"raw": "12:42:00", "parsed": "2025-11-08T12:42:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:21.733883Z"}
+{"raw": "transfer", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.739418Z"}
+{"raw": "\u20a66,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.754809Z"}
+{"raw": "Ilah/9029189750/Paycom(Opay)", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:21.963384Z"}
+{"raw": "ilah", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:22.022656Z"}
+{"raw": "03/10/25", "parsed": "2025-10-03T00:00:00", "method": "strptime:%d/%m/%y", "timestamp": "2025-11-09T10:03:22.054381Z"}
+{"raw": "\u20a61,000.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:22.055274Z"}
+{"raw": "bills", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:22.389680Z"}
+{"raw": "kedco prepaid", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:22.404840Z"}
+{"raw": "\u20a65,100.00", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:22.422618Z"}
+{"raw": "18:47:51", "parsed": "2025-11-08T18:47:51", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:22.712788Z"}
+{"raw": "purchase", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:22.720246Z"}
+{"raw": "Kuda MF Bank (RC796975). All rights reserved. All deposits are insured by the Nigerian Deposit Insurance Corporation (NDIC).", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:22.760672Z"}
+{"raw": "licensed by the Central Bank of Nigeria. \"Kuda\" and \"Kudabank\" are trademarks of Kuda Technologies LTD. 1-11 Commercial", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:22.814935Z"}
+{"raw": "WORDFINANCE KUDA K aba nk BANKLINES", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:22.866746Z"}
+{"raw": "Lagos. Nigeria. 131 Finsbury Pavement, London, EC2A 1NT, UK.", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:22.890800Z"}
+{"raw": "RC", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:22.960184Z"}
+{"raw": "796975", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:22.974597Z"}
+{"raw": "Account Number 2013716080", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:23.130344Z"}
+{"raw": "Page 2 of 2", "parsed": null, "method": "failed_all_methods", "timestamp": "2025-11-09T10:03:23.160132Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.197462Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.207165Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.209539Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.211785Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.214088Z"}
+{"raw": "2033-10-23 21:34:40", "parsed": "2033-10-23T21:34:40", "method": "pandas:dayfirst", "timestamp": "2025-11-09T10:03:23.221174Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.633511Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.639680Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.642553Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.645053Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.647104Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.649796Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.655961Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.658345Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.660370Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.662389Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.664452Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.668537Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.674830Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.677029Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.679178Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.681201Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.684582Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.690942Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:23.693634Z"}
+{"raw": "2025-05-14 00:00:00", "parsed": "2025-05-14T00:00:00", "method": "pandas:dayfirst", "timestamp": "2025-11-09T10:03:23.696017Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:24.013901Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:24.017356Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:24.023998Z"}
+{"raw": "2025-11-09 00:00:00", "parsed": "2025-09-11T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:24.027977Z"}
+{"raw": "2025-11-08 23:08:23", "parsed": "2025-08-11T23:08:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:24.032795Z"}
+{"raw": "2044-05-16 22:16:34.301000", "parsed": "2044-05-16T22:16:34.301000", "method": "pandas:dayfirst", "timestamp": "2025-11-09T10:03:24.043158Z"}
+{"raw": "2025-05-30 00:00:00", "parsed": "2025-05-30T00:00:00", "method": "pandas:dayfirst", "timestamp": "2025-11-09T10:03:24.380381Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:24.809686Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:24.811913Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:24.813965Z"}
+{"raw": "2025-11-08 18:41:52", "parsed": "2025-08-11T18:41:52", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:24.816782Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:24.826556Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:24.828688Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:24.830649Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:24.832989Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:24.839044Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:24.841915Z"}
+{"raw": "2025-05-30 00:00:00", "parsed": "2025-05-30T00:00:00", "method": "pandas:dayfirst", "timestamp": "2025-11-09T10:03:24.844050Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.209848Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.212176Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.214586Z"}
+{"raw": "2025-11-09 00:00:00", "parsed": "2025-09-11T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:25.217766Z"}
+{"raw": "2025-11-08 18:42:23", "parsed": "2025-08-11T18:42:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:25.229347Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.235405Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.241589Z"}
+{"raw": "2025-08-12 00:00:00", "parsed": "2025-12-08T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:25.243891Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.249639Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.256313Z"}
+{"raw": "2025-11-09 09:37:28", "parsed": "2025-09-11T09:37:28", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:25.259463Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.264629Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.267484Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.276163Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.279097Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.281527Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.284666Z"}
+{"raw": "2025-08-12 00:00:00", "parsed": "2025-12-08T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:25.291626Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.296595Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.299758Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:25.306630Z"}
+{"raw": "2025-11-09 00:00:00", "parsed": "2025-09-11T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:25.309407Z"}
+{"raw": "2025-11-09 09:37:44", "parsed": "2025-09-11T09:37:44", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:25.314822Z"}
+{"raw": "2044-05-16 22:16:34.301000", "parsed": "2044-05-16T22:16:34.301000", "method": "pandas:dayfirst", "timestamp": "2025-11-09T10:03:25.327121Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.028856Z"}
+{"raw": "2025-08-12 00:00:00", "parsed": "2025-12-08T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:26.031013Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.039880Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.043570Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.045609Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.047546Z"}
+{"raw": "2025-11-09 09:38:35", "parsed": "2025-09-11T09:38:35", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:26.049796Z"}
+{"raw": "2044-05-16 22:16:34.301000", "parsed": "2044-05-16T22:16:34.301000", "method": "pandas:dayfirst", "timestamp": "2025-11-09T10:03:26.060045Z"}
+{"raw": "2025-08-12 00:00:00", "parsed": "2025-12-08T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:26.412691Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.417471Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.423770Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.426636Z"}
+{"raw": "2025-11-09 00:00:00", "parsed": "2025-09-11T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:26.428644Z"}
+{"raw": "2025-11-09 09:39:23", "parsed": "2025-09-11T09:39:23", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:26.433493Z"}
+{"raw": "2044-05-16 22:16:34.301000", "parsed": "2044-05-16T22:16:34.301000", "method": "pandas:dayfirst", "timestamp": "2025-11-09T10:03:26.442283Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.925121Z"}
+{"raw": "2025-08-12 00:00:00", "parsed": "2025-12-08T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:26.927230Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.931867Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.935224Z"}
+{"raw": "2025-11-09 09:39:27", "parsed": "2025-09-11T09:39:27", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:26.942071Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.946880Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:26.949032Z"}
+{"raw": "2044-05-16 22:16:34.301000", "parsed": "2044-05-16T22:16:34.301000", "method": "pandas:dayfirst", "timestamp": "2025-11-09T10:03:26.953550Z"}
+{"raw": "2025-08-20 00:00:00", "parsed": "2025-08-20T00:00:00", "method": "pandas:dayfirst", "timestamp": "2025-11-09T10:03:27.293756Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:27.678045Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:27.680135Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:27.682250Z"}
+{"raw": "2025-11-09 00:00:00", "parsed": "2025-09-11T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:27.684723Z"}
+{"raw": "2025-11-08 10:55:33", "parsed": "2025-08-11T10:55:33", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:27.695141Z"}
+{"raw": "2044-05-16 22:16:34.301000", "parsed": "2044-05-16T22:16:34.301000", "method": "pandas:dayfirst", "timestamp": "2025-11-09T10:03:27.699802Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.131800Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.134093Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.138638Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.143754Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.146297Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.148415Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.151014Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.158304Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.161434Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.163904Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.166798Z"}
+{"raw": "2025-09-23 00:00:00", "parsed": "2025-09-23T00:00:00", "method": "pandas:dayfirst", "timestamp": "2025-11-09T10:03:28.170263Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.477225Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.480503Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.482522Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.484876Z"}
+{"raw": "2025-11-08 12:42:00", "parsed": "2025-08-11T12:42:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:28.493246Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.497981Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.500213Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.503207Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.509007Z"}
+{"raw": "2025-10-03 00:00:00", "parsed": "2025-03-10T00:00:00", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:28.511200Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.515626Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.517933Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.522910Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.527104Z"}
+{"raw": "2025-11-08 18:47:51", "parsed": "2025-08-11T18:47:51", "method": "dateparser:DMY", "timestamp": "2025-11-09T10:03:28.529124Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.533701Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.536727Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.544005Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.546122Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.548133Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.550226Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.553733Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.559709Z"}
+{"raw": "", "parsed": null, "method": "empty_string", "timestamp": "2025-11-09T10:03:28.561783Z"}

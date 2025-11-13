@@ -1,0 +1,66 @@
+{
+  "table_id": 1,
+  "error": "_clean_table_dataframe() got an unexpected keyword argument 'table_id'",
+  "trace": "Traceback (most recent call last):\n  File \"/Users/macbookpro/Documents/bankbot/banklytik/statements/direct_processor.py\", line 211, in process_tables_directly\n    cleaned = _clean_table_dataframe(\nTypeError: _clean_table_dataframe() got an unexpected keyword argument 'table_id'\n",
+  "df_type": "<class 'pandas.core.frame.DataFrame'>",
+  "df_columns": [
+    "date",
+    "credit",
+    "debit",
+    "channel",
+    "description",
+    "description",
+    "balance"
+  ],
+  "df_shape": [
+    9,
+    7
+  ],
+  "df_sample": [
+    [
+      "14/05/25 23:08:23",
+      "",
+      "\u20a6100.00",
+      "airtime",
+      "",
+      "airtime purchase 2347049794301",
+      "\u20a60.00"
+    ],
+    [
+      "30/05/25 18:41:52",
+      "\u20a61,000.00",
+      "",
+      "inward transfer",
+      "Abdulrahman Kamilu Ilah/9029189750/Paycom(Opay)",
+      "kip:opay/abdulrahman kamilu/transfer from abdulrah",
+      "\u20a61,000.00"
+    ],
+    [
+      "30/05/25 18:42:23",
+      "",
+      "\u20a61,000.00",
+      "bills",
+      "",
+      "kedco prepaid purchase",
+      "\u20a60.00"
+    ],
+    [
+      "12/08/25 09:37:28",
+      "\u20a61,000.00",
+      "",
+      "inward transfer",
+      "Abdulrahman Kamilu Ilah/9029189750/Paycom(Opay)",
+      "transfer from abdulrahman kamilu ilah",
+      "\u20a61,000.00"
+    ],
+    [
+      "12/08/25 09:37:44",
+      "",
+      "\u20a61,000.00",
+      "airtime",
+      "",
+      "airtime purchase 2347049794301",
+      "\u20a60.00"
+    ]
+  ]
+}

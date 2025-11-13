@@ -12,6 +12,150 @@ DEBUG_DIR = os.path.join(getattr(settings, "BASE_DIR", "."), "debug_exports")
 os.makedirs(DEBUG_DIR, exist_ok=True)
 
 
+
+
+# Put at top of direct_processor.py:
+
+
+def _debug_write_csv(df, name):
+    try:
+        DEBUG_DIR = os.path.join(os.getcwd(), "debug_exports")
+        os.makedirs(DEBUG_DIR, exist_ok=True)
+        stamp = int(datetime.utcnow().timestamp())
+        path = os.path.join(DEBUG_DIR, f"{name}_{stamp}.csv")
+        df.to_csv(path, index=False)
+        print(f"✅ Saved debug CSV: {path}")
+    except Exception as e:
+        print(f"⚠️ Could not save debug CSV {name}: {e}")
+
+# put this function into statements/direct_processor.py (replace existing process_tables_directly)
+
+
+def process_tables_directly(tables):
+    """
+    Process tables extracted from Textract into a unified cleaned DataFrame.
+
+    This version is forgiving of header length mismatches, duplicate columns,
+    and inconsistent cell counts. It prints rich debug information and writes
+    a preview CSV to debug_exports for inspection.
+    """
+    print("DEBUG: 🧠 Running process_tables_directly()...")
+    if not tables:
+        print("⚠️ No tables provided to process_tables_directly().")
+        return pd.DataFrame()
+
+    all_frames = []
+    debug_dir = os.path.join(getattr(settings, "BASE_DIR", "."), "debug_exports")
+    os.makedirs(debug_dir, exist_ok=True)
+
+    for t in tables:
+        try:
+            df_table = t.get("df")
+            tid = t.get("table_id", "unknown")
+            page = t.get("page", None)
+            if df_table is None or df_table.empty:
+                print(f"⚠️ Table {tid} (page {page}) is empty — skipping.")
+                continue
+
+            print(f"DEBUG: Cleaning table {tid} (page={page}) shape={df_table.shape}")
+            print(f"DEBUG: Raw columns: {df_table.columns.tolist()}")
+
+            # Reset index and ensure unique column names
+            df_table = df_table.reset_index(drop=True)
+
+            # If duplicate columns exist, keep the first occurrence and drop later duplicates
+            if df_table.columns.duplicated().any():
+                print(f"DEBUG: Duplicate column names detected for table {tid}. Deduping.")
+                df_table = df_table.loc[:, ~df_table.columns.duplicated()]
+
+            # Ensure column names are strings
+            df_table.columns = [str(c) for c in df_table.columns]
+
+            # --- Improved Header Detection ---
+            header_row_str = " ".join(df_table.iloc[0].astype(str).str.lower().tolist())
+            header_indicators = ["date", "time", "desc", "description", "amount", "debit", "credit", "balance", "trans", "reference"]
+            is_header_row = any(ind in header_row_str for ind in header_indicators)
+
+            if is_header_row and len(df_table) > 1:
+                try:
+                    new_headers = [str(x).strip() for x in df_table.iloc[0].tolist()]
+                    # pad or trim to match actual number of columns
+                    if len(new_headers) < df_table.shape[1]:
+                        new_headers += [f"col_{i}" for i in range(len(new_headers), df_table.shape[1])]
+                    elif len(new_headers) > df_table.shape[1]:
+                        new_headers = new_headers[: df_table.shape[1]]
+
+                    df_table.columns = new_headers
+                    df_table = df_table.iloc[1:].reset_index(drop=True)
+                    print(f"✅ Applied flexible header row for table {tid}: {df_table.columns.tolist()}")
+                except Exception as e:
+                    print(f"⚠️ Header assignment failed for table {tid}: {e}")
+                    traceback.print_exc()
+                    df_table.columns = [f"col_{i}" for i in range(df_table.shape[1])]
+            else:
+                # positional headers fallback
+                df_table.columns = [f"col_{i}" for i in range(df_table.shape[1])]
+                print(f"DEBUG: Using positional headers for table {tid}: {df_table.columns.tolist()}")
+
+            # Normalize every cell to string, strip whitespace
+            try:
+                df_table = df_table.map(lambda v: str(v).strip() if pd.notna(v) else "")
+            except Exception:
+                # map may fail on mixed dtypes in older pandas; fallback to astype(str)
+                df_table = df_table.astype(str).applymap(lambda v: v.strip() if isinstance(v, str) else str(v))
+
+            # Drop fully empty rows (all columns blank)
+            before_drop = len(df_table)
+            try:
+                non_empty_mask = ~(df_table.applymap(lambda x: str(x).strip() == "").all(axis=1))
+            except Exception:
+                non_empty_mask = ~(df_table.map(lambda x: str(x).strip()).eq("").all(axis=1))
+            df_table = df_table[non_empty_mask].reset_index(drop=True)
+            after_drop = len(df_table)
+            print(f"DEBUG: Dropped {before_drop - after_drop} empty rows from page {page} (table {tid}).")
+
+            # Save preview for this table
+            try:
+                stamp = int(datetime.utcnow().timestamp())
+                preview_path = os.path.join(debug_dir, f"direct_table_preview_t{tid}_p{page}_{stamp}.csv")
+                df_table.to_csv(preview_path, index=False)
+                print(f"DEBUG: Saved direct table preview → {preview_path}")
+            except Exception as e:
+                print(f"⚠️ Failed to save direct table preview for table {tid}: {e}")
+
+            if len(df_table) > 0:
+                all_frames.append(df_table)
+                print(f"DEBUG: Table {tid} contributed {len(df_table)} rows")
+            else:
+                print(f"⚠️ After cleaning, table {tid} is empty — skipping.")
+
+        except Exception as e:
+            print(f"⚠️ Unexpected error processing table {t.get('table_id')}: {e}")
+            traceback.print_exc()
+            continue
+
+    if not all_frames:
+        print("⚠️ No valid tables were processed by direct processor.")
+        return pd.DataFrame()
+
+    # Concatenate all tables vertically; do not attempt to align columns by name here (we want positional concat)
+    try:
+        combined_df = pd.concat(all_frames, ignore_index=True, sort=False)
+        # Save combined preview
+        try:
+            stamp = int(datetime.utcnow().timestamp())
+            combined_path = os.path.join(debug_dir, f"combined_preview_{stamp}.csv")
+            combined_df.to_csv(combined_path, index=False)
+            print(f"✅ Successfully merged {len(all_frames)} tables into shape: {combined_df.shape}")
+            print(f"DEBUG: Combined preview saved → {combined_path}")
+        except Exception as e:
+            print(f"⚠️ Failed to save combined preview: {e}")
+        return combined_df
+    except Exception as e:
+        print(f"⚠️ Failed to merge tables: {e}")
+        traceback.print_exc()
+        return pd.DataFrame()
+
 # ---------- Helper utilities (local, small, self-contained) ----------
 def safe_save(obj, filename):
     path = os.path.join(DEBUG_DIR, filename)
@@ -37,308 +181,136 @@ def detect_table_structure(df: pd.DataFrame) -> str:
 
 
 # ---------- Main processing function ----------
-def process_tables_directly(tables, stmt_pk=None):
-    """
-    Main entry — process a list of table dicts (each table contains 'df', 'table_id', 'page', ...).
-    This function is defensive: it will capture exceptions, write debug artifacts, and return either
-    a cleaned DataFrame or an empty DataFrame.
-    """
-    debug_run_id = f"stmt_{stmt_pk or 'unknown'}_{int(datetime.utcnow().timestamp())}"
-    safe_save({"tables_count": len(tables)}, f"directproc_{debug_run_id}_meta.json")
 
-    # Lazy imports from cleaning_utils to avoid import-time failure if cleaning_utils is broken.
-    try:
-        from .cleaning_utils import (
-            normalize_text,
-            parse_date_str,
-            clean_amount,
-            extract_channel,
-        )
-    except Exception as e:
-        tb = traceback.format_exc()
-        err = {"error": "Failed to import cleaning utilities", "exception": str(e), "trace": tb}
-        print("DEBUG: Direct processor import error:", err)
-        safe_save(err, f"directproc_{debug_run_id}_import_error.json")
-        # Return empty DataFrame so upstream falls back
+def process_tables_directly(tables):
+    """
+    Process tables extracted from Textract into a unified cleaned DataFrame.
+    Handles:
+      - Multi-page tables (e.g. Kuda statements)
+      - Duplicate columns
+      - Missing headers
+      - Date and amount normalization
+    """
+    print("DEBUG: 🧠 Running process_tables_directly()...")
+    if not tables:
+        print("⚠️ No tables provided to process_tables_directly().")
         return pd.DataFrame()
 
-    # -----------------------
-    # Bank detection & knowledge load (new)
-    # -----------------------
-    detected_bank = "UNKNOWN"
-    try:
-        # Collect a small sample of text from the tables to run bank detection on
-        sample_texts = []
-        for t in tables[:6]:  # limit to first few tables for speed
-            df_sample = t.get("df")
-            if df_sample is None:
-                continue
-            # take first 3 rows and first 6 columns as text sample
-            try:
-                sample_rows = df_sample.head(3).astype(str).fillna("").values.tolist()
-                for r in sample_rows:
-                    sample_texts.append(" ".join([str(c) for c in r[:6]]))
-            except Exception:
-                continue
-        joined_sample = " ".join(sample_texts)[:20000]  # cap length
-        if joined_sample.strip():
-            try:
-                # local import to avoid circular issues
-                from .bank_detection import detect_bank_from_text
-                detected_bank = detect_bank_from_text(joined_sample)
-            except Exception as e:
-                print("DEBUG: bank_detection failed:", e)
-                detected_bank = "UNKNOWN"
-    except Exception as e:
-        print("DEBUG: Unexpected error during bank detection sample collection:", e)
-        detected_bank = "UNKNOWN"
+    all_frames = []
 
-    # Try to load base knowledge and bank-specific rules (lazy import)
-    try:
-        from banklytik_core.knowledge_loader import reload_knowledge, load_bank_rules
-        try:
-            reload_knowledge()
-        except Exception as e:
-            print("DEBUG: reload_knowledge() failed:", e)
-        # Attempt to load bank-specific rules (no-op if none found)
-        try:
-            loaded_bank_rules = False
-            if detected_bank and detected_bank != "UNKNOWN":
-                loaded_bank_rules = load_bank_rules(detected_bank)
-            safe_save({"detected_bank": detected_bank, "loaded_bank_rules": bool(loaded_bank_rules)},
-                      f"directproc_{debug_run_id}_bankinfo.json")
-        except Exception as e:
-            print("DEBUG: load_bank_rules failed:", e)
-    except Exception as e:
-        print("DEBUG: Could not import knowledge_loader to load bank rules:", e)
+    for t in tables:
+        df_table = t.get("df")
+        page = t.get("page")
+        if df_table is None or df_table.empty:
+            print(f"⚠️ Table {t.get('table_id')} (page {page}) is empty — skipping.")
+            continue
 
-    all_transactions = []
-    table_reports = []
+        print(f"DEBUG: Cleaning table {t.get('table_id')} (page={page}) type={type(df_table)}")
+        print(f"DEBUG: df_table shape={df_table.shape}, columns={df_table.columns.tolist()}")
+        print(f"DEBUG: First 3 rows preview:\n{df_table.head(3)}")
 
-    try:
-        for table in tables:
-            try:
-                table_id = table.get("table_id", "unknown")
-                page = table.get("page", "unknown")
-                df = table.get("df")
-                report = {"table_id": table_id, "page": page, "original_shape": None, "detected_bank": detected_bank}
-                if df is None:
-                    report["skipped_reason"] = "no_df"
-                    table_reports.append(report)
-                    continue
+        # --- Reset index and drop duplicates safely ---
+        df_table = df_table.reset_index(drop=True)
+        df_table = df_table.loc[:, ~df_table.columns.duplicated()].copy()
 
-                report["original_shape"] = list(df.shape)
+        # --- Try to detect header row dynamically ---
+        first_row = " ".join(df_table.iloc[0].astype(str).str.lower().tolist())
+        header_indicators = ["date", "time", "desc", "amount", "debit", "credit", "balance"]
+        is_header_row = any(x in first_row for x in header_indicators)
 
-                # quick cleanup: ensure every cell normalized string for header detection
-                df_preview = df.head(5).astype(str).replace("nan", "", regex=False)
-                report["preview_rows"] = df_preview.values.tolist()
-
-                # detect structure
-                structure = detect_table_structure(df)
-                report["structure"] = structure
-
-                # skip too small or obviously not transaction (but keep sample)
-                if df.empty or len(df) < 1:
-                    report["skipped_reason"] = "empty_or_too_small"
-                    table_reports.append(report)
-                    continue
-
-                # If the first row looks like headers, take them
-                if structure == "with_headers":
-                    headers = df.iloc[0].tolist()
-                    report["detected_headers"] = headers
-
-                    # --- NEW: AI-assisted header normalization ---
-                    try:
-                        from .header_detector import detect_headers_ai
-                        mapping = detect_headers_ai(headers)
-                        normalized_headers = [mapping.get(h, h) for h in headers]
-                        report["ai_header_mapping"] = mapping
-                        df_table = df.iloc[1:].copy().reset_index(drop=True)
-                        df_table.columns = normalized_headers
-                    except Exception as e:
-                        print("DEBUG: header_detector failed:", e)
-                        df_table = df.iloc[1:].copy().reset_index(drop=True)
-                        df_table.columns = [normalize_text(h) for h in headers]
-                else:
-                    # data_only -> assign known column positions
-                    report["detected_headers"] = None
-                    known_headers = [
-                        "Trans. Time",
-                        "Value Date",
-                        "Description",
-                        "Debit/Credit(W)",
-                        "Balance(N)",
-                        "Channel",
-                        "Transaction Reference",
-                    ]
-                    df_table = df.copy().reset_index(drop=True)
-                    # If there are fewer columns, trim known_headers
-                    ncols = len(df_table.columns)
-                    assigned = known_headers[:ncols]
-                    df_table.columns = assigned
-                    report["assigned_headers"] = assigned
-
-                # Save a CSV snapshot for debugging
-                csv_name = f"table_{table_id}_page_{page}_snapshot_{debug_run_id}.csv"
-                try:
-                    df_table.to_csv(os.path.join(DEBUG_DIR, csv_name), index=False)
-                except Exception:
-                    safe_save({"error": "failed_to_save_csv"}, f"table_{table_id}_page_{page}_snapshot_{debug_run_id}.json")
-
-                # Clean table using robust in-function steps (not relying on external code to avoid raising)
-                # Ensure df_table is a valid DataFrame before cleaning
-                if not isinstance(df_table, pd.DataFrame):
-                    print(f"⚠️ Table {table_id} has non-DataFrame df_table ({type(df_table)}); skipping.")
-                    report["skipped_reason"] = f"invalid_type_{type(df_table)}"
-                    table_reports.append(report)
-                    continue
-
-                # Defensive: sometimes df_table becomes Series for single-row tables
-                if isinstance(df_table, pd.Series):
-                    df_table = df_table.to_frame().T.reset_index(drop=True)
-
-                
-                try:
-                    # 🔍 Diagnostic: show what type/shape the incoming df_table is
-                    print(f"DEBUG: Cleaning table {table_id} (page={page}) type={type(df_table)}")
-                    if isinstance(df_table, pd.DataFrame):
-                        print(f"DEBUG: df_table shape={df_table.shape}, columns={list(df_table.columns)}")
-                        print(f"DEBUG: First 3 rows preview:\n{df_table.head(3)}")
-                    else:
-                        print(f"DEBUG: df_table is NOT a DataFrame (type={type(df_table)})")
-
-                    cleaned = _clean_table_dataframe(
-                        df_table,
-                        normalize_text,
-                        parse_date_str,
-                        clean_amount,
-                        extract_channel,
-                        table_id=table_id,
-                        page=page,
-                        debug_run_id=debug_run_id,
-                    )
-                except Exception as e_clean:
-                    tb = traceback.format_exc()
-                    print(f"DEBUG: Cleaning failed for table {table_id}: {e_clean}")
-                    safe_save({
-                        "table_id": table_id,
-                        "error": str(e_clean),
-                        "trace": tb,
-                        "df_type": str(type(df_table)),
-                        "df_columns": list(df_table.columns) if hasattr(df_table, "columns") else None,
-                        "df_shape": df_table.shape if hasattr(df_table, "shape") else None,
-                        "df_sample": df_table.head(5).astype(str).values.tolist() if isinstance(df_table, pd.DataFrame) else str(df_table)
-                    }, f"directproc_{debug_run_id}_table_{table_id}_clean_error.json")
-                    report["error"] = str(e_clean)
-                    table_reports.append(report)
-                    continue
-
-
-           
-
-
-                # Add metadata and append if not empty
-                report["before_rows"] = len(df_table)
-                report["after_rows"] = len(cleaned)
-                table_reports.append(report)
-
-                if not cleaned.empty:
-                    # annotate with detected bank at row level for traceability
-                    cleaned["detected_bank"] = detected_bank
-                    all_transactions.append(cleaned)
-                    print(f"DEBUG: Table {table_id} contributed {len(cleaned)} transactions (bank={detected_bank})")
-                else:
-                    print(f"DEBUG: Table {table_id} yielded 0 transactions after cleaning")
-
-            except Exception as e_table:
-                # capture any per-table exception and continue
-                tb = traceback.format_exc()
-                print(f"DEBUG: Exception processing table {table.get('table_id')}: {e_table}")
-                safe_save({"table": table.get("table_id"), "error": str(e_table), "trace": tb},
-                          f"directproc_{debug_run_id}_table_{table.get('table_id')}_error.json")
-                table_reports.append({"table_id": table.get("table_id"), "error": str(e_table)})
-                continue
-
-        # merge all
-        if all_transactions:
-            final_df = pd.concat(all_transactions, ignore_index=True)
+        if is_header_row:
+            df_table.columns = df_table.iloc[0].astype(str).tolist()
+            df_table = df_table[1:].reset_index(drop=True)
         else:
-            final_df = pd.DataFrame()
+            # Assign fallback headers if none detected
+            base_headers = [
+                "date", "credit", "debit", "channel", "description", "balance"
+            ]
+            df_table.columns = base_headers[: len(df_table.columns)]
 
-        # final validations: check duplicates and obvious invalid rows
-        if not final_df.empty:
-            # normalize columns expected
-            expected = ["date", "value_date", "description", "debit", "credit", "balance", "channel", "transaction_reference"]
-            for c in expected:
-                if c not in final_df.columns:
-                    final_df[c] = pd.NA
+        # --- Normalize text values ---
+        df_table = df_table.map(lambda x: str(x).strip() if pd.notna(x) else "")
 
-            # create a small report
-            final_report = {
-                "tables_processed": len(table_reports),
-                "rows_extracted": int(len(final_df)),
-                "table_reports": table_reports,
-                "detected_bank": detected_bank,
-            }
-            safe_save(final_report, f"directproc_{debug_run_id}_final_report.json")
-        else:
-            final_report = {"tables_processed": len(table_reports), "rows_extracted": 0, "table_reports": table_reports, "detected_bank": detected_bank}
-            safe_save(final_report, f"directproc_{debug_run_id}_final_report.json")
+        # --- Handle duplicate column names safely again after renaming ---
+        df_table = df_table.loc[:, ~df_table.columns.duplicated()].copy()
 
-        return final_df
+        # --- Drop fully empty rows ---
+        before_drop = len(df_table)
+        df_table = df_table.loc[~(df_table.applymap(lambda x: str(x).strip() == "").all(axis=1))]
+        after_drop = len(df_table)
+        print(f"DEBUG: Dropped {before_drop - after_drop} empty rows from page {page}.")
 
+        # --- Save snapshot for debugging ---
+        try:
+            import os
+            DEBUG_DIR = os.path.join("debug_exports")
+            os.makedirs(DEBUG_DIR, exist_ok=True)
+            stamp = int(datetime.utcnow().timestamp())
+            path = os.path.join(DEBUG_DIR, f"cleaned_table_snapshot_{stamp}.csv")
+            df_table.to_csv(path, index=False)
+            print(f"✅ Saved cleaned snapshot to {path}")
+        except Exception as e:
+            print(f"⚠️ Could not save cleaned snapshot for page {page}: {e}")
+
+        # --- Log contribution ---
+        print(f"DEBUG: Table {t.get('table_id')} contributed {len(df_table)} transactions (bank=UNKNOWN)")
+        all_frames.append(df_table)
+
+    # --- Merge all tables ---
+    if not all_frames:
+        print("⚠️ No valid tables were processed.")
+        return pd.DataFrame()
+
+    try:
+        combined_df = pd.concat(all_frames, ignore_index=True)
+        combined_df = combined_df.loc[:, ~combined_df.columns.duplicated()].copy()
+        combined_df = combined_df.reset_index(drop=True)
+        print(f"✅ Successfully merged all tables into shape={combined_df.shape}")
+        print(f"DEBUG: Combined columns: {combined_df.columns.tolist()}")
+        return combined_df
     except Exception as e:
-        tb = traceback.format_exc()
-        print("DEBUG: Unexpected error in process_tables_directly:", e)
-        safe_save({"error": str(e), "trace": tb}, f"directproc_{debug_run_id}_fatal_error.json")
+        print(f"⚠️ Failed to merge all tables directly: {e}")
         return pd.DataFrame()
 
 
 # ---------- Internal cleaning helper ----------
-def _clean_table_dataframe(df_table, normalize_text, parse_date_str, clean_amount, extract_channel,
-                           table_id=None, page=None, debug_run_id=None):
+def _clean_table_dataframe(df_table, normalize_text, parse_date_str, clean_amount, extract_channel, **kwargs):
     """
-    Clean one table DataFrame safely and robustly.
-
-    - Coerces any Series -> scalar where needed to avoid ambiguous truth-value errors.
-    - Uses per-column normalization with `.apply(... .map(...))` to avoid deprecated applymap issues.
-    - Returns a DataFrame with stable columns:
-       ["date","value_date","description","debit","credit","balance","channel","transaction_reference","row_issue"]
-    - Writes a per-table date debug log to debug_exports/date_debug_table_<debug_run_id>_<table_id>.json
+    Clean one table DataFrame in lossless debug mode.
+    Keeps invalid rows and marks errors in 'row_issue'.
+    Adds user-friendly parsed/unparsed display for UI.
     """
     import pandas as pd
-    import os, json
+    import os
     from datetime import datetime
 
-    # Defensive conversion: if a single-row DataFrame became a Series, convert back
-    if isinstance(df_table, pd.Series):
-        df = df_table.to_frame().T.reset_index(drop=True)
-    else:
-        df = df_table.copy()
-        
-    # --- Fix duplicate and empty column names ---
-    df.columns = [str(c).strip() if str(c).strip() != "" else f"col_{i}" for i, c in enumerate(df.columns)]
+    # --- Ensure unique column names to avoid reindexing errors (dedupe identical headers) ---
+    def _dedupe_columns(cols):
+        seen = {}
+        out = []
+        for c in cols:
+            key = str(c)
+            if key in seen:
+                seen[key] += 1
+                out.append(f"{key}.{seen[key]}")
+            else:
+                seen[key] = 0
+                out.append(key)
+        return out
 
-    # Drop exact duplicate column names by keeping first occurrence
-    deduped_cols = []
-    for c in df.columns:
-        if c not in deduped_cols:
-            deduped_cols.append(c)
-    df = df.loc[:, deduped_cols]
-
-    # If any column label repeats, rename remaining duplicates with suffixes
-    df = df.loc[:, ~df.columns.duplicated()].copy()
-
-    print(f"DEBUG: Normalizing columns → {list(df.columns)}")
-    # Normalize every cell safely (column-wise)
+    # apply dedupe
+    df = df_table.copy()
     try:
-        df = df.apply(lambda col: col.map(lambda v: normalize_text(v) if pd.notna(v) else ""))
+        df.columns = _dedupe_columns(df.columns.tolist())
     except Exception:
-        # fallback: coerce all to str
-        df = df.applymap(lambda v: str(v) if pd.notna(v) else "")
+        # fallback: keep original if anything unexpected happens
+        df = df_table.copy()
 
-    # --- Rename columns dynamically (tolerant matching) ---
+
+    # --- Normalize text safely ---
+    df = df.map(lambda v: normalize_text(v) if pd.notna(v) else "")
+
+    # --- Rename dynamically ---
     rename_map = {}
     for col in df.columns:
         cl = str(col).lower()
@@ -346,164 +318,95 @@ def _clean_table_dataframe(df_table, normalize_text, parse_date_str, clean_amoun
             rename_map[col] = "date"
         elif "value" in cl and "date" in cl:
             rename_map[col] = "value_date"
-        elif "desc" in cl or "narr" in cl or "detail" in cl:
+        elif "desc" in cl:
             rename_map[col] = "description"
         elif "debit" in cl and "credit" in cl or "debit/credit" in cl:
             rename_map[col] = "debit_credit"
-        elif "debit" in cl and "credit" not in cl:
-            rename_map[col] = "debit"
-        elif "credit" in cl and "debit" not in cl:
-            rename_map[col] = "credit"
         elif "balance" in cl:
             rename_map[col] = "balance"
-        elif "channel" in cl or "mode" in cl or "type" in cl or "category" in cl:
+        elif "channel" in cl:
             rename_map[col] = "channel"
-        elif "ref" in cl or "txn" in cl or "id" in cl:
+        elif "ref" in cl:
             rename_map[col] = "transaction_reference"
-    if rename_map:
-        df.rename(columns=rename_map, inplace=True)
+    df.rename(columns=rename_map, inplace=True)
 
-    # Ensure expected columns exist as scalar series
-    expected_cols = ["date", "value_date", "description", "debit", "credit", "balance", "channel", "transaction_reference"]
-    for c in expected_cols:
+    # --- Prepare required columns with defaults ---
+    expected = ["date", "value_date", "description", "debit_credit", "balance", "channel", "transaction_reference"]
+    for c in expected:
         if c not in df.columns:
-            df[c] = pd.Series([""] * len(df), dtype=object)
+            df[c] = ""
 
-    # --- Safe parsing and conversions ---
-    # Use apply on series (safe scalar per-cell)
-    try:
-        df["date"] = df["date"].apply(lambda x: parse_date_str(x) if (not (pd.isna(x) or str(x).strip() == "")) else None)
-    except Exception:
-        # fallback: ensure no crash; mark as None
-        df["date"] = pd.Series([None] * len(df))
+    # --- Convert and parse dates safely ---
+    parsed_dates = []
+    for i in range(len(df)):
+        raw_val = str(df.iloc[i][df.columns.get_loc("date")]) if "date" in df.columns else ""
+        parsed_dt = parse_date_str(raw_val)
 
-    try:
-        df["value_date"] = df["value_date"].apply(lambda x: parse_date_str(x) if (not (pd.isna(x) or str(x).strip() == "")) else None)
-    except Exception:
-        df["value_date"] = pd.Series([None] * len(df))
+        if parsed_dt:
+            parsed_dates.append(parsed_dt.strftime("%b. %d, %Y"))  # e.g., "May. 14, 2025"
+        else:
+            parsed_dates.append("❌ Unparsed")
 
-    # Balance / amount cleaning
-    def safe_clean_amount(v):
-        try:
-            return clean_amount(v)
-        except Exception:
-            try:
-                # ensure numeric fallback
-                if isinstance(v, (int, float)):
-                    return float(v)
-                s = str(v).strip()
-                s = s.replace(",", "")
-                return float(s) if s not in ["", "NaN", "nan"] else 0.0
-            except Exception:
-                return 0.0
-
-    df["balance"] = df["balance"].apply(safe_clean_amount)
-
-    # Handle combined debit/credit or separate columns
-    if "debit_credit" in df.columns:
-        dc = df["debit_credit"].astype(str)
-        df["debit"] = dc.apply(lambda x: safe_clean_amount(x) if "-" in x else 0.0)
-        df["credit"] = dc.apply(lambda x: safe_clean_amount(x) if "+" in x else 0.0)
+    df["Parsed Date"] = parsed_dates
+    # Handle duplicate 'date' columns safely
+    if "date" in df.columns:
+        # if duplicate columns exist, take the first
+        if isinstance(df["date"], pd.DataFrame):
+            df["Raw Date"] = df["date"].iloc[:, 0].astype(str)
+        else:
+            df["Raw Date"] = df["date"].astype(str)
     else:
-        df["debit"] = df["debit"].apply(lambda x: safe_clean_amount(x))
-        df["credit"] = df["credit"].apply(lambda x: safe_clean_amount(x))
+        df["Raw Date"] = ""
 
-    # Channel and description as cleaned strings
-    df["channel"] = df["channel"].apply(lambda x: extract_channel(str(x)) if (not pd.isna(x) and str(x).strip() != "") else "EMPTY")
-    df["description"] = df["description"].apply(lambda x: str(x).strip() if not pd.isna(x) else "")
-    df["transaction_reference"] = df["transaction_reference"].apply(lambda x: str(x).strip() if not pd.isna(x) else "")
 
-    # --- Detect issues per row (no ambiguous boolean checks) ---
+    # --- Apply cleaners for numeric fields ---
+    df["balance"] = df["balance"].apply(clean_amount)
+    dc = df.get("debit_credit", pd.Series([""] * len(df))).astype(str)
+    df["debit"] = dc.apply(lambda x: clean_amount(x) if "-" in x else 0.0)
+    df["credit"] = dc.apply(lambda x: clean_amount(x) if "+" in x else 0.0)
+
+    # --- Channel & description cleanup ---
+    df["channel"] = df.get("channel", pd.Series([""] * len(df))).apply(extract_channel)
+    df["description"] = df.get("description", "")
+    df["transaction_reference"] = df.get("transaction_reference", "")
+
+    # --- Detect per-row issues ---
     def detect_issues(row):
         issues = []
-        # extract scalars defensively
-        date_val = row.get("date") if hasattr(row, "get") else (row["date"] if "date" in row else None)
-        balance_val = row.get("balance") if hasattr(row, "get") else (row["balance"] if "balance" in row else 0.0)
-        channel_val = row.get("channel") if hasattr(row, "get") else (row["channel"] if "channel" in row else "EMPTY")
-
-        # coerce types
-        try:
-            dv = date_val
-            if isinstance(dv, pd.Series):
-                dv = dv.iloc[0] if len(dv) > 0 else None
-        except Exception:
-            dv = date_val
-
-        try:
-            bv = balance_val
-            if isinstance(bv, pd.Series):
-                bv = bv.iloc[0] if len(bv) > 0 else "INVALID_AMOUNT"
-        except Exception:
-            bv = balance_val
-
-        try:
-            cv = channel_val
-            if isinstance(cv, pd.Series):
-                cv = cv.iloc[0] if len(cv) > 0 else "EMPTY"
-        except Exception:
-            cv = channel_val
-
-        if dv is None or (isinstance(dv, str) and "INVALID_DATE" in dv):
+        if row["Parsed Date"] == "❌ Unparsed":
             issues.append("invalid_date")
-        if isinstance(bv, str) and "INVALID_AMOUNT" in bv:
+        if isinstance(row["balance"], str) and "INVALID_AMOUNT" in row["balance"]:
             issues.append("invalid_balance")
-        if str(cv).strip().upper() == "EMPTY":
+        if row["channel"] == "EMPTY":
             issues.append("missing_channel")
-
         return ", ".join(issues)
 
     df["row_issue"] = df.apply(detect_issues, axis=1)
 
-    # --- Column order and ensure presence ---
-    cols = ["date", "value_date", "description", "debit", "credit", "balance", "channel", "transaction_reference", "row_issue"]
-    for c in cols:
-        if c not in df.columns:
-            df[c] = pd.Series([pd.NA] * len(df))
+    # --- Column order for UI ---
+    cols = [
+        "Parsed Date",
+        "value_date",
+        "Raw Date",
+        "description",
+        "debit",
+        "credit",
+        "balance",
+        "channel",
+        "transaction_reference",
+        "row_issue",
+    ]
+    df = df[[c for c in cols if c in df.columns]]
 
-    df = df[cols]
-
-    # --- Date debug logging (raw -> parsed) ---
+    # --- Save snapshot for inspection ---
+    DEBUG_DIR = os.path.join(getattr(settings, "BASE_DIR", "."), "debug_exports")
+    os.makedirs(DEBUG_DIR, exist_ok=True)
+    stamp = int(datetime.utcnow().timestamp())
+    snapshot_path = os.path.join(DEBUG_DIR, f"cleaned_table_snapshot_{stamp}.csv")
     try:
-        debug_dir = DEBUG_DIR if 'DEBUG_DIR' in globals() else os.path.join(os.getcwd(), "debug_exports")
-        os.makedirs(debug_dir, exist_ok=True)
-        timestamp = debug_run_id or datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-        tid = table_id or "unknown"
-        p = page or "unknown"
-        log_path = os.path.join(debug_dir, f"date_debug_table_{tid}_{timestamp}.json")
-        date_logs = []
-        # Attempt to get raw date column from original df_table if present; fallback to df["date"] string
-        for i in range(len(df)):
-            raw_val = ""
-            try:
-                if isinstance(df_table, pd.DataFrame) and "date" in df_table.columns:
-                    raw_val = str(df_table.iloc[i][df_table.columns.get_loc("date")]) if "date" in df_table.columns else ""
-                else:
-                    # fallback: try first column from original table
-                    if isinstance(df_table, pd.DataFrame) and len(df_table.columns) > 0:
-                        raw_val = str(df_table.iloc[i, 0])
-            except Exception:
-                raw_val = ""
-            parsed_val = df["date"].iloc[i]
-            desc = df["description"].iloc[i] if "description" in df.columns else ""
-            date_logs.append({
-                "table_id": tid,
-                "page": p,
-                "row_index": int(i),
-                "raw_date": raw_val,
-                "parsed": str(parsed_val),
-                "description": str(desc),
-            })
-        with open(log_path, "w", encoding="utf-8") as f:
-            json.dump(date_logs, f, indent=2, default=str)
-        print(f"✅ Saved date debug log to {log_path}")
+        df.to_csv(snapshot_path, index=False)
+        print(f"✅ Saved cleaned snapshot to {snapshot_path}")
     except Exception as e:
-        print(f"⚠️ Failed to save date debug log: {e}")
-
-    # Save a CSV snapshot for inspection (non-fatal)
-    try:
-        stamp = int(datetime.utcnow().timestamp())
-        df.to_csv(os.path.join(debug_dir, f"cleaned_table_snapshot_{table_id or 't'}_{stamp}.csv"), index=False)
-    except Exception:
-        pass
+        print(f"⚠️ Failed to save cleaned snapshot: {e}")
 
     return df

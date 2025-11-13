@@ -1,0 +1,30 @@
+{
+  "table_id": 2,
+  "error": "Cannot set a DataFrame with multiple columns to the single column Raw Date",
+  "trace": "Traceback (most recent call last):\n  File \"/Users/macbookpro/Documents/bankbot/banklytik/statements/direct_processor.py\", line 211, in process_tables_directly\n    cleaned = _clean_table_dataframe(\n  File \"/Users/macbookpro/Documents/bankbot/banklytik/statements/direct_processor.py\", line 352, in _clean_table_dataframe\n    df[\"Raw Date\"] = df[\"date\"]\n  File \"/Users/macbookpro/Documents/anaconda3/envs/bank/lib/python3.10/site-packages/pandas/core/frame.py\", line 4301, in __setitem__\n    self._set_item_frame_value(key, value)\n  File \"/Users/macbookpro/Documents/anaconda3/envs/bank/lib/python3.10/site-packages/pandas/core/frame.py\", line 4459, in _set_item_frame_value\n    raise ValueError(\nValueError: Cannot set a DataFrame with multiple columns to the single column Raw Date\n",
+  "df_type": "<class 'pandas.core.frame.DataFrame'>",
+  "df_columns": [
+    "23/09/25 12:42:00",
+    "\u20a66,100.00",
+    "",
+    "date",
+    "Abdulrahman Kamilu Ilah/9029189750/Paycom(Opay)",
+    "date",
+    "\u20a66,100.00"
+  ],
+  "df_shape": [
+    1,
+    7
+  ],
+  "df_sample": [
+    [
+      "03/10/25 18:47:51",
+      "",
+      "\u20a61,000.00",
+      "bills",
+      "",
+      "kedco prepaid purchase",
+      "\u20a65,100.00"
+    ]
+  ]
+}

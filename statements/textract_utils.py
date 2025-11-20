@@ -1,13 +1,12 @@
-# statements/textract_utils.py
 """
 Robust Textract utilities for Banklytik.
 
 This version maps blocks by Id and resolves TABLE -> CELL -> WORD relationships
 so we extract all tables across pages reliably (no assumptions about block order).
 It preserves the previous public API:
-  - extract_all_tables(blocks) -> list of {"table_id","page","df","blocks","raw_table_block"}
-  - table_blocks_to_dataframe(cell_blocks, all_blocks_dict) -> DataFrame
-  - extract_combined_table(blocks) -> DataFrame (fallback)
+  - extract_all_tables(blocks)
+  - table_blocks_to_dataframe(cell_blocks, all_blocks_dict)
+  - extract_combined_table(blocks)
   - sample_representative_pages(blocks, max_pages)
   - build_deepseek_sampling_payload(blocks)
   - detect_table_structure(df)
@@ -18,12 +17,15 @@ import time
 import json
 import pandas as pd
 from django.conf import settings
-
 import re
 from typing import List, Dict, Any
 from collections import defaultdict
+import os
+from datetime import datetime
 
-# Textract client setup (unchanged)
+# -------------------------
+# Textract Client Setup
+# -------------------------
 def get_textract_client():
     return boto3.client(
         "textract",
@@ -64,8 +66,9 @@ def get_all_blocks(job_id):
             break
     return blocks
 
+
 # -------------------------
-# Internal helpers
+# Internal Helpers
 # -------------------------
 def _map_blocks(blocks: List[Dict[str, Any]]):
     """Return id_map and type_map for quick lookup."""
@@ -100,13 +103,12 @@ def _extract_cell_text(cell_block: Dict[str, Any], id_map: Dict[str, Dict[str, A
         if ctype == "WORD":
             texts.append(child.get("Text", ""))
         elif ctype == "SELECTION_ELEMENT":
-            sel = child.get("SelectionStatus") or child.get("SelectionStatus".lower())
+            sel = child.get("SelectionStatus") or child.get("selectionstatus")
             if sel == "SELECTED":
                 texts.append("[X]")
         elif ctype == "LINE":
-            # Some outputs place lines as children - be tolerant
             texts.append(child.get("Text", ""))
-    return " ".join([t for t in texts if t is not None and str(t).strip() != ""]).strip()
+    return " ".join([t for t in texts if t and str(t).strip() != ""]).strip()
 
 def _table_block_to_matrix(table_block: Dict[str, Any], id_map: Dict[str, Dict[str, Any]]):
     """
@@ -114,7 +116,6 @@ def _table_block_to_matrix(table_block: Dict[str, Any], id_map: Dict[str, Dict[s
     Returns: matrix (list of rows), max_row, max_col, list_of_cell_blocks
     """
     cell_ids = []
-    # Gather child ids from table block (may reference CELL ids)
     for cid in _get_child_ids(table_block):
         cell_ids.append(cid)
 
@@ -123,37 +124,28 @@ def _table_block_to_matrix(table_block: Dict[str, Any], id_map: Dict[str, Dict[s
         b = id_map.get(cid)
         if not b:
             continue
-        # If the relationship points to a ROW or CELL container, attempt to find nested children
         if b.get("BlockType") == "CELL":
             cell_blocks.append(b)
         else:
-            # in some responses relationships can be nested; inspect CHILD of this block
             for nested in _get_child_ids(b):
                 nb = id_map.get(nested)
                 if nb and nb.get("BlockType") == "CELL":
                     cell_blocks.append(nb)
 
-    # Build grid indexed by RowIndex/ColumnIndex
     grid = {}
     max_row = 0
     max_col = 0
     for cell in cell_blocks:
-        row_index = cell.get("RowIndex") or cell.get("RowIndex", 0)
-        col_index = cell.get("ColumnIndex") or cell.get("ColumnIndex", 0)
-        if row_index is None or col_index is None:
-            continue
-        row_index = int(row_index)
-        col_index = int(col_index)
-        max_row = max(max_row, row_index)
-        max_col = max(max_col, col_index)
-        grid.setdefault(row_index, {})[col_index] = _extract_cell_text(cell, id_map)
+        row_index = int(cell.get("RowIndex", 0) or 0)
+        col_index = int(cell.get("ColumnIndex", 0) or 0)
+        if row_index and col_index:
+            max_row = max(max_row, row_index)
+            max_col = max(max_col, col_index)
+            grid.setdefault(row_index, {})[col_index] = _extract_cell_text(cell, id_map)
 
-    # Build matrix
     matrix = []
     for r in range(1, max_row + 1):
-        row = []
-        for c in range(1, max_col + 1):
-            row.append(grid.get(r, {}).get(c, ""))
+        row = [grid.get(r, {}).get(c, "") for c in range(1, max_col + 1)]
         matrix.append(row)
     return matrix, max_row, max_col, cell_blocks
 
@@ -162,9 +154,7 @@ def table_matrix_to_dataframe(matrix: List[List[str]]):
     if not matrix:
         return pd.DataFrame()
     df = pd.DataFrame(matrix)
-    # drop empty rows
     df = df.loc[~(df.map(lambda x: str(x).strip() == "").all(axis=1))].reset_index(drop=True)
-    # drop empty columns
     nonempty_cols = [i for i in df.columns if not (df[i].astype(str).str.strip() == "").all()]
     if not nonempty_cols:
         return pd.DataFrame()
@@ -172,45 +162,48 @@ def table_matrix_to_dataframe(matrix: List[List[str]]):
     df.columns = [str(c) for c in df.columns]
     return df
 
+
 # -------------------------
 # Public API
 # -------------------------
-def table_blocks_to_dataframe(cell_blocks: List[Dict[str, Any]], all_blocks_dict: Dict[str, Dict[str, Any]]):
+def debug_log_table_snapshot(table_id, page, df):
     """
-    Convert a list of CELL blocks (and id map) into a pandas DataFrame.
-    This preserves the signature you had: it accepts the cell blocks and an id map.
+    Save detailed snapshot and preview of each extracted Textract table.
     """
-    # Group cells by row/col
-    rows = {}
-    for cell in cell_blocks:
-        if cell.get("BlockType") != "CELL":
-            continue
-        r = cell.get("RowIndex", 0)
-        c = cell.get("ColumnIndex", 0)
-        text = _extract_cell_text(cell, all_blocks_dict)
-        rows.setdefault(int(r), {})[int(c)] = text
+    if df is None or df.empty:
+        print(f"⚠️ Table {table_id} (page {page}) is empty — skipping debug snapshot.")
+        return
 
-    if not rows:
-        return pd.DataFrame()
+    DEBUG_DIR = os.path.join(getattr(settings, "BASE_DIR", "."), "debug_exports")
+    os.makedirs(DEBUG_DIR, exist_ok=True)
 
-    max_cols = max(max(cols.keys()) for cols in rows.values()) if rows else 0
-    data = []
-    for rid in sorted(rows.keys()):
-        row_data = [rows[rid].get(ci, "") for ci in range(1, max_cols + 1)]
-        data.append(row_data)
-    return pd.DataFrame(data)
+    stamp = int(datetime.utcnow().timestamp())
+    csv_path = os.path.join(DEBUG_DIR, f"table_{table_id}_page_{page}_snapshot_{stamp}.csv")
+
+    print(f"🧾 DEBUG: Saving raw table snapshot for page {page}, table {table_id} → {csv_path}")
+    try:
+        df.to_csv(csv_path, index=False)
+        meta = {
+            "table_id": table_id,
+            "page": page,
+            "shape": list(df.shape),
+            "columns": list(df.columns),
+            "head_preview": df.head(5).to_dict(orient="records"),
+        }
+        json_path = csv_path.replace(".csv", "_meta.json")
+        with open(json_path, "w") as f:
+            json.dump(meta, f, indent=2)
+    except Exception as e:
+        print(f"⚠️ Failed to save table snapshot for table {table_id}: {e}")
+
 
 def extract_all_tables(blocks: List[Dict[str, Any]]):
-    """
-    Extract all TABLE blocks across pages and return list of dicts:
-      {"table_id": int, "page": int|None, "df": DataFrame, "blocks": [cell_blocks], "raw_table_block": <block>}
-    """
+    """Extract all TABLE blocks across pages."""
     if not blocks:
         return []
 
     id_map, type_map = _map_blocks(blocks)
     table_blocks = type_map.get("TABLE", [])
-
     tables = []
     table_counter = 0
 
@@ -229,28 +222,19 @@ def extract_all_tables(blocks: List[Dict[str, Any]]):
                 "blocks": cell_blocks,
                 "raw_table_block": tb
             })
-            print(f"DEBUG: Found table {table_counter} with {len(cell_blocks)} blocks (page={page})")
+            print(f"DEBUG: Found table {table_counter} with {len(cell_blocks)} cells (page={page})")
         except Exception as e:
             print(f"DEBUG: Failed to parse one TABLE block: {e}")
-            continue
 
-    # Fallback: if no TABLE blocks found, attempt combined extraction
-    if not tables:
-        try:
-            df_combined = extract_combined_table(blocks)
-            if not df_combined.empty:
-                tables = [{"table_id": 1, "page": None, "df": df_combined, "blocks": [], "raw_table_block": None}]
-                print(f"DEBUG: Fallback combined into shape: {df_combined.shape}")
-        except Exception as e:
-            print(f"DEBUG: extract_combined_table fallback failed: {e}")
+    for t in tables:
+        debug_log_table_snapshot(t["table_id"], t["page"], t["df"])
 
     print(f"DEBUG: Extracted {len(tables)} tables from Textract")
     return tables
 
+
 def extract_combined_table(blocks: List[Dict[str, Any]]):
-    """
-    Fallback combining approach. Attempts to build rows from LINE blocks if TABLEs are not present.
-    """
+    """Fallback combining approach using LINE blocks."""
     print("DEBUG: Using original extract_combined_table (fallback)")
     id_map, type_map = _map_blocks(blocks)
     line_blocks = type_map.get("LINE", []) or []
@@ -263,13 +247,16 @@ def extract_combined_table(blocks: List[Dict[str, Any]]):
         parts = re.split(r'\s{2,}|\t|\s\|\s', ln)
         parts = [p.strip() for p in parts if p.strip() != ""]
         rows.append(parts)
+
     if not rows:
         return pd.DataFrame()
+
     max_cols = max(len(r) for r in rows)
     norm_rows = [r + [""] * (max_cols - len(r)) for r in rows]
     df = pd.DataFrame(norm_rows)
     print(f"DEBUG: Combined {len(rows)} lines into shape: {df.shape}")
     return df
+
 
 def sample_representative_pages(blocks, max_pages=3):
     pages = {}
@@ -284,19 +271,17 @@ def sample_representative_pages(blocks, max_pages=3):
         })
     return sampled_pages
 
+
 def build_deepseek_sampling_payload(blocks, sampled_pages=3):
     pages = sample_representative_pages(blocks, sampled_pages)
     return {"sampled_pages": pages}
 
+
 def detect_table_structure(df):
-    """
-    Detect whether a Textract-extracted table has headers or starts with data.
-    Returns: "with_headers" or "data_only" or "empty"
-    """
+    """Detect if a Textract-extracted table has headers."""
     if df is None or df.empty:
         return "empty"
     first_row = df.iloc[0].astype(str).str.lower().tolist()
-    first_row_str = " ".join(first_row)
     header_indicators = ["trans", "date", "desc", "value", "debit", "credit", "balance", "channel", "reference"]
-    has_headers = any(h in first_row_str for h in header_indicators)
+    has_headers = any(h in " ".join(first_row) for h in header_indicators)
     return "with_headers" if has_headers else "data_only"

@@ -1,0 +1,12 @@
+date,raw_date,value_date,description,debit,credit,balance,channel,transaction_reference,row_issue
+2025-05-14 23:08:23,14/05/25 23:08:23,,airtime purchase 2347049794301,100.0,0.0,0.0,AIRTIME,,invalid_value_date
+2025-05-30 18:41:52,30/05/25 18:41:52,,kip:opay/abdulrahman kamilu/transfer from abdulrah,0.0,1000.0,1000.0,TRANSFER,,invalid_value_date
+2025-05-30 18:42:23,30/05/25 18:42:23,,kedco prepaid purchase,1000.0,0.0,0.0,OTHER,,invalid_value_date
+2025-08-12 09:37:28,12/08/25 09:37:28,,transfer from abdulrahman kamilu ilah,0.0,1000.0,1000.0,TRANSFER,,invalid_value_date
+2025-08-12 09:37:44,12/08/25 09:37:44,,airtime purchase 2347049794301,1000.0,0.0,0.0,AIRTIME,,invalid_value_date
+2025-08-12 09:38:35,12/08/25 09:38:35,,reversal of airtime purchase 2347049794301,0.0,1000.0,1000.0,AIRTIME,,invalid_value_date
+2025-08-12 09:39:23,12/08/25 09:39:23,,airtime purchase 2347049794301,1000.0,0.0,0.0,AIRTIME,,invalid_value_date
+2025-08-12 09:39:27,12/08/25 09:39:27,,reversal of airtime purchase 2347049794301,0.0,1000.0,1000.0,AIRTIME,,invalid_value_date
+2025-08-20 10:55:33,20/08/25 10:55:33,,airtime purchase 2347049794301,1000.0,0.0,0.0,AIRTIME,,invalid_value_date
+2025-09-23 12:42:00,23/09/25 12:42:00,,transfer from abdulrahman kamilu ilah,0.0,6100.0,6100.0,TRANSFER,,invalid_value_date
+2025-10-03 18:47:51,03/10/25 18:47:51,,kedco prepaid purchase,1000.0,0.0,5100.0,OTHER,,invalid_value_date

@@ -373,11 +373,13 @@ def reprocess_statement(request, pk):
 @login_required
 def process_statement(request, pk):
     """Main statement processing function (offline-ready)."""
+    import traceback
     stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
+    
     if stmt.processed:
         return redirect("statements:review", pk=stmt.pk)
 
-    # --- DeepSeek preload (keep as you had) ---
+    # --- DeepSeek preload ---
     try:
         deepseek_rules = get_deepseek_patterns()
         print(f"✅ DeepSeek preloaded with {len(deepseek_rules)} rules.")
@@ -388,6 +390,7 @@ def process_statement(request, pk):
     try:
         s3 = get_s3_client()
         json_key = f"{stmt.title}.json"
+
         if s3_key_exists(settings.AWS_S3_BUCKET, json_key):
             obj = s3.get_object(Bucket=settings.AWS_S3_BUCKET, Key=json_key)
             blocks_data = json.loads(obj["Body"].read().decode("utf-8"))
@@ -395,13 +398,15 @@ def process_statement(request, pk):
             job_id = start_textract_job(stmt.title)
             wait_for_job(job_id)
             blocks_data = {"Blocks": get_all_blocks(job_id)}
-            # save to S3 for offline reuse
+
+            # save JSON for offline reuse
             s3.put_object(
                 Bucket=settings.AWS_S3_BUCKET,
                 Key=json_key,
                 Body=json.dumps(blocks_data).encode("utf-8"),
                 ContentType="application/json",
             )
+
     except Exception as e:
         print(f"⚠️ Textract fetch failed: {e}")
         traceback.print_exc()
@@ -410,167 +415,384 @@ def process_statement(request, pk):
     blocks = blocks_data.get("Blocks", blocks_data)
     save_debug_textract_json(blocks_data, stmt.pk)
 
-    # --- Extract tables ---
+    # --- Extract tables from Textract ---
     tables = extract_all_tables(blocks)
     print(f"🧾 Extracted {len(tables)} tables from Textract.")
-
     df_clean = None
 
-    # --- Try direct processor first ---
+    # =====================================================
+    # 🔥 TRY DIRECT PROCESSOR FIRST
+    # =====================================================
     if tables:
         try:
             df_direct = process_tables_directly(tables)
+
             if df_direct is not None and not df_direct.empty:
                 print(f"✅ Direct processor produced shape: {df_direct.shape}")
                 print("DEBUG: Direct processor head:\n", df_direct.head(10))
-                # attempt to clean using robust_clean_dataframe (it expects a DataFrame)
+
+                # ⭐ WRITE MERGED DEBUG FOR ME TO INSPECT ⭐
+                try:
+                    debug_path = os.path.join("debug_exports", "merged_debug.csv")
+                    os.makedirs("debug_exports", exist_ok=True)
+                    df_direct.to_csv(debug_path, index=False)
+                    print(f"⭐ WROTE merged_debug.csv → {debug_path}")
+                except Exception as e:
+                    print(f"⚠️ Failed writing merged_debug.csv: {e}")
+
+                # Now pass into robust cleaner
                 df_clean = robust_clean_dataframe(df_direct)
-                print(f"✅ After robust_clean_dataframe: {getattr(df_clean,'shape', None)}")
+                print(f"✅ After robust_clean_dataframe: {df_clean.shape}")
+
             else:
                 print("⚠️ Direct processor returned empty DataFrame")
                 df_clean = None
+
         except Exception as e:
             print(f"⚠️ Direct processor error: {e}")
             traceback.print_exc()
             df_clean = None
 
-    # --- Fallback to combined extraction ---
-    if df_clean is None or (hasattr(df_clean, "empty") and df_clean.empty):
+    # =====================================================
+    # 🔥 FALLBACK TO COMBINED EXTRACTOR
+    # =====================================================
+    if df_clean is None or df_clean.empty:
         print("⚙️ Using fallback extract_combined_table()...")
+
         try:
             df_raw = extract_combined_table(blocks)
             print(f"DEBUG: extract_combined_table returned shape: {getattr(df_raw, 'shape', None)}")
+
             if df_raw is not None and not df_raw.empty:
-                print("DEBUG: extract_combined_table head:\n", df_raw.head(20))
+                print("DEBUG: extract_combined_table head:\\n", df_raw.head(20))
                 df_clean = robust_clean_dataframe(df_raw)
-                print(f"✅ Fallback robust_clean produced: {getattr(df_clean,'shape', None)}")
+                print(f"✅ Fallback robust_clean produced: {df_clean.shape}")
             else:
-                print("❌ Fallback also returned empty DataFrame")
+                print("❌ Fallback returned empty DataFrame")
                 df_clean = None
+
         except Exception as e:
-            print(f"❌ Critical failure in fallback processing: {e}")
+            print(f"❌ Critical failure in fallback cleaning: {e}")
             traceback.print_exc()
             return redirect("statements:detail", pk=stmt.pk)
 
-    # --- Save transactions to DB if any ---
-    if df_clean is not None and not (hasattr(df_clean, "empty") and df_clean.empty):
+    # =====================================================
+    # 🔥 SAVE TRANSACTIONS IF ANY
+    # =====================================================
+    if df_clean is not None and not df_clean.empty:
         try:
             save_transactions_from_dataframe(stmt, df_clean)
         except Exception as e:
             print(f"⚠️ Could not save transactions: {e}")
             traceback.print_exc()
     else:
-        print("❌ No data to save - all processing methods failed")
+        print("❌ No data to save — all processing failed")
         stmt.error_message = "No transaction data could be extracted from the PDF"
         stmt.save()
 
     return redirect("statements:detail", pk=stmt.pk)
 
-def robust_clean_dataframe(df_raw):
+
+# =====================================================
+# 🔥 NEW MANUAL TABLE SELECTION WORKFLOW
+# =====================================================
+
+from .table_scorer import score_all_tables
+from .selection_session import get_session, clear_session
+from .table_merger import merge_selected_tables
+from .column_mapper import analyze_merged_table, ColumnMapper
+
+@login_required
+def start_table_selection(request, pk):
     """
-    Clean and normalize extracted bank statement tables.
-    Filters junk rows and ensures consistent canonical format.
+    Start the manual table selection workflow.
+    Extracts tables and redirects to table selection page.
     """
-    import pandas as pd
-    from datetime import datetime
-
-    print("DEBUG: robust_clean_dataframe input shape:", getattr(df_raw, "shape", None))
-    df = df_raw.copy() if df_raw is not None else pd.DataFrame()
-
-    if df is None or df.empty:
-        cols = [
-            "date", "raw_date", "value_date", "description",
-            "debit", "credit", "balance", "channel",
-            "transaction_reference", "row_issue",
-        ]
-        return pd.DataFrame(columns=cols)
-
-    # Normalize text
-    df = df.map(lambda v: normalize_text(v) if pd.notna(v) else "")
-
-    # Assign fallback headers if needed
-    if not any("date" in str(c).lower() for c in df.columns):
-        df.columns = [
-            "Trans. Time", "Value Date", "Description",
-            "Debit/Credit(W)", "Balance(N)", "Channel", "Transaction Reference"
-        ][: len(df.columns)]
-
-    # Fill required columns
-    required = {
-        "Trans. Time": "",
-        "Value Date": "",
-        "Description": "",
-        "Debit/Credit(W)": "",
-        "Balance(N)": "0",
-        "Channel": "",
-        "Transaction Reference": "",
-    }
-    for c, default in required.items():
-        if c not in df.columns:
-            df[c] = default
-
-    # Parse and clean
-    df["raw_date"] = df["Trans. Time"].astype(str)
-    df["date"] = df["raw_date"].apply(lambda v: parse_date_str(v) if str(v).strip() else None)
-    df["value_date"] = df["Value Date"].apply(lambda v: parse_date_str(v) if str(v).strip() else None)
-    df["description"] = df["Description"].astype(str)
-    df["balance"] = df["Balance(N)"].apply(clean_amount)
-
-    dc = df["Debit/Credit(W)"].astype(str)
-    df["debit"] = dc.apply(lambda x: clean_amount(x) if "-" in x else 0.0)
-    df["credit"] = dc.apply(lambda x: clean_amount(x) if "+" in x else 0.0)
-    df["channel"] = df["Channel"].apply(extract_channel)
-    df["transaction_reference"] = df["Transaction Reference"].astype(str)
-
-    # --- Filter invalid / junk rows ---
-    before = len(df)
-    df = df[
-        df["date"].notna() |
-        df["debit"].astype(float).ne(0) |
-        df["credit"].astype(float).ne(0) |
-        df["balance"].astype(float).ne(0)
-    ]
-    df = df[df["description"].str.strip() != ""]
-    after = len(df)
-    print(f"🧹 Filtered junk rows: {before - after} removed, {after} kept")
-
-    # Detect row issues
-    def _detect_issues(r):
-        issues = []
-        if r["date"] is None:
-            issues.append("invalid_date")
-        if r.get("value_date") is None:
-            issues.append("invalid_value_date")
-        if r.get("channel") == "EMPTY":
-            issues.append("missing_channel")
-        return ", ".join(issues) if issues else ""
-
-    df["row_issue"] = df.apply(_detect_issues, axis=1)
-
-    # Canonical order
-    cols = [
-        "date", "raw_date", "value_date", "description",
-        "debit", "credit", "balance", "channel",
-        "transaction_reference", "row_issue",
-    ]
-    for c in cols:
-        if c not in df.columns:
-            df[c] = pd.NA
-
-    final_df = df[cols]
-
-    # Save debug snapshot
+    stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
+    
+    # Clear any existing session
+    clear_session(stmt.pk, request.user.id)
+    
+    # Load Textract data
     try:
-        DEBUG_DIR = os.path.join(getattr(settings, "BASE_DIR", "."), "debug_exports")
-        os.makedirs(DEBUG_DIR, exist_ok=True)
-        stamp = int(datetime.utcnow().timestamp())
-        path = os.path.join(DEBUG_DIR, f"robust_clean_snapshot_{stamp}.csv")
-        final_df.to_csv(path, index=False)
-        print(f"💾 Saved cleaned snapshot → {path}")
-    except Exception as e:
-        print(f"⚠️ Snapshot save failed: {e}")
+        s3 = get_s3_client()
+        json_key = f"{stmt.title}.json"
 
-    return final_df
+        if s3_key_exists(settings.AWS_S3_BUCKET, json_key):
+            obj = s3.get_object(Bucket=settings.AWS_S3_BUCKET, Key=json_key)
+            blocks_data = json.loads(obj["Body"].read().decode("utf-8"))
+        else:
+            # If no Textract data exists, run Textract
+            job_id = start_textract_job(stmt.title)
+            wait_for_job(job_id)
+            blocks_data = {"Blocks": get_all_blocks(job_id)}
+            
+            # Save JSON for future use
+            s3.put_object(
+                Bucket=settings.AWS_S3_BUCKET,
+                Key=json_key,
+                Body=json.dumps(blocks_data).encode("utf-8"),
+                ContentType="application/json",
+            )
+
+        blocks = blocks_data.get("Blocks", blocks_data)
+        save_debug_textract_json(blocks_data, stmt.pk)
+        
+        # Extract and score tables
+        tables = extract_all_tables(blocks)
+        scored_tables = score_all_tables(tables)
+        
+        # Store only metadata in session (no DataFrames)
+        session = get_session(stmt.pk, request.user.id)
+        
+        # Create serializable version without DataFrames
+        serializable_tables = []
+        for table in scored_tables:
+            serializable_table = {
+                'table_id': table.get('table_id'),
+                'page': table.get('page'),
+                'score': table.get('score', 0),
+                'confidence': table.get('confidence', 'low'),
+                'reasons': table.get('reasons', []),
+                'row_count': table.get('row_count', 0),
+                'column_count': table.get('column_count', 0),
+                'score_breakdown': table.get('score_breakdown', {}),
+                'preview_data': table.get('preview_data', [])
+            }
+            serializable_tables.append(serializable_table)
+        
+        session.set_extracted_tables(serializable_tables)
+        
+        # Store the Textract JSON data for re-extraction when needed
+        session.state['textract_json'] = blocks_data
+        session.save()
+        
+        return redirect("statements:select_tables", pk=stmt.pk)
+        
+    except Exception as e:
+        logger.error(f"Table selection start failed: {e}")
+        return render(
+            request,
+            "statements/process_error.html",
+            {"error": f"Failed to extract tables: {str(e)}"},
+        )
+
+
+@login_required
+def select_tables(request, pk):
+    """
+    Display all extracted tables for user selection.
+    """
+    stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
+    session = get_session(stmt.pk, request.user.id)
+    
+    # Get table metadata from session
+    tables_metadata = session.get_extracted_tables()
+    
+    if request.method == "POST":
+        # Get selected table IDs
+        selected_ids = request.POST.getlist("selected_tables")
+        selected_ids = [int(id) for id in selected_ids if id.isdigit()]
+        
+        if not selected_ids:
+            return render(
+                request,
+                "statements/select_tables.html",
+                {
+                    "statement": stmt,
+                    "tables": tables_metadata,
+                    "error": "Please select at least one table containing transactions."
+                },
+            )
+        
+        # Store selected tables
+        session.set_selected_tables(selected_ids)
+        
+        # Re-extract tables from stored Textract JSON data
+        blocks_data = session.state.get('textract_json')
+        if not blocks_data:
+            return render(
+                request,
+                "statements/select_tables.html",
+                {
+                    "statement": stmt,
+                    "tables": tables_metadata,
+                    "error": "Failed to retrieve table data. Please restart the selection process."
+                },
+            )
+        
+        # Extract tables again and filter by selected IDs
+        blocks = blocks_data.get("Blocks", blocks_data)
+        tables = extract_all_tables(blocks)
+        selected_tables = [t for t in tables if t.get('table_id') in selected_ids]
+        
+        merged_df = merge_selected_tables(selected_tables)
+        
+        if merged_df is None or merged_df.empty:
+            return render(
+                request,
+                "statements/select_tables.html",
+                {
+                    "statement": stmt,
+                    "tables": tables_metadata,
+                    "error": "Failed to merge selected tables. Please try different table selection."
+                },
+            )
+        
+        session.set_merged_data(merged_df)
+        
+        return redirect("statements:map_columns", pk=stmt.pk)
+    
+    # GET request - show table selection
+    return render(
+        request,
+        "statements/select_tables.html",
+        {
+            "statement": stmt,
+            "tables": tables_metadata,
+            "selected_count": len(session.state.get('selected_table_ids', [])),
+        },
+    )
+
+
+@login_required
+def map_columns(request, pk):
+    """
+    Column mapping interface for the merged table.
+    """
+    stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
+    session = get_session(stmt.pk, request.user.id)
+    
+    merged_df = session.get_merged_data()
+    
+    if merged_df is None or merged_df.empty:
+        return redirect("statements:select_tables", pk=stmt.pk)
+    
+    if request.method == "POST":
+        # Get column mappings from form
+        column_mappings = {}
+        for key, value in request.POST.items():
+            if key.startswith("column_"):
+                column_name = key.replace("column_", "")
+                if value and value != "unknown":
+                    column_mappings[column_name] = value
+        
+        if not column_mappings:
+            return render(
+                request,
+                "statements/map_columns.html",
+                {
+                    "statement": stmt,
+                    "analysis": analyze_merged_table(merged_df),
+                    "error": "Please map at least one column to a transaction field."
+                },
+            )
+        
+        # Apply mappings and create standardized dataframe
+        mapper = ColumnMapper()
+        standardized_df = mapper.apply_column_mapping(merged_df, column_mappings)
+        
+        # Store in session
+        session.set_column_mappings(column_mappings)
+        session.set_final_dataframe(standardized_df)
+        
+        return redirect("statements:preview_data", pk=stmt.pk)
+    
+    # GET request - show column mapping interface
+    analysis = analyze_merged_table(merged_df)
+    
+    return render(
+        request,
+        "statements/map_columns.html",
+        {
+            "statement": stmt,
+            "analysis": analysis,
+            "existing_mappings": session.get_column_mappings(),
+        },
+    )
+
+
+@login_required
+def preview_data(request, pk):
+    """
+    Preview the final cleaned data before saving.
+    """
+    stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
+    session = get_session(stmt.pk, request.user.id)
+    
+    final_df = session.get_final_dataframe()
+    
+    if final_df is None or final_df.empty:
+        return redirect("statements:map_columns", pk=stmt.pk)
+    
+    if request.method == "POST":
+        # User confirmed - save transactions
+        try:
+            # Apply final cleaning
+            df_clean = robust_clean_dataframe(final_df)
+            
+            if df_clean is not None and not df_clean.empty:
+                transactions_created, flagged_transactions = save_transactions_from_dataframe(stmt, df_clean)
+                
+                # Clear session
+                clear_session(stmt.pk, request.user.id)
+                
+                return render(
+                    request,
+                    "statements/preview_success.html",
+                    {
+                        "statement": stmt,
+                        "transactions_created": transactions_created,
+                        "flagged_transactions": flagged_transactions,
+                    },
+                )
+            else:
+                return render(
+                    request,
+                    "statements/preview_data.html",
+                    {
+                        "statement": stmt,
+                        "final_data": final_df.head(20).to_dict(orient='records'),
+                        "data_shape": final_df.shape,
+                        "error": "Failed to clean data. Please review your column mappings."
+                    },
+                )
+                
+        except Exception as e:
+            logger.error(f"Failed to save transactions: {e}")
+            return render(
+                request,
+                "statements/preview_data.html",
+                {
+                    "statement": stmt,
+                    "final_data": final_df.head(20).to_dict(orient='records'),
+                    "data_shape": final_df.shape,
+                    "error": f"Failed to save transactions: {str(e)}"
+                },
+            )
+    
+    # GET request - show data preview
+    return render(
+        request,
+        "statements/preview_data.html",
+        {
+            "statement": stmt,
+            "final_data": final_df.head(20).to_dict(orient='records'),
+            "data_shape": final_df.shape,
+            "column_mappings": session.get_column_mappings(),
+        },
+    )
+
+
+@login_required
+def cancel_selection(request, pk):
+    """
+    Cancel the manual table selection workflow.
+    """
+    stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
+    clear_session(stmt.pk, request.user.id)
+    
+    return redirect("statements:detail", pk=stmt.pk)
 
 
 @login_required
@@ -647,3 +869,209 @@ def review_statement(request, pk):
         "statement": stmt,
         "tables": [],  # will fill next
     })
+
+
+# =====================================================
+# 🤖 AI-POWERED CHAT FOR TRANSACTION ANALYSIS
+# =====================================================
+
+from .ai_query_generator import generate_pandas_code
+from .code_validator import validate_code
+from .code_executor import execute_pandas_code
+import time
+
+@login_required
+def chat(request, pk):
+    """
+    AI-powered chat interface for natural language queries about transactions.
+    
+    Uses DeepSeek to generate pandas code that analyzes transactions.
+    """
+    stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
+    
+    # Check if statement has transactions
+    transaction_count = stmt.transactions.count()
+    if transaction_count == 0:
+        return render(
+            request,
+            "statements/chat.html",
+            {
+                "statement": stmt,
+                "error": "❌ No transactions in this statement. Please import transactions first.",
+                "chat_history": [],
+            },
+        )
+    
+    answer = None
+    code = None
+    error = None
+    execution_time = None
+    
+    if request.method == "POST":
+        question = request.POST.get("question", "").strip()
+        
+        if not question:
+            return render(
+                request,
+                "statements/chat.html",
+                {
+                    "statement": stmt,
+                    "error": "❌ Please enter a question.",
+                    "chat_history": stmt.chats.all()[:10],
+                },
+            )
+        
+        # Limit question length to prevent token waste
+        if len(question) > 500:
+            return render(
+                request,
+                "statements/chat.html",
+                {
+                    "statement": stmt,
+                    "error": "❌ Question is too long (max 500 characters).",
+                    "chat_history": stmt.chats.all()[:10],
+                },
+            )
+        
+        print(f"\n{'='*80}")
+        print(f"🤖 CHAT QUERY: {question}")
+        print(f"{'='*80}")
+        
+        # Step 1: Get transaction data as DataFrame
+        try:
+            transactions = stmt.transactions.values()
+            df = pd.DataFrame(transactions)
+            
+            # Remove Django-specific fields
+            df = df[['date', 'description', 'debit', 'credit', 'balance', 'channel', 'transaction_reference']]
+            
+            print(f"📊 Loaded {len(df)} transactions")
+            print(f"   Columns: {list(df.columns)}")
+            
+        except Exception as e:
+            error = f"❌ Failed to load transaction data: {str(e)}"
+            print(error)
+            return render(
+                request,
+                "statements/chat.html",
+                {
+                    "statement": stmt,
+                    "error": error,
+                    "chat_history": stmt.chats.all()[:10],
+                },
+            )
+        
+        # Step 2: Generate pandas code using DeepSeek
+        schema = {
+            'columns': df.columns.tolist(),
+            'sample_data': df.head(5).to_dict('records')
+        }
+        
+        success, generated_code = generate_pandas_code(question, schema)
+        
+        if not success:
+            error = generated_code
+            print(error)
+            return render(
+                request,
+                "statements/chat.html",
+                {
+                    "statement": stmt,
+                    "question": question,
+                    "error": error,
+                    "chat_history": stmt.chats.all()[:10],
+                },
+            )
+        
+        code = generated_code
+        print(f"\n✅ Generated code:\n{code}\n")
+        
+        # Step 3: Validate generated code
+        is_safe, validation_error = validate_code(code, verbose=True)
+        
+        if not is_safe:
+            error = validation_error
+            print(error)
+            
+            # Save failed attempt to history
+            from .models import ChatHistory
+            ChatHistory.objects.create(
+                user=request.user,
+                statement=stmt,
+                question=question,
+                code=code,
+                result=error,
+            )
+            
+            return render(
+                request,
+                "statements/chat.html",
+                {
+                    "statement": stmt,
+                    "question": question,
+                    "code": code,
+                    "error": error,
+                    "chat_history": stmt.chats.all()[:10],
+                },
+            )
+        
+        # Step 4: Execute the code safely
+        start_time = time.time()
+        success, result = execute_pandas_code(df, code, timeout_seconds=10)
+        execution_time = round(time.time() - start_time, 2)
+        
+        if not success:
+            error = result
+            print(error)
+            answer = None
+        else:
+            answer = result
+            print(f"\n✅ Result:\n{answer}\n")
+        
+        # Step 5: Save to chat history
+        from .models import ChatHistory
+        ChatHistory.objects.create(
+            user=request.user,
+            statement=stmt,
+            question=question,
+            code=code,
+            result=answer or error,
+        )
+        
+        print(f"{'='*80}\n")
+        
+    # Render chat page with history
+    chat_history = stmt.chats.all().order_by('-created_at')[:20]
+    
+    return render(
+        request,
+        "statements/chat.html",
+        {
+            "statement": stmt,
+            "question": question if request.method == "POST" else None,
+            "answer": answer,
+            "code": code,
+            "error": error,
+            "execution_time": execution_time,
+            "chat_history": chat_history,
+            "transaction_count": transaction_count,
+        },
+    )
+
+
+@login_required
+def chat_history(request, pk):
+    """
+    View full chat history for a statement.
+    """
+    stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
+    chat_history = stmt.chats.all().order_by('-created_at')
+    
+    return render(
+        request,
+        "statements/history.html",
+        {
+            "statement": stmt,
+            "chat_history": chat_history,
+        },
+    )

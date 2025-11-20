@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Select Transaction Tables - Banklytik{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Select Transaction Tables</h1>
+                <div>
+                    <a href="{% url 'statements:detail' statement.pk %}" class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">How to Select Tables</h5>
+                    <p class="card-text">
+                        Banklytik has extracted {{ tables|length }} tables from your bank statement. 
+                        Please select <strong>only the tables that contain your actual transaction data</strong>.
+                    </p>
+                    <ul>
+                        <li>✅ Select tables with dates, amounts, and descriptions</li>
+                        <li>✅ Include tables from all pages if your statement spans multiple pages</li>
+                        <li>❌ Skip header/footer tables, summaries, and non-transaction data</li>
+                    </ul>
+                </div>
+            </div>
+
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row">
+                    {% for table in tables %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 {% if table.table_id in selected_table_ids %}border-primary{% endif %}">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Table {{ table.table_id }}</strong>
+                                        <span class="badge bg-secondary ms-2">Page {{ table.page|default:"1" }}</span>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="selected_tables" value="{{ table.table_id }}"
+                                               id="table_{{ table.table_id }}"
+                                               {% if table.table_id in selected_table_ids %}checked{% endif %}>
+                                        <label class="form-check-label" for="table_{{ table.table_id }}">
+                                            Select
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body">
+                                    <!-- Confidence Badge -->
+                                    <div class="mb-3">
+                                        <span class="badge {% if table.confidence == 'high' %}bg-success{% elif table.confidence == 'medium' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                            {{ table.confidence|title }} Confidence ({{ table.score }}%)
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Table Preview -->
+                                    <div class="table-responsive mb-3" style="max-height: 200px; overflow-y: auto;">
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    {% for col in table.preview_data.0 %}
+                                                        <th>Col {{ forloop.counter }}</th>
+                                                    {% endfor %}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for row in table.preview_data %}
+                                                    <tr>
+                                                        {% for cell in row %}
+                                                            <td style="font-size: 0.8rem;">{{ cell|truncatechars:30 }}</td>
+                                                        {% endfor %}
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <!-- Reasons -->
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <strong>Why we think this might be transactions:</strong><br>
+                                            {% for reason in table.reasons %}
+                                                • {{ reason }}<br>
+                                            {% endfor %}
+                                        </small>
+                                    </div>
+                                    
+                                    <!-- Table Stats -->
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            {{ table.row_count }} rows × {{ table.column_count }} columns
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        Continue to Column Mapping
+                    </button>
+                    <a href="{% url 'statements:cancel_selection' statement.pk %}" class="btn btn-outline-secondary ms-2">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

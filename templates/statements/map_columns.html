@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Map Columns - Banklytik{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Map Columns to Transaction Fields</h1>
+                <div>
+                    <a href="{% url 'statements:select_tables' statement.pk %}" class="btn btn-outline-secondary">
+                        ← Back
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">How to Map Columns</h5>
+                    <p class="card-text">
+                        Banklytik has merged your selected tables into one dataset. 
+                        Now tell us which columns contain which transaction information.
+                    </p>
+                    <ul>
+                        <li>✅ <strong>Date:</strong> Transaction dates/times</li>
+                        <li>✅ <strong>Description:</strong> Transaction details/narration</li>
+                        <li>✅ <strong>Debit:</strong> Money going out (withdrawals)</li>
+                        <li>✅ <strong>Credit:</strong> Money coming in (deposits)</li>
+                        <li>✅ <strong>Balance:</strong> Account balance after transaction</li>
+                        <li>✅ <strong>Reference:</strong> Transaction reference numbers</li>
+                    </ul>
+                </div>
+            </div>
+
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+
+            <!-- ============== MERGED TABLE PREVIEW ============== -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📊 Preview of Extracted Transactions</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3">Here's a preview of your merged transaction data. Verify that it looks correct before mapping columns.</p>
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-dark sticky-top">
+                                <tr>
+                                    {% for col_name in analysis.column_names %}
+                                        <th style="white-space: nowrap;">{{ col_name }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in analysis.preview_rows %}
+                                    <tr>
+                                        {% for value in row %}
+                                            <td>
+                                                <small>{{ value|truncatechars:30 }}</small>
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="100" class="text-center text-muted">No data available</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- ============== COLUMN MAPPING SECTION ============== -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">🔗 Step 1: Map Your Columns</h5>
+                        <small class="text-muted d-block mt-2">Tell us which columns contain which information so we can clean your data properly.</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 20%;">Column</th>
+                                        <th style="width: 18%;">AI Suggests</th>
+                                        <th style="width: 15%;">Confidence</th>
+                                        <th style="width: 22%;">Sample Data</th>
+                                        <th style="width: 25%;">You Choose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for column_name, analysis in analysis.column_analysis.items %}
+                                        <tr>
+                                            <td>
+                                                <strong class="text-dark">{{ column_name }}</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge {% if analysis.confidence == 'high' %}bg-success{% elif analysis.confidence == 'medium' %}bg-warning{% else %}bg-secondary{% endif %}" style="font-size: 0.9em;">
+                                                    {{ analysis.suggested_type|title }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge {% if analysis.confidence == 'high' %}bg-success{% elif analysis.confidence == 'medium' %}bg-warning{% else %}bg-secondary{% endif %}" style="min-width: 50px;">
+                                                        {{ analysis.score }}%
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted font-monospace" style="word-break: break-word;">
+                                                    {% for sample in analysis.sample_data|slice:":2" %}
+                                                        <code>{{ sample|truncatechars:25 }}</code>{% if not forloop.last %}<br>{% endif %}
+                                                    {% endfor %}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <select class="form-select form-select-sm" name="column_{{ column_name }}">
+                                                    <option value="unknown">— Skip This —</option>
+                                                    <option value="date" {% if existing_mappings|get_item:column_name == "date" %}selected{% endif %}>📅 Date/Time</option>
+                                                    <option value="description" {% if existing_mappings|get_item:column_name == "description" %}selected{% endif %}>📝 Description</option>
+                                                    <option value="debit" {% if existing_mappings|get_item:column_name == "debit" %}selected{% endif %}>➖ Debit (Out)</option>
+                                                    <option value="credit" {% if existing_mappings|get_item:column_name == "credit" %}selected{% endif %}>➕ Credit (In)</option>
+                                                    <option value="amount" {% if existing_mappings|get_item:column_name == "amount" %}selected{% endif %}>💰 Amount</option>
+                                                    <option value="balance" {% if existing_mappings|get_item:column_name == "balance" %}selected{% endif %}>📊 Balance</option>
+                                                    <option value="reference" {% if existing_mappings|get_item:column_name == "reference" %}selected{% endif %}>🔢 Reference</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        {% if analysis.reasons %}
+                                        <tr class="table-secondary">
+                                            <td colspan="5" class="p-2">
+                                                <small class="text-muted">
+                                                    <strong>💡 Why we suggest this:</strong>
+                                                    {% for reason in analysis.reasons %}
+                                                        {{ reason }}{% if not forloop.last %} • {% endif %}
+                                                    {% endfor %}
+                                                </small>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="mt-4 d-flex justify-content-between">
+                    <div>
+                        <a href="{% url 'statements:select_tables' statement.pk %}" class="btn btn-outline-secondary">
+                            Back to Table Selection
+                        </a>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Continue to Data Preview
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.progress {
+    min-width: 100px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-select suggested field for high-confidence columns
+document.addEventListener('DOMContentLoaded', function() {
+    {% for column_name, analysis in analysis.column_analysis.items %}
+        {% if analysis.confidence == 'high' and analysis.suggested_type != 'unknown' %}
+            const select = document.querySelector('select[name="column_{{ column_name }}"]');
+            if (select && select.value === 'unknown') {
+                select.value = '{{ analysis.suggested_type }}';
+            }
+        {% endif %}
+    {% endfor %}
+});
+</script>
+{% endblock %}

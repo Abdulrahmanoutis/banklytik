@@ -1,17 +1,17 @@
 [
   {
-    "pattern": null,
-    "replace": null,
-    "notes": "Unrecognized pattern (needs manual review): NaT"
+    "pattern": "(\\d{4}\\s+[A-Za-z]{3,})\\s+(\\d{2}:\\d{2}\\s+\\d{2})",
+    "replace": "\\1 25 \\2",
+    "notes": "Fix missing day between month and time, defaulting to 25."
   },
   {
-    "pattern": null,
-    "replace": null,
-    "notes": "Unrecognized pattern (needs manual review): 2025 Feb 20:42 59"
+    "pattern": "(\\d{2}:\\d{2}):\\s+(\\d{2})",
+    "replace": "\\1 \\2",
+    "notes": "Fix colon-space issue (e.g., '20:11: 58' → '20:11 58')."
   },
   {
-    "pattern": null,
-    "replace": null,
-    "notes": "Unrecognized pattern (needs manual review): 2025 Feb 22:17 43"
+    "pattern": "(\\d{2})([A-Za-z]{3,})(\\d{4})",
+    "replace": "\\1 \\2 \\3",
+    "notes": "Fix merged day-month-year without space."
   }
 ]

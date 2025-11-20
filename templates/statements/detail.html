@@ -2,11 +2,30 @@
 {% block content %}
 <h2>Transactions for {{ statement.title }}</h2>
 
-<p>
-  <a href="{% url 'statements:reprocess' statement.pk %}" class="btn btn-warning">
-    🔄 Reprocess Statement
-  </a>
-</p>
+<div class="mb-4">
+  {% if not statement.processed %}
+    <div class="alert alert-warning">
+      <strong>Statement not processed yet.</strong> Choose a processing method:
+    </div>
+    <div class="btn-group" role="group">
+      <a href="{% url 'statements:process' statement.pk %}" class="btn btn-outline-primary">
+        🔄 Auto Process
+      </a>
+      <a href="{% url 'statements:start_selection' statement.pk %}" class="btn btn-primary">
+        🎯 Manual Table Selection
+      </a>
+    </div>
+  {% else %}
+    <div class="btn-group" role="group">
+      <a href="{% url 'statements:reprocess' statement.pk %}" class="btn btn-warning">
+        🔄 Reprocess Statement
+      </a>
+      <a href="{% url 'statements:start_selection' statement.pk %}" class="btn btn-outline-primary">
+        🎯 Manual Table Selection
+      </a>
+    </div>
+  {% endif %}
+</div>
 
 <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%;">
   <thead style="background-color: #f2f2f2;">

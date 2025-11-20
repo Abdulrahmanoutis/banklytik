@@ -1,30 +1,32 @@
 # banklytik_core/startup_loader.py
-import logging
+import logging, threading, time, os
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
+READY_FILE = Path("deepseek_ready.log")
 
-def safe_initialize_deepseek():
-    """
-    Safely initialize the DeepSeek learning system at Django startup.
-    This function delays imports until runtime to prevent circular imports
-    between core modules (knowledge_loader, knowledge_registry, statements).
-    """
+def _init_task():
+    """Background task that runs DeepSeek initialization after a small delay."""
     try:
-        # Lazy imports to avoid circular dependencies
         from banklytik_core.knowledge_loader import reload_knowledge
         from banklytik_core.knowledge_registry import initialize_registry
 
-        logger.info("🔄 Initializing DeepSeek knowledge system...")
-
-        # Step 1: Load markdown and JSON rules into memory
+        time.sleep(2)  # wait for Django apps to fully load
         reload_knowledge()
-
-        # Step 2: Register functions and rules into AI-accessible registry
         initialize_registry()
 
-        logger.info("✅ DeepSeek initialized successfully.")
-        print("✅ DeepSeek system initialized cleanly.")
-
+        READY_FILE.write_text("DeepSeek initialized successfully.\n")
+        logger.info("✅ DeepSeek fully initialized and ready.")
+        print("✅ DeepSeek fully initialized and ready.")
     except Exception as e:
-        logger.warning(f"⚠️ DeepSeek initialization failed: {e}")
-        print(f"⚠️ DeepSeek initialization failed: {e}")
+        logger.warning(f"⚠️ DeepSeek background initialization failed: {e}")
+        print(f"⚠️ DeepSeek background initialization failed: {e}")
+
+def safe_initialize_deepseek():
+    """
+    Run DeepSeek initialization in a background thread to prevent
+    blocking or circular import issues during AppConfig.ready().
+    """
+    threading.Thread(target=_init_task, daemon=True).start()
+    logger.info("🕒 DeepSeek background initialization scheduled.")
+    print("🕒 DeepSeek background initialization scheduled.")

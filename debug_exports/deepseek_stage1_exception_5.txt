@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/macbookpro/Documents/bankbot/banklytik/statements/deepseek_column_detection.py", line 108, in run_column_detection_with_deepseek
-    payload = process_textract_blocks(blocks)
-  File "/Users/macbookpro/Documents/bankbot/banklytik/statements/textract_sampling.py", line 150, in process_textract_blocks
-    deepseek_payload = build_deepseek_payload(pages_data, sampled_pages)
-NameError: name 'build_deepseek_payload' is not defined

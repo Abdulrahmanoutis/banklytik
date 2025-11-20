@@ -1,4 +1,0 @@
-{
-  "error": "Reindexing only valid with uniquely valued Index objects",
-  "trace": "Traceback (most recent call last):\n  File \"/Users/macbookpro/Documents/bankbot/banklytik/statements/direct_processor.py\", line 265, in process_tables_directly\n    final_df = pd.concat(all_transactions, ignore_index=True)\n  File \"/Users/macbookpro/Documents/anaconda3/envs/bank/lib/python3.10/site-packages/pandas/core/reshape/concat.py\", line 395, in concat\n    return op.get_result()\n  File \"/Users/macbookpro/Documents/anaconda3/envs/bank/lib/python3.10/site-packages/pandas/core/reshape/concat.py\", line 680, in get_result\n    indexers[ax] = obj_labels.get_indexer(new_labels)\n  File \"/Users/macbookpro/Documents/anaconda3/envs/bank/lib/python3.10/site-packages/pandas/core/indexes/base.py\", line 3885, in get_indexer\n    raise InvalidIndexError(self._requires_unique_msg)\npandas.errors.InvalidIndexError: Reindexing only valid with uniquely valued Index objects\n"
-}

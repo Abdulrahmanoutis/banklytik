@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Transactions Saved - Banklytik{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                </div>
+                
+                <h1 class="mb-3">Transactions Successfully Saved!</h1>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Processing Summary</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="alert alert-success">
+                                    <h6>✅ Transactions Created</h6>
+                                    <p class="h4 mb-0">{{ transactions_created }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-warning">
+                                    <h6>⚠️ Transactions with Issues</h6>
+                                    <p class="h4 mb-0">{{ flagged_transactions }}</p>
+                                    <small class="text-muted">(e.g., invalid dates)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="lead mb-4">
+                    Your bank statement has been successfully processed and is now ready for analysis.
+                </p>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <a href="{% url 'statements:detail' statement.pk %}" class="btn btn-primary btn-lg">
+                        View Transactions
+                    </a>
+                    <a href="{% url 'statements:chat' statement.pk %}" class="btn btn-outline-primary btn-lg">
+                        Ask AI Questions
+                    </a>
+                    <a href="{% url 'statements:list' %}" class="btn btn-outline-secondary btn-lg">
+                        Back to Statements
+                    </a>
+                </div>
+                
+                <div class="mt-5">
+                    <div class="alert alert-info">
+                        <h6>💡 What's Next?</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li>• Ask questions about your spending patterns</li>
+                            <li>• Analyze your income and expenses</li>
+                            <li>• Identify your largest transactions</li>
+                            <li>• Export your data for further analysis</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

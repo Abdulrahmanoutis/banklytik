@@ -32,6 +32,7 @@ def parse_date_str(s_raw):
     Parse a wide range of bank-statement date formats safely.
     Handles:
       - Kuda format: 'DD/MM/YY HH:MM:SS' or 'DD/MM/YY'
+      - OPay format: 'YYYY MMM DD HH:MM:SS' or 'DD MMM YYYY'
       - DD/MM/YYYY etc.
     Returns a naive datetime (caller may localize) or None.
     """
@@ -39,13 +40,42 @@ def parse_date_str(s_raw):
         return None
 
     s = str(s_raw).strip()
+    print(f"🔍 DEBUG parse_date_str: Input = '{s}' (type: {type(s).__name__})")
+    
     if s == "" or s.lower() in ("nan", "none", "nat"):
+        print(f"   → Empty/null value, returning None")
         return None
 
     # Normalize separators
     s_norm = re.sub(r"[-\.]", "/", s)
 
-    # 1) Kuda style full datetime: DD/MM/YY HH:MM:SS (or single-digit day/month)
+    # 1) OPay Trans. Time format: YYYY MMM DD HH:MM:SS (e.g., "2025 Feb 24 07:36:01")
+    opay_dt_pattern = r'^\s*(\d{4})\s+([A-Za-z]{3})\s+(\d{1,2})\s+(\d{1,2}):(\d{2}):(\d{2})\s*$'
+    m = re.match(opay_dt_pattern, s)
+    if m:
+        try:
+            year, month_str, day, hour, minute, second = m.groups()
+            month = datetime.strptime(month_str, "%b").month
+            dt = datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))
+            print(f"✅ Parsed OPay datetime: {s} → {dt}")
+            return dt
+        except Exception as e:
+            print(f"⚠️ OPay datetime parsing failed for '{s}': {e}")
+
+    # 2) OPay Value Date format: DD MMM YYYY (e.g., "23 Feb 2025")
+    opay_date_pattern = r'^\s*(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})\s*$'
+    m = re.match(opay_date_pattern, s)
+    if m:
+        try:
+            day, month_str, year = m.groups()
+            month = datetime.strptime(month_str, "%b").month
+            dt = datetime(int(year), int(month), int(day))
+            print(f"✅ Parsed OPay date: {s} → {dt}")
+            return dt
+        except Exception as e:
+            print(f"⚠️ OPay date parsing failed for '{s}': {e}")
+
+    # 3) Kuda style full datetime: DD/MM/YY HH:MM:SS (or single-digit day/month)
     kuda_dt_pattern = r'^\s*(\d{1,2})/(\d{1,2})/(\d{2})\s+(\d{1,2}):(\d{2}):(\d{2})\s*$'
     m = re.match(kuda_dt_pattern, s_norm)
     if m:
@@ -55,12 +85,12 @@ def parse_date_str(s_raw):
             # convert 2-digit year to 4-digit (assume 2000-2099)
             year_full = 2000 + year if year < 100 else year
             dt = datetime(int(year_full), int(month), int(day), int(hour), int(minute), int(second))
-            print(f"✅ Parsed date: {s} → {dt}")
+            print(f"✅ Parsed Kuda datetime: {s} → {dt}")
             return dt
         except Exception as e:
-            print(f"⚠️ Kuda full-datetime parsing failed for '{s}': {e}")
+            print(f"⚠️ Kuda datetime parsing failed for '{s}': {e}")
 
-    # 2) Kuda date only: DD/MM/YY or DD/MM/YYYY
+    # 4) Kuda date only: DD/MM/YY or DD/MM/YYYY
     kuda_date_pattern = r'^\s*(\d{1,2})/(\d{1,2})/(\d{2,4})\s*$'
     m2 = re.match(kuda_date_pattern, s_norm)
     if m2:
@@ -70,12 +100,12 @@ def parse_date_str(s_raw):
             if year < 100:
                 year = 2000 + year
             dt = datetime(year, int(month), int(day))
-            print(f"✅ Parsed date: {s} → {dt}")
+            print(f"✅ Parsed Kuda date: {s} → {dt}")
             return dt
         except Exception as e:
-            print(f"⚠️ Kuda date-only parsing failed for '{s}': {e}")
+            print(f"⚠️ Kuda date parsing failed for '{s}': {e}")
 
-    # 3) If it's a time-only string (e.g., '23:08:23'), try to attach today's date as fallback
+    # 5) If it's a time-only string (e.g., '23:08:23'), try to attach today's date as fallback
     time_only = re.match(r'^\s*(\d{1,2}):(\d{2}):(\d{2})\s*$', s)
     if time_only:
         try:
@@ -87,17 +117,19 @@ def parse_date_str(s_raw):
         except Exception:
             pass
 
-    # 4) Pandas fallback with dayfirst
+    # 6) Pandas fallback with dayfirst (but NOT for YYYY-MM-DD format)
     try:
-        parsed_pd = pd.to_datetime(s, errors="coerce", dayfirst=True)
+        # Don't use dayfirst=True if it's already in YYYY-MM-DD format
+        use_dayfirst = not bool(re.match(r'^\d{4}-\d{2}-\d{2}', s))
+        parsed_pd = pd.to_datetime(s, errors="coerce", dayfirst=use_dayfirst)
         if pd.notna(parsed_pd):
             dt = parsed_pd.to_pydatetime()
-            print(f"✅ Pandas parsed: {s} → {dt}")
+            print(f"✅ Pandas parsed: {s} → {dt} (dayfirst={use_dayfirst})")
             return dt
     except Exception as e:
         print(f"⚠️ Pandas parse attempt failed for '{s}': {e}")
 
-    # 5) Manual format list fallback
+    # 7) Manual format list fallback
     known_formats = [
         "%d/%m/%Y %H:%M:%S",
         "%d/%m/%y %H:%M:%S",
@@ -109,6 +141,7 @@ def parse_date_str(s_raw):
         "%Y-%m-%d",
         "%b %d, %Y",
         "%d %b %Y",
+        "%d %b %Y %H:%M:%S",  # Additional format for OPay-style
     ]
     for fmt in known_formats:
         try:
@@ -166,6 +199,10 @@ def extract_channel(desc):
 def robust_clean_dataframe(df_raw):
     """
     Clean and normalize extracted bank statement tables.
+    Handles both:
+    1. Old format from direct_processor (Trans. Time, Description, etc.)
+    2. New format from column_mapper (date, description, debit, credit, etc.)
+    
     Filters junk rows and ensures consistent canonical format.
     """
     import pandas as pd
@@ -184,50 +221,118 @@ def robust_clean_dataframe(df_raw):
 
     # Normalize text
     df = df.map(lambda v: normalize_text(v) if pd.notna(v) else "")
+    
+    print(f"DEBUG: Incoming columns: {list(df.columns)}")
+    print(f"DEBUG: Data types: {df.dtypes.to_dict()}")
+    print(f"DEBUG: First row sample:\n{df.head(1).to_string()}")
 
-    # Assign fallback headers if needed
-    if not any("date" in str(c).lower() for c in df.columns):
-        df.columns = [
-            "Trans. Time", "Value Date", "Description",
-            "Debit/Credit(W)", "Balance(N)", "Channel", "Transaction Reference"
-        ][: len(df.columns)]
+    # Detect if this is the NEW format from column_mapper
+    has_standardized_cols = all(col in df.columns for col in ['date', 'description', 'debit', 'credit'])
+    print(f"DEBUG: Checking for standardized cols: date={('date' in df.columns)}, description={('description' in df.columns)}, debit={('debit' in df.columns)}, credit={('credit' in df.columns)}")
+    
+    if has_standardized_cols:
+        print("✅ Detected standardized format from column_mapper")
+        # Already in standardized format - just ensure all required columns exist
+        
+        # Ensure all required columns exist
+        if 'raw_date' not in df.columns:
+            df['raw_date'] = df['date'].astype(str) if 'date' in df.columns else ""
+        if 'value_date' not in df.columns:
+            df['value_date'] = None
+        if 'channel' not in df.columns:
+            df['channel'] = df['description'].apply(extract_channel) if 'description' in df.columns else "OTHER"
+        if 'transaction_reference' not in df.columns:
+            df['transaction_reference'] = ""
+        
+        # Parse dates if they're strings
+        if df['date'].dtype == 'object':
+            df['date'] = df['date'].apply(lambda v: parse_date_str(v) if isinstance(v, str) and v.strip() else v)
+        
+        # Handle OPay format: single "amount" column with +/- values
+        # If debit/credit are empty but amount column exists, split it
+        if 'amount' in df.columns:
+            print("🔍 Detected 'amount' column - checking if we need to split it to debit/credit")
+            
+            # Check if debit and credit are mostly empty
+            debit_empty = ('debit' not in df.columns) or (df['debit'].astype(str).str.strip() == '').all()
+            credit_empty = ('credit' not in df.columns) or (df['credit'].astype(str).str.strip() == '').all()
+            
+            if debit_empty and credit_empty:
+                print("✅ Splitting 'amount' column into debit/credit based on sign")
+                # Convert amount to float first
+                df['_amount_float'] = df['amount'].apply(clean_amount)
+                # Split into debit (negative) and credit (positive)
+                df['debit'] = df['_amount_float'].apply(lambda x: abs(x) if x < 0 else 0.0)
+                df['credit'] = df['_amount_float'].apply(lambda x: abs(x) if x > 0 else 0.0)
+                df = df.drop(columns=['_amount_float'])
+        
+        # Convert amounts to float
+        for col in ['debit', 'credit', 'balance']:
+            if col in df.columns:
+                if df[col].dtype == 'object':
+                    df[col] = df[col].apply(clean_amount)
+                else:
+                    df[col] = df[col].fillna(0.0).astype(float)
+            else:
+                # Create empty column if it doesn't exist
+                df[col] = 0.0
+        
+    else:
+        print("⚠️ Detected old format - remapping columns")
+        # OLD FORMAT: Assign fallback headers if needed
+        if not any("date" in str(c).lower() for c in df.columns):
+            df.columns = [
+                "Trans. Time", "Value Date", "Description",
+                "Debit/Credit(W)", "Balance(N)", "Channel", "Transaction Reference"
+            ][: len(df.columns)]
 
-    # Fill required columns
-    required = {
-        "Trans. Time": "",
-        "Value Date": "",
-        "Description": "",
-        "Debit/Credit(W)": "",
-        "Balance(N)": "0",
-        "Channel": "",
-        "Transaction Reference": "",
-    }
-    for c, default in required.items():
-        if c not in df.columns:
-            df[c] = default
+        # Fill required columns for old format
+        required = {
+            "Trans. Time": "",
+            "Value Date": "",
+            "Description": "",
+            "Debit/Credit(W)": "",
+            "Balance(N)": "0",
+            "Channel": "",
+            "Transaction Reference": "",
+        }
+        for c, default in required.items():
+            if c not in df.columns:
+                df[c] = default
 
-    # Parse and clean
-    df["raw_date"] = df["Trans. Time"].astype(str)
-    df["date"] = df["raw_date"].apply(lambda v: parse_date_str(v) if str(v).strip() else None)
-    df["value_date"] = df["Value Date"].apply(lambda v: parse_date_str(v) if str(v).strip() else None)
-    df["description"] = df["Description"].astype(str)
-    df["balance"] = df["Balance(N)"].apply(clean_amount)
+        # Parse and clean for old format
+        df["raw_date"] = df["Trans. Time"].astype(str)
+        df["date"] = df["raw_date"].apply(lambda v: parse_date_str(v) if str(v).strip() else None)
+        df["value_date"] = df["Value Date"].apply(lambda v: parse_date_str(v) if str(v).strip() else None)
+        df["description"] = df["Description"].astype(str)
+        df["balance"] = df["Balance(N)"].apply(clean_amount)
 
-    dc = df["Debit/Credit(W)"].astype(str)
-    df["debit"] = dc.apply(lambda x: clean_amount(x) if "-" in x else 0.0)
-    df["credit"] = dc.apply(lambda x: clean_amount(x) if "+" in x else 0.0)
-    df["channel"] = df["Channel"].apply(extract_channel)
-    df["transaction_reference"] = df["Transaction Reference"].astype(str)
+        dc = df["Debit/Credit(W)"].astype(str)
+        df["debit"] = dc.apply(lambda x: clean_amount(x) if "-" in x else 0.0)
+        df["credit"] = dc.apply(lambda x: clean_amount(x) if "+" in x else 0.0)
+        df["channel"] = df["Channel"].apply(extract_channel)
+        df["transaction_reference"] = df["Transaction Reference"].astype(str)
 
-    # --- Filter invalid / junk rows ---
+    # --- Filter rows: keep if has valid date OR has transaction amount ---
     before = len(df)
+    
+    # More lenient filtering: accept rows with valid dates OR non-zero amounts OR valid balance
+    df['_has_date'] = df["date"].notna()
+    df['_has_debit'] = df["debit"].astype(float) != 0
+    df['_has_credit'] = df["credit"].astype(float) != 0
+    df['_has_balance'] = df["balance"].astype(float) != 0
+    df['_has_desc'] = df["description"].astype(str).str.strip() != ""
+    
+    # Keep rows that have: (date AND description) OR (transaction amounts) OR (balance)
     df = df[
-        df["date"].notna() |
-        df["debit"].astype(float).ne(0) |
-        df["credit"].astype(float).ne(0) |
-        df["balance"].astype(float).ne(0)
+        (df['_has_date'] & df['_has_desc']) |  # Valid date + description
+        (df['_has_debit'] | df['_has_credit']) |  # Transaction amounts
+        df['_has_balance']  # Valid balance
     ]
-    df = df[df["description"].str.strip() != ""]
+    
+    # Remove temporary columns
+    df = df.drop(columns=['_has_date', '_has_debit', '_has_credit', '_has_balance', '_has_desc'], errors='ignore')
+    
     after = len(df)
     print(f"🧹 Filtered junk rows: {before - after} removed, {after} kept")
 

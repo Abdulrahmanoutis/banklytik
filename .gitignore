@@ -15,4 +15,7 @@ staticfiles/
 # IDE and system
 .vscode/
 .DS_Store
-*.log.env
+*.log
+
+# Debug and exports
+debug_exports/

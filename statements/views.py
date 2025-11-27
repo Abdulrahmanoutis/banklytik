@@ -723,7 +723,7 @@ def preview_data(request, pk):
     final_df = session.get_final_dataframe()
     
     if final_df is None or final_df.empty:
-        return redirect("statements:map_columns", pk=stmt.pk)
+        redirect("statements:map_columns", pk=stmt.pk)
     
     if request.method == "POST":
         # User confirmed - save transactions
@@ -752,7 +752,7 @@ def preview_data(request, pk):
                     "statements/preview_data.html",
                     {
                         "statement": stmt,
-                        "final_data": final_df.head(20).to_dict(orient='records'),
+                        "final_data": final_df.to_dict(orient='records'),
                         "data_shape": final_df.shape,
                         "error": "Failed to clean data. Please review your column mappings."
                     },
@@ -765,21 +765,45 @@ def preview_data(request, pk):
                 "statements/preview_data.html",
                 {
                     "statement": stmt,
-                    "final_data": final_df.head(20).to_dict(orient='records'),
+                    "final_data": final_df.to_dict(orient='records'),
                     "data_shape": final_df.shape,
                     "error": f"Failed to save transactions: {str(e)}"
                 },
             )
     
     # GET request - show data preview
+    field_labels = [
+        ('date', 'Date'),
+        ('description', 'Description'), 
+        ('debit', 'Debit'),
+        ('credit', 'Credit'),
+        ('amount', 'Amount'),
+        ('balance', 'Balance'),
+        ('reference', 'Reference'),
+    ]
+
+    # Convert DataFrame to records and apply cleaning for validation
+    df_clean = robust_clean_dataframe(final_df)
+    final_data = df_clean.to_dict(orient='records') if df_clean is not None else []
+    
+    # Extract validation summary if available
+    validation_summary = {
+        'total': len(final_data),
+        'with_warnings': sum(1 for row in final_data if row.get('date_validation_warning') == 'ERROR'),
+        'suspicious': sum(1 for row in final_data if row.get('date_validation_warning') == 'WARNING'),
+        'valid': sum(1 for row in final_data if row.get('date_validation_warning') == 'INFO'),
+    }
+
     return render(
         request,
         "statements/preview_data.html",
         {
             "statement": stmt,
-            "final_data": final_df.head(20).to_dict(orient='records'),
-            "data_shape": final_df.shape,
+            "final_data": final_data,
+            "data_shape": df_clean.shape if df_clean is not None else (0, 0),
             "column_mappings": session.get_column_mappings(),
+            "field_labels": field_labels,
+            "validation_summary": validation_summary,
         },
     )
 

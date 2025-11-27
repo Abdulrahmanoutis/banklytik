@@ -15,63 +15,97 @@
                 </div>
             </div>
             
-            <div class="card mb-4">
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+
+            {% if validation_summary %}
+            <div class="card mb-4 bg-light">
+                <div class="card-header">
+                    <h5 class="mb-0">📊 Data Validation Summary</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">Final Review</h5>
-                    <p class="card-text">
-                        Review your transaction data before saving. This is how it will appear in your Banklytik account.
-                    </p>
-                    <div class="alert alert-info">
-                        <strong>Dataset Summary:</strong> {{ data_shape.0 }} transactions × {{ data_shape.1 }} columns
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <h6>Total Transactions</h6>
+                            <h3>{{ validation_summary.total }}</h3>
+                        </div>
+                        <div class="col-md-3">
+                            <h6 class="text-success">✅ Valid</h6>
+                            <h3 class="text-success">{{ validation_summary.valid }}</h3>
+                        </div>
+                        <div class="col-md-3">
+                            <h6 class="text-warning">⚠️ Warnings</h6>
+                            <h3 class="text-warning">{{ validation_summary.suspicious }}</h3>
+                        </div>
+                        <div class="col-md-3">
+                            <h6 class="text-danger">❌ Errors</h6>
+                            <h3 class="text-danger">{{ validation_summary.with_warnings }}</h3>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            {% if error %}
-                <div class="alert alert-danger">{{ error }}</div>
             {% endif %}
 
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">📝 Transaction Preview - Editable</h5>
-                    <small class="text-muted">Click any cell to edit • Changes saved automatically</small>
+                    <small class="text-muted">Click any cell to edit • OCR errors flagged below</small>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                        <table class="table table-striped table-bordered table-hover" id="editableTable">
+                        <table class="table table-striped table-bordered table-hover mb-0" id="editableTable">
                             <thead class="table-light sticky-top">
                                 <tr>
                                     <th style="width: 40px;">#</th>
                                     {% for key in final_data.0.keys %}
-                                        <th class="editable-header">{{ key|title }}</th>
+                                        {% if key not in 'row_issue,_date_validation,date_validation_issue,date_validation_warning' %}
+                                            <th class="editable-header">{{ key|title }}</th>
+                                        {% endif %}
                                     {% endfor %}
+                                    <th style="width: 300px;">🔍 Validation Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for row in final_data %}
-                                    <tr data-row-id="{{ forloop.counter0 }}">
+                                    {% with warning_level=row.date_validation_warning|default:'INFO' %}
+                                    <tr data-row-id="{{ forloop.counter0 }}" class="{% if warning_level == 'ERROR' %}table-danger{% elif warning_level == 'WARNING' %}table-warning{% endif %}">
                                         <td class="text-muted small">{{ forloop.counter }}</td>
                                         {% for key, value in row.items %}
-                                            <td class="editable-cell" data-field="{{ key }}" data-row="{{ forloop.parentloop.counter0 }}" title="Click to edit">
-                                                <span class="cell-content">
-                                                    {% if value %}
-                                                        {{ value|truncatechars:50 }}
-                                                    {% else %}
-                                                        <span class="text-muted">—</span>
-                                                    {% endif %}
-                                                </span>
-                                                <input type="text" class="form-control form-control-sm cell-input" style="display:none;" value="{{ value|default:'' }}">
-                                            </td>
+                                            {% if key not in 'row_issue,_date_validation,date_validation_issue,date_validation_warning' %}
+                                                <td class="editable-cell" data-field="{{ key }}" data-row="{{ forloop.parentloop.counter0 }}" title="Click to edit">
+                                                    <span class="cell-content">
+                                                        {% if value %}
+                                                            {{ value }}
+                                                        {% else %}
+                                                            <span class="text-muted">—</span>
+                                                        {% endif %}
+                                                    </span>
+                                                    <input type="text" class="form-control form-control-sm cell-input" style="display:none; width: 100%;" value="{{ value|default:'' }}">
+                                                </td>
+                                            {% endif %}
                                         {% endfor %}
+                                        <td class="validation-cell" style="font-size: 0.85rem;">
+                                            {% if warning_level == 'ERROR' %}
+                                                <span class="badge bg-danger">❌ ERROR</span>
+                                            {% elif warning_level == 'WARNING' %}
+                                                <span class="badge bg-warning text-dark">⚠️ WARNING</span>
+                                            {% else %}
+                                                <span class="badge bg-success">✅ VALID</span>
+                                            {% endif %}
+                                            <br>
+                                            <small>{{ row.date_validation_issue|default:'No issues' }}</small>
+                                        </td>
                                     </tr>
+                                    {% endwith %}
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-2 alert alert-info">
-                        <small>
-                            <strong>💡 How to use:</strong> Click on any cell to edit it. The value will be updated immediately. 
-                            Your changes will be saved when you click "Save Transactions".
+                    <div class="card-footer">
+                        <small class="text-muted">
+                            <strong>💡 OCR Validation:</strong> The system automatically detects OCR errors like impossible dates (e.g., "2025 Feb 20:42 59"). 
+                            Red rows indicate critical errors, yellow rows indicate warnings. You can edit any cell to correct errors before saving.
                         </small>
                     </div>
                 </div>
@@ -123,31 +157,22 @@
 
 {% block extra_js %}
 <script>
-// Store edited data for later saving
-const editedData = {};
-
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ Preview page loaded - initializing editable cells');
     
-    // Initialize all editable cells with event delegation
     const table = document.getElementById('editableTable');
     if (!table) {
         console.error('❌ Could not find #editableTable');
         return;
     }
     
-    const editableCells = document.querySelectorAll('.editable-cell');
-    console.log(`📋 Found ${editableCells.length} editable cells`);
-    
     // Use event delegation on the table body
     const tbody = table.querySelector('tbody');
     if (tbody) {
         tbody.addEventListener('click', function(e) {
-            // Check if clicked element or its parent is an editable cell
             let cell = e.target.closest('.editable-cell');
             if (!cell) return;
             
-            // Don't trigger if clicking on input
             if (e.target.classList.contains('cell-input')) return;
             
             console.log(`🖱️ Clicked on cell with field: ${cell.getAttribute('data-field')}`);
@@ -155,35 +180,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Also add direct listeners for safety
-    editableCells.forEach((cell, index) => {
-        cell.addEventListener('click', function(e) {
-            if (e.target.classList.contains('cell-input')) return;
-            console.log(`🖱️ Direct click on cell ${index}`);
-            enterEditMode(this);
-        });
-    });
-    
-    // Capture form submission to include edited data
+    // Handle form submission
     const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', function(e) {
-            collectEditedData();
-            // Add hidden inputs for each edit
-            Object.keys(editedData).forEach(key => {
-                const [rowId, field] = key.split('_');
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = `edit_${rowId}_${field}`;
-                input.value = editedData[key];
-                form.appendChild(input);
+            // Collect all edited values
+            const editedCells = document.querySelectorAll('.editable-cell');
+            editedCells.forEach(cell => {
+                const input = cell.querySelector('.cell-input');
+                const rowId = cell.getAttribute('data-row');
+                const field = cell.getAttribute('data-field');
+                const value = input.value;
+                
+                // Add hidden input for each cell
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = `edit_${rowId}_${field}`;
+                hiddenInput.value = value;
+                form.appendChild(hiddenInput);
             });
+            
+            console.log('📝 Form submitted with edited data');
         });
     }
 });
 
 function enterEditMode(cell) {
-    // Hide content, show input
     const content = cell.querySelector('.cell-content');
     const input = cell.querySelector('.cell-input');
     
@@ -202,8 +224,7 @@ function enterEditMode(cell) {
         if (e.key === 'Enter') {
             exitEditMode(cell);
         } else if (e.key === 'Escape') {
-            // Revert changes
-            input.value = content.innerText;
+            input.value = content.textContent;
             exitEditMode(cell);
         }
     });
@@ -212,70 +233,52 @@ function enterEditMode(cell) {
 function exitEditMode(cell) {
     const content = cell.querySelector('.cell-content');
     const input = cell.querySelector('.cell-input');
-    const rowId = cell.getAttribute('data-row');
-    const field = cell.getAttribute('data-field');
     const newValue = input.value;
     
     // Update content display
     if (newValue.trim()) {
-        content.innerText = newValue;
+        content.textContent = newValue;
     } else {
         content.innerHTML = '<span class="text-muted">—</span>';
     }
     
-    // Track edit
-    const key = `${rowId}_${field}`;
-    editedData[key] = newValue;
-    
     // Visual feedback that cell was edited
-    if (newValue !== content.getAttribute('data-original-value')) {
-        cell.classList.add('table-warning');
-    }
+    cell.classList.add('table-warning');
     
     // Hide input, show content
     input.style.display = 'none';
     content.style.display = 'inline';
 }
-
-function collectEditedData() {
-    // Collect all edited values
-    const editableCells = document.querySelectorAll('.editable-cell');
-    editableCells.forEach(cell => {
-        const input = cell.querySelector('.cell-input');
-        const rowId = cell.getAttribute('data-row');
-        const field = cell.getAttribute('data-field');
-        const key = `${rowId}_${field}`;
-        
-        editedData[key] = input.value;
-    });
-    
-    console.log('📝 Edited Data:', editedData);
-}
-
-// Add field labels for the mapping summary (keep this if needed)
-const fieldLabels = [
-    ['date', 'Date/Time'],
-    ['description', 'Description'],
-    ['debit', 'Debit Amount'],
-    ['credit', 'Credit Amount'],
-    ['amount', 'Transaction Amount'],
-    ['balance', 'Balance'],
-    ['reference', 'Reference']
-];
 </script>
 
 <style>
 .editable-cell {
     cursor: pointer;
     transition: background-color 0.2s;
+    position: relative;
 }
 
 .editable-cell:hover {
-    background-color: #f0f7ff !important;
+    background-color: #f8f9fa !important;
 }
 
-.editable-cell input {
-    width: 100%;
+.editable-cell.table-warning {
+    background-color: #fff3cd !important;
+}
+
+.cell-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid #007bff;
+    border-radius: 4px;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    padding: 8px 12px;
 }
 </style>
 {% endblock %}

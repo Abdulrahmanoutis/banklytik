@@ -7,6 +7,7 @@ from django.conf import settings
 
 from banklytik_core.knowledge_loader import get_rules
 from banklytik_core.deepseek_adapter import get_deepseek_patterns
+from .date_validator import validate_and_flag_dates
 
 
 # ---------------------------------------------------------------------
@@ -219,7 +220,11 @@ def robust_clean_dataframe(df_raw):
         ]
         return pd.DataFrame(columns=cols)
 
-    # Normalize text
+    # PRESERVE raw date BEFORE any normalization (important for validation)
+    if 'date' in df.columns:
+        df['_original_date'] = df['date'].astype(str)
+    
+    # Normalize text (but NOT raw date values which we need for validation)
     df = df.map(lambda v: normalize_text(v) if pd.notna(v) else "")
     
     print(f"DEBUG: Incoming columns: {list(df.columns)}")
@@ -234,9 +239,18 @@ def robust_clean_dataframe(df_raw):
         print("✅ Detected standardized format from column_mapper")
         # Already in standardized format - just ensure all required columns exist
         
-        # Ensure all required columns exist
-        if 'raw_date' not in df.columns:
+        # PRESERVE raw_date BEFORE any parsing (for validation) - use original before normalization
+        if '_original_date' in df.columns:
+            df['raw_date'] = df['_original_date']
+        elif 'raw_date' not in df.columns:
             df['raw_date'] = df['date'].astype(str) if 'date' in df.columns else ""
+        else:
+            # Make sure raw_date is preserved as-is before parsing
+            df['raw_date'] = df['raw_date'].astype(str)
+        
+        # Clean up temporary column
+        df = df.drop(columns=['_original_date'], errors='ignore')
+            
         if 'value_date' not in df.columns:
             df['value_date'] = None
         if 'channel' not in df.columns:
@@ -339,13 +353,35 @@ def robust_clean_dataframe(df_raw):
     # Detect row issues
     def _detect_issues(r):
         issues = []
+        
+        # Check for invalid/missing date
         if r["date"] is None:
-            issues.append("invalid_date")
-        if r.get("value_date") is None:
-            issues.append("invalid_value_date")
+            issues.append("❌ INVALID_DATE")
+        else:
+            # Check if date appears incomplete (defaulted to midnight with no time component)
+            # This typically happens when only date (no time) is provided
+            parsed_date = r["date"]
+            if isinstance(parsed_date, datetime):
+                # If time is 00:00:00 and the raw_date doesn't contain time indicators
+                if parsed_date.hour == 0 and parsed_date.minute == 0 and parsed_date.second == 0:
+                    raw = str(r.get("raw_date", "")).strip()
+                    # Check if raw_date has any time indicators
+                    if not re.search(r'\d{1,2}:\d{2}', raw) and raw:
+                        issues.append("⚠️ INCOMPLETE_DATE")
+        
+        if r.get("value_date") is None and str(r.get("raw_date", "")).strip():
+            issues.append("⚠️ MISSING_VALUE_DATE")
         if r.get("channel") == "EMPTY":
-            issues.append("missing_channel")
-        return ", ".join(issues) if issues else ""
+            issues.append("⚠️ MISSING_CHANNEL")
+        
+        # Check for zero transaction amounts with valid description
+        debit_val = float(r.get("debit", 0) or 0)
+        credit_val = float(r.get("credit", 0) or 0)
+        desc = str(r.get("description", "")).strip()
+        if debit_val == 0 and credit_val == 0 and desc and r["date"] is not None:
+            issues.append("⚠️ ZERO_AMOUNT")
+        
+        return " | ".join(issues) if issues else ""
 
     df["row_issue"] = df.apply(_detect_issues, axis=1)
 
@@ -360,6 +396,10 @@ def robust_clean_dataframe(df_raw):
             df[c] = pd.NA
 
     final_df = df[cols]
+
+    # Apply date validation using the new DateValidator
+    print("\n🔍 Applying OCR error detection and date validation...")
+    final_df = validate_and_flag_dates(final_df, verbose=True)
 
     # Save debug snapshot
     try:

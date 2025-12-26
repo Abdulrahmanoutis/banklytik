@@ -23,6 +23,25 @@ def normalize_text(value):
     return s.strip()
 
 
+def fix_missing_space_date(date_str):
+    """
+    Fix OCR spacing and colon issues in date strings.
+    This helps DeepSeek pattern parsing and fallback regex cleaning.
+    """
+    if not isinstance(date_str, str):
+        return date_str
+
+    s = date_str.strip()
+
+    # Fix common missing spaces between day/time
+    s = re.sub(r"(\d{2})(?=\d{2}:\d{2})", r"\1 ", s)
+    s = re.sub(r"(\d{4})(?=[A-Za-z]{3,})", r"\1 ", s)
+    s = re.sub(r"(\d{2}:\d{2})(?=\d{2})", r"\1 ", s)
+    s = re.sub(r"\s{2,}", " ", s)
+
+    return s.strip()
+
+
 # ---------------------------------------------------------------------
 # DATE PARSING (Improved for Kuda format)
 # ---------------------------------------------------------------------
@@ -120,6 +139,12 @@ def parse_date_str(s_raw):
 
     # 6) Pandas fallback with dayfirst (but NOT for YYYY-MM-DD format)
     try:
+        # Check for month-year only patterns (e.g., "Feb 2025") - these are incomplete dates
+        month_year_pattern = r'^([A-Za-z]{3,})\s+(\d{4})$'
+        if re.match(month_year_pattern, s):
+            print(f"⚠️ Incomplete date pattern detected: '{s}' - missing day component")
+            return None  # Let the validation system handle this
+        
         # Don't use dayfirst=True if it's already in YYYY-MM-DD format
         use_dayfirst = not bool(re.match(r'^\d{4}-\d{2}-\d{2}', s))
         parsed_pd = pd.to_datetime(s, errors="coerce", dayfirst=use_dayfirst)
@@ -362,7 +387,7 @@ def robust_clean_dataframe(df_raw):
             # This typically happens when only date (no time) is provided
             parsed_date = r["date"]
             if isinstance(parsed_date, datetime):
-                # If time is 00:00:00 and the raw_date doesn't contain time indicators
+                # If time is 00:00:00 and raw_date doesn't contain time indicators
                 if parsed_date.hour == 0 and parsed_date.minute == 0 and parsed_date.second == 0:
                     raw = str(r.get("raw_date", "")).strip()
                     # Check if raw_date has any time indicators

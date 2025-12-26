@@ -6,9 +6,23 @@ def user_statement_path(instance, filename):
     return f"statements/user_{instance.user.id}/{filename}"
 
 
+BANK_CHOICES = [
+    ('AUTO', 'Auto-detect'),
+    ('KUDA', 'Kuda Bank'),
+    ('OPAY', 'OPay'),
+    ('GTBANK', 'GTBank'),
+    ('ZENITH', 'Zenith Bank'),
+    ('ACCESS', 'Access Bank'),
+    ('UBA', 'UBA'),
+    ('FCMB', 'FCMB'),
+    ('UNKNOWN', 'Unknown'),
+]
+
+
 class BankStatement(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="statements")
     title = models.CharField(max_length=255)
+    bank_type = models.CharField(max_length=20, choices=BANK_CHOICES, default='AUTO')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     pdf_file = models.FileField(upload_to=user_statement_path)
     processed = models.BooleanField(default=False)

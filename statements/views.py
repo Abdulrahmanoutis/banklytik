@@ -372,12 +372,12 @@ def reprocess_statement(request, pk):
 
 @login_required
 def process_statement(request, pk):
-    """Main statement processing function (offline-ready)."""
+    """Main statement processing function using processing router."""
     import traceback
     stmt = get_object_or_404(BankStatement, pk=pk, user=request.user)
     
     if stmt.processed:
-        return redirect("statements:review", pk=stmt.pk)
+        return redirect("statements:detail", pk=stmt.pk)
 
     # --- DeepSeek preload ---
     try:
@@ -415,79 +415,26 @@ def process_statement(request, pk):
     blocks = blocks_data.get("Blocks", blocks_data)
     save_debug_textract_json(blocks_data, stmt.pk)
 
-    # --- Extract tables from Textract ---
-    tables = extract_all_tables(blocks)
-    print(f"🧾 Extracted {len(tables)} tables from Textract.")
-    df_clean = None
+    # --- Use Processing Router ---
+    try:
+        from statements.processing_router import process_statement_with_router
+        df_clean = process_statement_with_router(blocks, stmt.bank_type)
+        
+        if df_clean is not None and not df_clean.empty:
+            try:
+                save_transactions_from_dataframe(stmt, df_clean)
+            except Exception as e:
+                print(f"⚠️ Could not save transactions: {e}")
+                traceback.print_exc()
+        else:
+            print("❌ No data to save — all processing failed")
+            stmt.error_message = "No transaction data could be extracted from the PDF"
+            stmt.save()
 
-    # =====================================================
-    # 🔥 TRY DIRECT PROCESSOR FIRST
-    # =====================================================
-    if tables:
-        try:
-            df_direct = process_tables_directly(tables)
-
-            if df_direct is not None and not df_direct.empty:
-                print(f"✅ Direct processor produced shape: {df_direct.shape}")
-                print("DEBUG: Direct processor head:\n", df_direct.head(10))
-
-                # ⭐ WRITE MERGED DEBUG FOR ME TO INSPECT ⭐
-                try:
-                    debug_path = os.path.join("debug_exports", "merged_debug.csv")
-                    os.makedirs("debug_exports", exist_ok=True)
-                    df_direct.to_csv(debug_path, index=False)
-                    print(f"⭐ WROTE merged_debug.csv → {debug_path}")
-                except Exception as e:
-                    print(f"⚠️ Failed writing merged_debug.csv: {e}")
-
-                # Now pass into robust cleaner
-                df_clean = robust_clean_dataframe(df_direct)
-                print(f"✅ After robust_clean_dataframe: {df_clean.shape}")
-
-            else:
-                print("⚠️ Direct processor returned empty DataFrame")
-                df_clean = None
-
-        except Exception as e:
-            print(f"⚠️ Direct processor error: {e}")
-            traceback.print_exc()
-            df_clean = None
-
-    # =====================================================
-    # 🔥 FALLBACK TO COMBINED EXTRACTOR
-    # =====================================================
-    if df_clean is None or df_clean.empty:
-        print("⚙️ Using fallback extract_combined_table()...")
-
-        try:
-            df_raw = extract_combined_table(blocks)
-            print(f"DEBUG: extract_combined_table returned shape: {getattr(df_raw, 'shape', None)}")
-
-            if df_raw is not None and not df_raw.empty:
-                print("DEBUG: extract_combined_table head:\\n", df_raw.head(20))
-                df_clean = robust_clean_dataframe(df_raw)
-                print(f"✅ Fallback robust_clean produced: {df_clean.shape}")
-            else:
-                print("❌ Fallback returned empty DataFrame")
-                df_clean = None
-
-        except Exception as e:
-            print(f"❌ Critical failure in fallback cleaning: {e}")
-            traceback.print_exc()
-            return redirect("statements:detail", pk=stmt.pk)
-
-    # =====================================================
-    # 🔥 SAVE TRANSACTIONS IF ANY
-    # =====================================================
-    if df_clean is not None and not df_clean.empty:
-        try:
-            save_transactions_from_dataframe(stmt, df_clean)
-        except Exception as e:
-            print(f"⚠️ Could not save transactions: {e}")
-            traceback.print_exc()
-    else:
-        print("❌ No data to save — all processing failed")
-        stmt.error_message = "No transaction data could be extracted from the PDF"
+    except Exception as e:
+        print(f"❌ Processing router failed: {e}")
+        traceback.print_exc()
+        stmt.error_message = f"Processing failed: {str(e)}"
         stmt.save()
 
     return redirect("statements:detail", pk=stmt.pk)
@@ -789,9 +736,9 @@ def preview_data(request, pk):
     # Extract validation summary if available
     validation_summary = {
         'total': len(final_data),
-        'with_warnings': sum(1 for row in final_data if row.get('date_validation_warning') == 'ERROR'),
-        'suspicious': sum(1 for row in final_data if row.get('date_validation_warning') == 'WARNING'),
         'valid': sum(1 for row in final_data if row.get('date_validation_warning') == 'INFO'),
+        'suspicious': sum(1 for row in final_data if row.get('date_validation_warning') == 'WARNING'),
+        'with_warnings': sum(1 for row in final_data if row.get('date_validation_warning') == 'ERROR'),
     }
 
     return render(
@@ -1099,3 +1046,4 @@ def chat_history(request, pk):
             "chat_history": chat_history,
         },
     )
+#bbbb

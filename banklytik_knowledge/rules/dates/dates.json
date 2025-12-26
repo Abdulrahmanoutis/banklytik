@@ -3,24 +3,70 @@
     "title": "Fix Missing Space Between Day and Time",
     "regex": "(\\d{4}\\s+[A-Za-z]{3,}\\s+)(\\d{2})(\\d{2}:\\d{2}\\s+\\d{2})",
     "replace": "\\1\\2 \\3",
-    "notes": "Fixes '2025 Feb 2310:00 48' → '2025 Feb 23 10:00 48'"
+    "notes": "Fixes '2025 Feb 2310:00 48' → '2025 Feb 23 10:00 48'",
+    "category": "AUTO_CORRECT"
   },
   {
     "title": "Fix Missing Space Without Seconds",
     "regex": "(\\d{4}\\s+[A-Za-z]{3,}\\s+)(\\d{2})(\\d{2}:\\d{2})",
     "replace": "\\1\\2 \\3",
-    "notes": "Fixes '2025 Feb 2310:00' → '2025 Feb 23 10:00'"
+    "notes": "Fixes '2025 Feb 2310:00' → '2025 Feb 23 10:00'",
+    "category": "AUTO_CORRECT"
+  },
+  {
+    "title": "Fix Compact Day-Month Pattern (Value Date Focus)",
+    "regex": "^(\\d{1,2})([A-Za-z]{3,})\\s+(\\d{4})$",
+    "replace": "\\1 \\2 \\3",
+    "notes": "Fixes '24Feb 2025' → '24 Feb 2025'",
+    "category": "AUTO_CORRECT"
   },
   {
     "title": "Fix Day-Month-Year With No Space",
     "regex": "(\\d{2})([A-Za-z]{3,})(\\d{4}\\s+\\d{2}:\\d{2})",
     "replace": "\\1 \\2 \\3",
-    "notes": "Fixes '23Feb2025 10:00' → '23 Feb 2025 10:00'"
+    "notes": "Fixes '23Feb2025 10:00' → '23 Feb 2025 10:00'",
+    "category": "AUTO_CORRECT"
   },
   {
     "title": "Fix Extra Colon Before Seconds",
     "regex": "(\\d{4}\\s+[A-Za-z]{3,}\\s+\\d{2}\\s+\\d{2}:\\d{2}):\\s+(\\d{2})",
     "replace": "\\1 \\2",
-    "notes": "Fixes '2025 Feb 23 20:11: 58' → '2025 Feb 23 20:11 58'"
+    "notes": "Fixes '2025 Feb 23 20:11: 58' → '2025 Feb 23 20:11 58'",
+    "category": "AUTO_CORRECT"
+  },
+  {
+    "title": "Fix Time Mixed with Date",
+    "regex": "^\\d{1,2}:\\d{2}\\s+\\d{1,2}$",
+    "replace": null,
+    "notes": "Detects '09:05 38' - time mixed with date components",
+    "category": "FLAG_REVIEW"
+  },
+  {
+    "title": "Fix Extra Time Component",
+    "regex": "(\\d{4}\\s+[A-Za-z]{3,}\\s+\\d{1,2}\\s+\\d{1,2}:\\d{2})\\s+(\\d{1,2})$",
+    "replace": "\\1",
+    "notes": "Fixes '2025 Feb 23 09:05 38' → '2025 Feb 23 09:05'",
+    "category": "AUTO_CORRECT"
+  },
+  {
+    "title": "Detect Missing Day Parameter",
+    "regex": "^[A-Za-z]{3,}\\s+\\d{4}$",
+    "replace": null,
+    "notes": "Detects 'Feb 2025' - missing day parameter",
+    "category": "FLAG_REVIEW"
+  },
+  {
+    "title": "Detect Missing Month Parameter",
+    "regex": "^\\d{1,2}\\s+\\d{4}$",
+    "replace": null,
+    "notes": "Detects '24 2025' - missing month parameter",
+    "category": "FLAG_REVIEW"
+  },
+  {
+    "title": "Detect Empty or Null Date",
+    "regex": "^(|None|null|N/A|\\s*)$",
+    "replace": null,
+    "notes": "Detects empty or null date values",
+    "category": "FLAG_CRITICAL"
   }
 ]

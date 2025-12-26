@@ -1,4 +1,3 @@
-
 import pandas as pd
 import logging
 import re
@@ -68,7 +67,7 @@ def parse_nigerian_date(date_val):
         # Date-only formats (for value_date)
         "%Y %b %d",           # "2025 Feb 23"
         "%d %b %Y",           # "23 Feb 2025"
-        "%b %Y",              # "Feb 2025" - will set day to 1
+        # REMOVED: "%b %Y" - let validation system handle incomplete dates
         
         # Handle formats with missing spaces
         "%Y%b %d %H:%M %S",   # "2025Feb 23 09:05 38"
